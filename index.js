@@ -23,6 +23,8 @@ bot.on("message", async msg => {
 		const request = await http.get(att.url, async response => {
 			response.pipe(file)
 			await msg.delete();
+
+			delete require.cache[require.resolve(`./commands/test${queue}.js`)];
 			require(`./commands/test${queue}.js`).run(bot, msg);
 		});
 	}
