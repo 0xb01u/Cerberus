@@ -21,12 +21,16 @@ bot.on("message", async msg => {
 		let filepath = `./programs/${process.env.PROGRAM}.c`
 
 		if (queue === "cuda") {
-			if (!att.name.match(".cu?$"))
+			if (!att.name.match(".cu?$")) {
+				await msg.delete();
 				return msg.reply("only .c and .cu files are allowed.");
+			}
 			filepath += `u`;
 		}
-		else if (!att.name.match(".c$"))
+		else if (!att.name.match(".c$")) {
+			await msg.delete();
 			return msg.reply("only .c files are allowed.");
+		}
 
 
 		const file = fs.createWriteStream(filepath);
