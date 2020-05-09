@@ -108,7 +108,7 @@ exports.run = async (bot, msg, args) => {
 	// Non-tests executions:
 	} else {
 		// Just execute the program:
-		if (args.includes("n") || args.includes("N")) {
+		if (args.includes("n") || args.includes("N") || args.includes("c") || args.includes("C")) {
 			try {
 				execSync(`cd ./programs; nvcc -O3 ${process.env.PROGRAM}.cu -o ${process.env.PROGRAM}`);
 			} catch (exc) {
@@ -128,9 +128,12 @@ exports.run = async (bot, msg, args) => {
 
 				return msg.reply(`**ERROR**:\n${stderr}`);
 			}
+		} else {
+			// Just in case the source file hasn't been deleted yet:
+			fs.unlinkSync(`./programs/${process.env.PROGRAM}.cu`);
+
+			return msg.reply("invalid option.");
 		}
-		// Just in case the source file hasn't been deleted yet:
-		fs.unlinkSync(`./programs/${process.env.PROGRAM}.cu`);
 	}
 }
 
