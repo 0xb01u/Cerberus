@@ -10,9 +10,10 @@ bot.login(process.env.TOKEN);
 bot.on("message", async msg => {
 	if (msg.author.bot) return;
 
-	if (msg.attachments.size > 0 && msg.channel.name.startsWith(process.env.REQ_CHANNEL)) {
+	if (msg.channel.name.startsWith(process.env.REQ_CHANNEL) && msg.attachments.size > 0) {
 		// TODO: add the option to send privately.
 		let att = msg.attachments.first();
+		let args = msg.content.split(" ");
 
 		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length + process.env.SEPARATOR.length);
 
@@ -30,7 +31,10 @@ bot.on("message", async msg => {
 			await msg.delete();
 
 			delete require.cache[require.resolve(`./commands/test_${queue}.js`)];
-			require(`./commands/test_${queue}.js`).run(bot, msg);
+
+			await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
+			await require(`./commands/test_${queue}.js`).run(bot, msg, args);
+			await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 		});
 	}
 
