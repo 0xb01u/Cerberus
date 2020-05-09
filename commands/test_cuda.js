@@ -27,7 +27,7 @@ exports.run = async (bot, msg, args) => {
 		for (let i = 0; tests.includes(`${i}.sh`); i++) {
 			let result = "";
 			try {
-				result = execSync(`./tests/${i}.sh`).toString();
+				result = execSync(`./tests/${i}.sh`, { timeout: parseInt(process.env.TIMEWALL) }).toString();
 			} catch (exc) {
 				let current = fs.readFileSync(`./tests/${i}.sh`).toString();
 				let msg_update = update(output_msg, output, `\n**Test ${i + 1}**: **EXECUTION ERROR**:\n`
@@ -118,13 +118,13 @@ exports.run = async (bot, msg, args) => {
 			}
 
 			try {
-				let output = execSync(`./programs/${process.env.PROGRAM}`);
-				execSync(`rm -f ./programs/${process.env.PROGRAM}`);
+				let output = execSync(`./programs/${process.env.PROGRAM}`, { timeout: parseInt(process.env.TIMEWALL) });
+				fs.unlinkSync(`./programs/${process.env.PROGRAM}`);
 
 				return msg.reply(`\n${output}`);
 
 			} catch (exc) {
-				execSync(`rm -f ./programs/${process.env.PROGRAM}`);
+				fs.unlinkSync(`./programs/${process.env.PROGRAM}`);
 
 				return msg.reply(`**ERROR**:\n${stderr}`);
 			}

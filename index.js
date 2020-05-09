@@ -16,7 +16,6 @@ bot.on("message", async msg => {
 		let args = msg.content.split(" ");
 
 		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length + process.env.SEPARATOR.length);
-		console.log(queue);
 
 		let filepath = `./programs/${process.env.PROGRAM}.c`
 

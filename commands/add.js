@@ -12,7 +12,7 @@ exports.run = async (bot, msg, args) => {
 		execSync(`cd ./programs; make original;`);
 		// If all the commands are executed in one execSync(),
 		// stderr gets overwritten.
-		let result = execSync(`./programs/original ${test}`);
+		let result = execSync(`./programs/original ${test}`, { timeout: parseInt(process.env.TIMEWALL) });
 		execSync(`cd ./programs; make clean`);
 
 		let tests = fs.readdirSync("./tests/");
