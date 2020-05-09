@@ -14,20 +14,23 @@ bot.on("message", async msg => {
 		// TODO: add the option to send privately.
 		let att = msg.attachments.first();
 
-		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length);
+		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length + process.env.SEPARATOR.length);
 
-		if (queue === "_cuda" && !att.name.match(".cu?$"))
+		if (queue === "cuda" && !att.name.match(".cu?$"))
 			return msg.reply("only .c and .cu files are allowed.");
 		else if (!att.name.match(".c$"))
 			return msg.reply("only .c are allowed.");
 
-		const file = fs.createWriteStream(`./programs/${process.env.PROGRAM}`);
-		const request = await http.get(att.url, async response => {
+		let filepath = `./programs/${process.env.PROGRAM}.c`
+		if (queue === "cuda") filepath += `u`;
+
+		const file = fs.createWriteStream(filepath);
+		await http.get(att.url, async response => {
 			response.pipe(file)
 			await msg.delete();
 
-			delete require.cache[require.resolve(`./commands/test${queue}.js`)];
-			require(`./commands/test${queue}.js`).run(bot, msg);
+			delete require.cache[require.resolve(`./commands/test_${queue}.js`)];
+			require(`./commands/test_${queue}.js`).run(bot, msg);
 		});
 	}
 

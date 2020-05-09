@@ -1,12 +1,24 @@
 CFLAGS= -I. -O3 -DCP_TABLON
 CFLAGS_DEBUG= -I. -g -O0
 LIBS=-lm
-CC=nvcc
+CC=gcc
+OMPCC=gcc -fopenmp
+MPICC=mpicc
+CUDACC=nvcc
 
-evolution: placeholder.cu
+evolution: placeholder.c
 	$(CC) $(CFLAGS) $< -o $@ $(LIBS)
 
-debug: placeholder.cu
+omp: placeholder.c
+	$(OMPCC) $(CFLAGS) $< -o evolution $(LIBS)
+
+mpi: placeholder.c
+	$(MPICC) $(CFLAGS) $< -o evolution $(LIBS)
+
+cuda: placeholder.cu
+	$(CUDACC) $(CFLAGS) $< -o evolution $(LIBS)
+
+debug: placeholder.c
 	$(CC) $(CFLAGS_DEBUG) -DDEBUG $< -o $@ $(LIBS)
 
 original: original.c
