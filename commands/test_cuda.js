@@ -111,6 +111,7 @@ exports.run = async (bot, msg, args) => {
 		if (args.includes("n") || args.includes("N") || args.includes("c") || args.includes("C")) {
 			try {
 				execSync(`cd ./programs; nvcc -O3 ${process.env.PROGRAM}.cu -o ${process.env.PROGRAM}`);
+				fs.unlinkSync(`./programs/${process.env.PROGRAM}.cu`);
 			} catch (exc) {
 				fs.unlinkSync(`./programs/${process.env.PROGRAM}.cu`);
 
