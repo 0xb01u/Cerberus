@@ -2,12 +2,19 @@ const fs = require("fs");
 const { execSync } = require("child_process");
 
 exports.run = async (bot, msg) => {
+	bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
+
+	let output_msg = await msg.reply(`test results:`);
+	let output = `<@${msg.member.id}>, tests results:`;
+
 	try {
 		execSync(`cd ./programs; make`);
 	} catch (exc) {
 		fs.unlinkSync(`./programs/${process.env.PROGRAM}`);
 
-		return await msg.reply(`COMPILATION ERROR:\n ${exc.stderr}`);
+		bot.user.setPresence({ activity: {name: ``}, status: `online` });
+
+		return update(output_msg, output, `\nCOMPILATION ERROR:\n ${exc.stderr}\n`);
 	}
 
 	fs.unlinkSync(`./programs/${process.env.PROGRAM}`);
@@ -18,10 +25,13 @@ exports.run = async (bot, msg) => {
 		try {
 			result = execSync(`./tests/${i}.sh`).toString();
 		} catch (exc) {
-			execSync(`cd ../programs; make clean`);
+			execSync(`cd ./programs; make clean`);
+
+			bot.user.setPresence({ activity: {name: ``}, status: `online` });
 
 			let current = fs.readFileSync(`./tests/${i}.sh`).toString();
-			return await msg.reply(`test ${i + 1}: EXECUTION ERROR:\n${exc.stderr}\n\nTest was: ${current.substring("./programs/".length)}`)
+			return update(output_msg, output, `\nTest ${i + 1}: EXECUTION ERROR:\n`
+				+ `${exc.stderr}\n\nTest was: ${current.substring("./programs/".length)}\n`);
 		}
 
 		fs.writeFileSync(`./outputs/${i}.txt`, result);
@@ -34,14 +44,41 @@ exports.run = async (bot, msg) => {
 
 			if (lines[0] != "2c2") {
 				let current = fs.readFileSync(`./tests/${i}.sh`).toString();
-				console.log(lines);
-				await msg.reply(`test ${i + 1}: Failed.\nExpected: ${lines[2].substring(10)}\nGot: ${lines[5].substring(10)}\n\nTest was: ${current.substring("./programs/".length)}`);
+
+				let msg_update = await update(output_msg, output, 
+					`\n**Test ${i + 1}**: Failed.\n\n`
+					+ `Expected: ${lines[2].substring(10)}\n`
+					+ `Got: ${lines[5].substring(10)}\n\n`
+					+ `Test was: ${current.substring("./programs/".length)}\n`);
+				output_msg = msg_update.msg;
+				output = msg_update.content;
 			} else {
-				await msg.reply(`test ${i + 1}: Passed.\n${lines[3].substring(2)}`);
+				let msg_update = await update(output_msg, output,
+					`\n**Test ${i + 1}**: Passed \b\n`
+					+ `${lines[3].substring(2)}\n`);
+				output_msg = msg_update.msg;
+				output = msg_update.content;
 			}
 		}
 		fs.unlinkSync(`./outputs/${i}.txt`);
 	}
 
+	bot.user.setPresence({ activity: {name: ``}, status: `online` });
+
 	execSync(`cd ./programs; make clean`);
+}
+
+async function update(msg, original, addon) {
+	let new_content = original + addon;
+
+	if (new_content.length > 2000) {
+		addon = original.split("\n")[0] + " (continued)\n" + addon;
+		let new_msg = await msg.channel.send(addon);
+
+		return { msg: new_msg, content: addon };
+	} else {
+		await msg.edit(new_content);
+
+		return { msg: msg, content: new_content };
+	}
 }

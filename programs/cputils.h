@@ -1,10 +1,11 @@
 /**
  * Computación Paralela
- * Funciones para las prácticas
+ * Funciones para las prácticas (modificado para simulación)
  * 
  * @author Javier Fresno
  * @author Arturo Gonzalez-Escribano
- * @version 1.6
+ * @author Manuel de Castro Caballero
+ * @version 1.6-alt
  *
  */
 #ifndef _CPUTILS_
@@ -15,11 +16,11 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#ifdef CP_TABLON
-#include "cputilstablon.h"
-#else
+//#ifdef CP_TABLON
+//#include "cputilstablon.h"
+//#else
 #define	cp_abrir_fichero(name) fopen(name,"r")
-#endif
+//#endif
 
 
 /*

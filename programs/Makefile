@@ -1,4 +1,4 @@
-CFLAGS= -I. -O3
+CFLAGS= -I. -O3 -DCP_TABLON
 CFLAGS_DEBUG= -I. -g -O0
 LIBS=-lm
 CC=nvcc

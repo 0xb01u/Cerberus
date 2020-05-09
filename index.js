@@ -14,10 +14,12 @@ bot.on("message", async msg => {
 		// TODO: add the option to send privately.
 		let att = msg.attachments.first();
 
-		if (!att.name.match(".cu?$"))
-			return msg.reply("only .c and .cu files are allowed.");
-
 		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length);
+
+		if (queue === "_cuda" && !att.name.match(".cu?$"))
+			return msg.reply("only .c and .cu files are allowed.");
+		else if (!att.name.match(".c$"))
+			return msg.reply("only .c are allowed.");
 
 		const file = fs.createWriteStream(`./programs/${process.env.PROGRAM}`);
 		const request = await http.get(att.url, async response => {
