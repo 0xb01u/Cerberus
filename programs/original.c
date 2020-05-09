@@ -102,62 +102,6 @@ void cell_mutation( Cell *cell ) {
 	cell->choose_mov[2] = 1.0f - cell->choose_mov[1] - cell->choose_mov[0];
 }
 
-#ifdef DEBUG
-/* 
- * Function: Print the current state of the simulation 
- */
-void print_status( int iteration, int rows, int columns, float *culture, int num_cells, Cell *cells, int num_cells_alive, Statistics sim_stat ) {
-	/* 
-	 * You don't need to optimize this function, it is only for pretty printing and debugging purposes.
-	 * It is not compiled in the production versions of the program.
-	 * Thus, it is never used when measuring times in the leaderboard
-	 */
-	int i,j;
-
-	printf("Iteration: %d\n", iteration );
-	printf("+");
-	for( j=0; j<columns; j++ ) printf("---");
-	printf("+\n");
-	for( i=0; i<rows; i++ ) {
-		printf("|");
-		for( j=0; j<columns; j++ ) {
-			char symbol;
-			if ( accessMat( culture, i, j ) >= 20 ) symbol = '+';
-			else if ( accessMat( culture, i, j ) >= 10 ) symbol = '*';
-			else if ( accessMat( culture, i, j ) >= 5 ) symbol = '.';
-			else symbol = ' ';
-
-			int t;
-			int counter = 0;
-			for( t=0; t<num_cells; t++ ) {
-				int row = (int)(cells[t].pos_row);
-				int col = (int)(cells[t].pos_col);
-				if ( cells[t].alive && row == i && col == j ) {
-					counter ++;
-				}
-			}
-			if ( counter > 9 ) printf("(M)" );
-			else if ( counter > 0 ) printf("(%1d)", counter );
-			else printf(" %c ", symbol );
-		}
-		printf("|\n");
-	}
-	printf("+");
-	for( j=0; j<columns; j++ ) printf("---");
-	printf("+\n");
-	printf("Num_cells_alive: %04d\nHistory( Cells: %04d, Dead: %04d, Max.alive: %04d, Max.new: %04d, Max.dead: %04d, Max.age: %04d, Max.food: %6f )\n\n", 
-		num_cells_alive, 
-		sim_stat.history_total_cells, 
-		sim_stat.history_dead_cells, 
-		sim_stat.history_max_alive_cells, 
-		sim_stat.history_max_new_cells, 
-		sim_stat.history_max_dead_cells, 
-		sim_stat.history_max_age,
-		sim_stat.history_max_food
-	);
-}
-#endif
-
 /*
  * Function: Print usage line in stderr
  */
@@ -261,19 +205,6 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-#ifdef DEBUG
-	/* 1.7. Print arguments */
-	printf("Arguments, Rows: %d, Columns: %d, max_iter: %d\n", rows, columns, max_iter);
-	printf("Arguments, Max.food: %f, Food density: %f, Food level: %f\n", max_food, food_density, food_level);
-	printf("Arguments, Init Random Sequence: %hu,%hu,%hu\n", init_random_seq[0], init_random_seq[1], init_random_seq[2]);
-	if ( food_spot_active ) {
-		printf("Arguments, Food_spot, pos(%d,%d), size(%d,%d), Density: %f, Level: %f\n",
-			food_spot_row, food_spot_col, food_spot_size_rows, food_spot_size_cols, food_spot_density, food_spot_level );
-	}
-	printf("Initial cells: %d\n", num_cells );
-#endif // DEBUG
-
-
 	/* 1.8. Initialize random sequences for food dropping */
 	for( i=0; i<3; i++ ) {
 		food_random_seq[i] = (unsigned short)nrand48( init_random_seq );
@@ -291,16 +222,6 @@ int main(int argc, char *argv[]) {
 		for( j=0; j<3; j++ ) 
 			cells[i].random_seq[j] = (unsigned short)nrand48( init_random_seq );
 	}
-
-
-#ifdef DEBUG
-	/* 1.10. Print random seed of the initial cells */
-	/*
-	printf("Initial cells random seeds: %d\n", num_cells );
-	for( i=0; i<num_cells; i++ )
-		printf("\tCell %d, Random seq: %hu,%hu,%hu\n", i, cells[i].random_seq[0], cells[i].random_seq[1], cells[i].random_seq[2] );
-	*/
-#endif // DEBUG
 
 	/* 2. Start global timer */
 	double ttotal = cp_Wtime();
@@ -342,24 +263,6 @@ int main(int argc, char *argv[]) {
 	// Statistics: Initialize total number of cells, and max. alive
 	sim_stat.history_total_cells = num_cells;
 	sim_stat.history_max_alive_cells = num_cells;
-
-#ifdef DEBUG
-	/* Show initial cells data */
-	printf("Initial cells data: %d\n", num_cells );
-	for( i=0; i<num_cells; i++ ) {
-		printf("\tCell %d, Pos(%f,%f), Mov(%f,%f), Choose_mov(%f,%f,%f), Storage: %f, Age: %d\n",
-				i, 
-				cells[i].pos_row, 
-				cells[i].pos_col, 
-				cells[i].mov_row, 
-				cells[i].mov_col, 
-				cells[i].choose_mov[0], 
-				cells[i].choose_mov[1], 
-				cells[i].choose_mov[2], 
-				cells[i].storage,
-				cells[i].age );
-	}
-#endif // DEBUG
 
 	/* 4. Simulation */
 	float current_max_food = 0.0f;
@@ -560,12 +463,6 @@ int main(int argc, char *argv[]) {
 		if ( step_dead_cells > sim_stat.history_max_dead_cells ) sim_stat.history_max_dead_cells = step_dead_cells;
 		// Statistics: Max alive cells per step
 		if ( num_cells_alive > sim_stat.history_max_alive_cells ) sim_stat.history_max_alive_cells = num_cells_alive;
-
-
-#ifdef DEBUG
-		/* 4.10. DEBUG: Print the current state of the simulation at the end of each iteration */
-		print_status( iter, rows, columns, culture, num_cells, cells, num_cells_alive, sim_stat );
-#endif // DEBUG
 	}
 
 	
@@ -577,24 +474,6 @@ int main(int argc, char *argv[]) {
 
 	/* 5. Stop global time */
 	ttotal = cp_Wtime() - ttotal;
-
-#ifdef DEBUG
-	printf("List of cells at the end of the simulation: %d\n\n", num_cells );
-	for( i=0; i<num_cells; i++ ) {
-		printf("Cell %d, Alive: %d, Pos(%f,%f), Mov(%f,%f), Choose_mov(%f,%f,%f), Storage: %f, Age: %d\n",
-				i,
-				cells[i].alive,
-				cells[i].pos_row, 
-				cells[i].pos_col, 
-				cells[i].mov_row, 
-				cells[i].mov_col, 
-				cells[i].choose_mov[0], 
-				cells[i].choose_mov[1], 
-				cells[i].choose_mov[2], 
-				cells[i].storage,
-				cells[i].age );
-	}
-#endif // DEBUG
 
 	/* 6. Output for leaderboard */
 	printf("\n");
