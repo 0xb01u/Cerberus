@@ -16,14 +16,18 @@ bot.on("message", async msg => {
 		let args = msg.content.split(" ");
 
 		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length + process.env.SEPARATOR.length);
-
-		if (queue === "cuda" && !att.name.match(".cu?$"))
-			return msg.reply("only .c and .cu files are allowed.");
-		else if (!att.name.match(".c$"))
-			return msg.reply("only .c are allowed.");
+		console.log(queue);
 
 		let filepath = `./programs/${process.env.PROGRAM}.c`
-		if (queue === "cuda") filepath += `u`;
+
+		if (queue === "cuda") {
+			if (!att.name.match(".cu?$"))
+				return msg.reply("only .c and .cu files are allowed.");
+			filepath += `u`;
+		}
+		else if (!att.name.match(".c$"))
+			return msg.reply("only .c files are allowed.");
+
 
 		const file = fs.createWriteStream(filepath);
 		await http.get(att.url, async response => {
@@ -40,14 +44,18 @@ bot.on("message", async msg => {
 
 	else if (msg.content.startsWith(process.env.PRE)) {
 		let args = msg.content.substring(process.env.PRE.length).split(" ");
+		// Remove epty elements on args array:
+		args = args.filter((e) => e != "");
 		let cmd = args.shift().toLowerCase();
 
 		try {
 			delete require.cache[require.resolve(`./commands/${cmd}.js`)];
 
-			let commandFile = require(`./commands/${cmd}.js`);
-			commandFile.run(bot, msg, args);
+			require(`./commands/${cmd}.js`).run(bot, msg, args);
 
-		} catch (e) { console.log(e.stack); }
+		} catch (e) { 
+			msg.reply("nonexistent command.");
+			console.log(e.stack);
+		}
 	}
 });

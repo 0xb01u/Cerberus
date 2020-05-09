@@ -5,6 +5,9 @@ exports.run = async (bot, msg, args) => {
 		return msg.reply(`invalid usage: ${process.env.PRE}test <number>`);
 	}
 
+	// Remove duplicates:
+	args = args.filter((value, index, self) => self.indexOf(value) === index);
+
 	let output = `\n`;
 	for (i of args) {
 		try {
