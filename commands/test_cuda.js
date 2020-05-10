@@ -109,9 +109,11 @@ exports.run = async (bot, msg, args) => {
 	// Non-tests executions:
 	} else {
 		// Just execute the program:
-		if (args.includes("n") || args.includes("N") || args.includes("c") || args.includes("C")) {
+		if (args.includes("n") || args.includes("N")		// These were for "No test".
+			|| args.includes("c") || args.includes("C")		// These were for "Custom execution".
+			|| args.includes("a") || args.includes("A")) {	// These were for "Alternative execution" or "Args".
 			try {
-				execSync(`cd ./programs; nvcc -O3 ${process.env.PROGRAM}.cu -o ${process.env.PROGRAM}`);
+				execSync(`cd programs; nvcc -O3 ${process.env.PROGRAM}.cu -o ${process.env.PROGRAM}`);
 				fs.unlinkSync(`./programs/${process.env.PROGRAM}.cu`);
 			} catch (exc) {
 				fs.unlinkSync(`./programs/${process.env.PROGRAM}.cu`);
@@ -119,11 +121,28 @@ exports.run = async (bot, msg, args) => {
 				return msg.reply(`\n**COMPILATION ERROR**:\n\`\`\`\n${exc.stderr}\n\`\`\`\n`);
 			}
 
+			let exec_args = "";
+
+			let arg_index = Math.max(args.indexOf("n"), args.indexOf("N"),
+				args.indexOf("c"), args.indexOf("C"),
+				args.indexOf("a"), args.indexOf("A"));
+			if (arg_index < args.length - 1) {
+				exec_args = args.splice(arg_index + 1).reduce((a, b) => `${a} ${b}`);
+
+				if (exec_args.startsWith("./")) {
+					if (exec_args.indexOf(" ") != -1) {
+						exec_args = exec_args.substring(exec_args.indexOf(" ") + 1);
+					} else {
+						exec_args = "";
+					}
+				}
+			}
+
 			try {
-				let output = execSync(`./programs/${process.env.PROGRAM}`, { timeout: parseInt(process.env.TIMEWALL) });
+				let output = execSync(`./programs/${process.env.PROGRAM} ${exec_args}`, { timeout: parseInt(process.env.TIMEWALL) });
 				fs.unlinkSync(`./programs/${process.env.PROGRAM}`);
 
-				return msg.reply(`\n${output}`);
+				return msg.reply(`\n\`\`\`\n${output}\n\`\`\``);
 
 			} catch (exc) {
 				fs.unlinkSync(`./programs/${process.env.PROGRAM}`);

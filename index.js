@@ -6,6 +6,9 @@ require("dotenv").config();
 const bot = new Discord.Client();
 bot.login(process.env.TOKEN);
 
+bot.on("ready", async () => {
+	await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+});
 
 bot.on("message", async msg => {
 	if (msg.author.bot) return;
@@ -28,19 +31,20 @@ bot.on("message", async msg => {
 
 		const file = fs.createWriteStream(filepath);
 		await http.get(att.url, async response => {
-			response.pipe(file);
+			let download = response.pipe(file);
+			download.on("finish", async () => {
+				try {
+					delete require.cache[require.resolve(`./commands/test_${queue}.js`)];
 
-			try {
-				delete require.cache[require.resolve(`./commands/test_${queue}.js`)];
-
-				await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-				await require(`./commands/test_${queue}.js`).run(bot, msg, args);
-				await bot.user.setPresence({ activity: {name: ``}, status: `online` });
-			} catch (e) {
-				fs.unlinkSync(filepath);
-				msg.reply("invalid queue.");
-				console.log(e.stack);
-			}
+					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
+					await require(`./commands/test_${queue}.js`).run(bot, msg, args);
+					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+				} catch (e) {
+					fs.unlinkSync(filepath);
+					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+					msg.reply("invalid queue.");
+				}
+			});
 		});
 	}
 
@@ -67,20 +71,22 @@ bot.on("message", async msg => {
 
 		const file = fs.createWriteStream(filepath);
 		await http.get(att.url, async response => {
-			response.pipe(file);
-			await msg.delete();
+			let download = response.pipe(file);
+			download.on("finish", async () => {
+				try {
+					await msg.delete();
 
-			try {
-				console.log(args);
-				delete require.cache[require.resolve(`./commands/test_${queue}.js`)];
+					delete require.cache[require.resolve(`./commands/test_${queue}.js`)];
 
-				await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-				await require(`./commands/test_${queue}.js`).run(bot, msg, args);
-				await bot.user.setPresence({ activity: {name: ``}, status: `online` });
-			} catch (e) {
-				fs.unlinkSync(filepaht);
-				msg.reply("invalid queue.");
-			}
+					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
+					await require(`./commands/test_${queue}.js`).run(bot, msg, args);
+					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+				} catch (e) {
+					fs.unlinkSync(filepath);
+					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+					msg.reply("invalid queue.");
+				}
+			});
 		});
 	}
 
