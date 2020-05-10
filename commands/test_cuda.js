@@ -3,7 +3,7 @@ const { execSync } = require("child_process");
 
 exports.run = async (bot, msg, args) => {
 	// Tests executions:
-	if (args.includes("")) {
+	if (args.includes("") || args.length == 0) {
 		let passed = 0;
 		let failed = 0;
 		let tests_failed = [];
@@ -11,7 +11,8 @@ exports.run = async (bot, msg, args) => {
 		let tests_error = [];
 
 		let output_msg = await msg.reply(`test results:`);
-		let output = `<@${msg.member.id}>, tests results:`;
+		let output = `tests results:`;
+		if (msg.channel.type != "dm") output = `<@${msg.member.id}>, ${output}`;
 
 		try {
 			execSync(`cd ./programs; make cuda`);
