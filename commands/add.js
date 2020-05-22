@@ -9,7 +9,7 @@ exports.run = async (bot, msg, args) => {
 	let test = args.reduce((a, b) => `${a} ${b}`);
 
 	try {
-		execSync(`cd ./programs; make original;`);
+		execSync(`cd ./programs; tar xzf original.tgz; make`);
 		// If all the commands are executed in one execSync(),
 		// stderr gets overwritten.
 		let result = execSync(`./programs/original ${test}`, { timeout: parseInt(process.env.TIMEWALL) });

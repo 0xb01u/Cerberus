@@ -18,12 +18,12 @@ bot.on("message", async msg => {
 		let args = msg.content.split(" ");
 		let queue = args.shift().toLowerCase();
 
-		let filepath = `./programs/${process.env.PROGRAM}.c`;
+		let filepath = `./programs/${process.env.PROGRAM}`;
 		if (queue === "cuda") {
-			if (!att.name.match(".cu?$")) {
-				return msg.reply("only .c and .cu files are allowed.");
+			if (!att.name.match(".tgz$")) {
+				return msg.reply("only .tgz files are allowed.");
 			}
-			filepath += `u`;
+			filepath += `.tgz`;
 		}
 		else if (!att.name.match(".c$")) {
 			return msg.reply("only .c files are allowed (or .cu if sent to cuda).");
@@ -54,14 +54,14 @@ bot.on("message", async msg => {
 		let args = msg.content.split(" ");
 		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length + process.env.SEPARATOR.length);
 
-		let filepath = `./programs/${process.env.PROGRAM}.c`;
+		let filepath = `./programs/${process.env.PROGRAM}`;
 
 		if (queue === "cuda") {
-			if (!att.name.match(".cu?$")) {
+			if (!att.name.match(".tgz$")) {
 				await msg.delete();
-				return msg.reply("only .c and .cu files are allowed.");
+				return msg.reply("only .tgz files are allowed.");
 			}
-			filepath += `u`;
+			filepath += `.tgz`;
 		}
 		else if (!att.name.match(".c$")) {
 			await msg.delete();

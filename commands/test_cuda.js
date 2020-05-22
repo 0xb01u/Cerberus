@@ -15,14 +15,14 @@ exports.run = async (bot, msg, args) => {
 		if (msg.channel.type != "dm") output = `<@${msg.member.id}>, ${output}`;
 
 		try {
-			execSync(`cd ./programs; make cuda`);
+			execSync(`cd ./programs; tar xzf ${process.env.PROGRAM}.tgz; make`);
 		} catch (exc) {
-			fs.unlinkSync(`./programs/${process.env.PROGRAM}.cu`);
+			fs.unlinkSync(`./programs/${process.env.PROGRAM}.tgz`);
 
 			return update(output_msg, output, `\n**COMPILATION ERROR**:\n\`\`\`\n${exc.stderr}\n\`\`\`\n`);
 		}
 
-		fs.unlinkSync(`./programs/${process.env.PROGRAM}.cu`);
+		fs.unlinkSync(`./programs/${process.env.PROGRAM}.tgz`);
 
 		let tests = fs.readdirSync("./tests/");
 		for (let i = 0; tests.includes(`${i}.sh`); i++) {
@@ -40,7 +40,7 @@ exports.run = async (bot, msg, args) => {
 				tests_error.push(i + 1);
 
 				if (i === 0) {
-					execSync(`cd ./programs; make clean`);
+					execSync(`cd ./programs; make clean; rm -f *.cu *.h Makefile`);
 
 					return msg.reply(`your program couldn't finish executing the very first test. Aborting.`);
 				}
@@ -50,7 +50,7 @@ exports.run = async (bot, msg, args) => {
 			fs.writeFileSync(`./outputs/${i}.txt`, result);
 
 			try {
-				execSync(`diff ./outputs/o${i}.txt ./outputs/${i}.txt`);
+				execSync(`diff ./outputs/c${i}.txt ./outputs/${i}.txt`);
 				// In case the time is exactly the same (has happened):
 				let msg_update = await update(output_msg, output,
 					`\n**Test ${i + 1}**: Passed \b\n`
@@ -102,12 +102,12 @@ exports.run = async (bot, msg, args) => {
 
 		msg.reply(summary);
 
-		execSync(`cd ./programs; make clean`);
+		execSync(`cd ./programs; make clean; rm -f *.cu *.h Makefile`);
 
 		return (failed + errors) == 0;
 
 	// Non-tests executions:
-	} else {
+	} else if (false) {
 		// Just execute the program:
 		if (args.includes("n") || args.includes("N")		// These were for "No test".
 			|| args.includes("c") || args.includes("C")		// These were for "Custom execution".
