@@ -27,6 +27,7 @@ exports.run = async (bot, msg, args) => {
 		let tests = fs.readdirSync("./tests/");
 		for (let i = 0; tests.includes(`${i}.sh`); i++) {
 			let result = "";
+			let time = 0;
 			try {
 				result = execSync(`./tests/${i}.sh`, { timeout: parseInt(process.env.TIMEWALL) }).toString();
 			} catch (exc) {
@@ -59,6 +60,7 @@ exports.run = async (bot, msg, args) => {
 				output = msg_update.content;
 
 				passed++;
+				time += parseFloat(result.split("\n")[1].substring(6));
 			} catch (exc) {
 				let lines = exc.stdout.toString().split("\n");
 
@@ -91,6 +93,7 @@ exports.run = async (bot, msg, args) => {
 					output = msg_update.content;
 
 					passed++;
+					time += parseFloat(lines[3].substring(8))
 				}
 			}
 			fs.unlinkSync(`./outputs/${i}.txt`);
@@ -99,6 +102,10 @@ exports.run = async (bot, msg, args) => {
 		let summary = `**Summary**:\n${passed} tests passed.\n${failed} tests failed.\n${errors} errors.\n`;
 		if (failed > 0) summary += `\nFailed tests: ${tests_failed}`;
 		if (errors > 0) summary += `\n Erroneous tests: ${tests_error}`;
+
+		if (failed + errors === 0) {
+			summary += `\n\nSum of times: ${time}`
+		}
 
 		msg.reply(summary);
 

@@ -6,7 +6,7 @@ exports.run = async (bot, msg, args) => {
 	for (i of args) {
 		try {
 			fs.unlinkSync(`./tests/${i - 1}.sh`);
-			fs.unlinkSync(`./outputs/o${i - 1}.txt`);
+			fs.unlinkSync(`./outputs/c${i - 1}.txt`);
 		} catch (exc) {
 			return msg.reply(`invalid test number: ${i}.`);
 		}
@@ -20,7 +20,7 @@ exports.run = async (bot, msg, args) => {
 	while (src <= last) {
 		if (tests.includes(`${src}`)) {
 			fs.writeFileSync(`./tests/${dest}.sh`, fs.readFileSync(`./tests/${src}.sh`).toString());
-			fs.writeFileSync(`./outputs/o${dest}.txt`, fs.readFileSync(`./outputs/o${src}.txt`).toString());
+			fs.writeFileSync(`./outputs/c${dest}.txt`, fs.readFileSync(`./outputs/c${src}.txt`).toString());
 			dest++;
 		}
 		src++;
@@ -28,7 +28,7 @@ exports.run = async (bot, msg, args) => {
 
 	while (dest < src) {
 		fs.unlinkSync(`./tests/${dest}.sh`);
-		fs.unlinkSync(`./outputs/o${dest}.txt`);
+		fs.unlinkSync(`./outputs/c${dest}.txt`);
 		dest++;
 	}
 

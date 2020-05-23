@@ -20,7 +20,7 @@ exports.run = async (bot, msg, args) => {
 		while (tests.includes(`${i}.sh`)) i++;
 
 		fs.writeFileSync(`./tests/${i}.sh`, `./programs/${process.env.BIN} ${test}\n`);
-		fs.writeFileSync(`./outputs/o${i}.txt`, result);
+		fs.writeFileSync(`./outputs/c${i}.txt`, result);
 
 		return msg.reply(`correctly added test ${i + 1} with result:\n${result.toString(). split("\n")[2]}`);
 
