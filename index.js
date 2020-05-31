@@ -82,6 +82,7 @@ bot.on("message", async msg => {
 					await require(`./commands/test_${queue}.js`).run(bot, msg, args);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
+					console.log(e.stack);
 					fs.unlinkSync(filepath);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 					msg.reply("invalid queue.");
