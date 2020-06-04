@@ -49,7 +49,11 @@ bot.on("message", async msg => {
 	}
 
 	else if (msg.channel.name.startsWith(process.env.REQ_CHANNEL) && msg.attachments.size > 0) {
-		// TODO: add the option to send privately.
+
+		if (msg.author.username === "Polespam 2a cuenta") return msg.reply(":middle_finger:");
+		if (msg.author.username === "alerome") return msg.reply(":middle_finger:");
+		if (msg.author.username === "Erizo_Da_Funk") msg.reply(":hedgehog: :orangutan:");
+
 		let att = msg.attachments.first();
 		let args = msg.content.split(" ");
 		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length + process.env.SEPARATOR.length);
