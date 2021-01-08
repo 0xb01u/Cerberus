@@ -16,28 +16,23 @@ bot.on("message", async msg => {
 	if (msg.channel.type === "dm" && msg.attachments.size > 0) {
 		let att = msg.attachments.first();
 		let args = msg.content.split(" ");
-		let queue = args.shift().toLowerCase();
+		let queue = args.shift().toLowerCase();	// Currently "unused".
 
 		let filepath = `./programs/${process.env.PROGRAM}`;
-		if (queue === "cuda") {
-			if (!att.name.match(".tgz$")) {
-				return msg.reply("only .tgz files are allowed.");
-			}
-			filepath += `.tgz`;
+		if (!att.name.match(".tgz$")) {
+			return msg.reply("only .tgz files are allowed.");
 		}
-		else if (!att.name.match(".c$")) {
-			return msg.reply("only .c files are allowed (or .cu if sent to cuda).");
-		}
+		filepath += `.tgz`;
 
 		const file = fs.createWriteStream(filepath);
 		await http.get(att.url, async response => {
 			let download = response.pipe(file);
 			download.on("finish", async () => {
 				try {
-					delete require.cache[require.resolve(`./commands/test_${queue}.js`)];
+					delete require.cache[require.resolve(`./commands/test_${}.js`)];
 
 					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-					await require(`./commands/test_${queue}.js`).run(bot, msg, args);
+					await require(`./commands/test_${}.js`).run(bot, msg, args, queue);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					fs.unlinkSync(filepath);
@@ -49,28 +44,17 @@ bot.on("message", async msg => {
 	}
 
 	else if (msg.channel.name.startsWith(process.env.REQ_CHANNEL) && msg.attachments.size > 0) {
-
-		if (msg.author.username === "Polespam 2a cuenta") return msg.reply(":middle_finger:");
-		if (msg.author.username === "alerome") return msg.reply(":middle_finger:");
-		if (msg.author.username === "Erizo_Da_Funk") msg.reply(":hedgehog: :orangutan:");
-
 		let att = msg.attachments.first();
 		let args = msg.content.split(" ");
-		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length + process.env.SEPARATOR.length);
+		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length + process.env.SEPARATOR.length);	// Currently "unused".
 
 		let filepath = `./programs/${process.env.PROGRAM}`;
 
-		if (queue === "cuda") {
-			if (!att.name.match(".tgz$")) {
-				await msg.delete();
-				return msg.reply("only .tgz files are allowed.");
-			}
-			filepath += `.tgz`;
-		}
-		else if (!att.name.match(".c$")) {
+		if (!att.name.match(".tgz$")) {
 			await msg.delete();
-			return msg.reply("only .c files are allowed.");
+			return msg.reply("only .tgz files are allowed.");
 		}
+		filepath += `.tgz`;
 
 
 		const file = fs.createWriteStream(filepath);
@@ -80,10 +64,10 @@ bot.on("message", async msg => {
 				try {
 					await msg.delete();
 
-					delete require.cache[require.resolve(`./commands/test_${queue}.js`)];
+					delete require.cache[require.resolve(`./commands/test_${}.js`)];
 
 					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-					await require(`./commands/test_${queue}.js`).run(bot, msg, args);
+					await require(`./commands/test_${}.js`).run(bot, msg, args, queue);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					console.log(e.stack);

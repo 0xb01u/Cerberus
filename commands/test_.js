@@ -1,13 +1,19 @@
 const fs = require("fs");
 const { execSync } = require("child_process");
 
-exports.run = async (bot, msg, args) => {
+/**
+ * Execute a program and return its output.
+ *
+ * The program must have already been downloaded to the corresponding folder.
+ * The program must be compressed in a .tgz file, and include the source code
+ * as one or many files, all other dependencies, and a Makefile to properly
+ * compile it.
+ */
+exports.run = async (bot, msg, args, queue) => {
 	// Tests executions:
-	if (args.includes("") || args.length == 0) {
+	if (args.length == 0) {
 		let passed = 0;
-		let failed = 0;
 		let tests_failed = [];
-		let errors = 0;
 		let tests_error = [];
 
 		let output_msg = await msg.reply(`test results:`);
@@ -19,7 +25,7 @@ exports.run = async (bot, msg, args) => {
 		} catch (exc) {
 			fs.unlinkSync(`./programs/${process.env.PROGRAM}.tgz`);
 
-			return update(output_msg, output, `\n**COMPILATION ERROR**:\n${exc.stderr}\n`);
+			return update(output_msg, output, `**COMPILATION ERROR**:\n${exc.stderr}`);
 		}
 
 		fs.unlinkSync(`./programs/${process.env.PROGRAM}.tgz`);
@@ -39,23 +45,28 @@ exports.run = async (bot, msg, args) => {
 					msg_update = update(output_msg, output, `\n**Test ${i + 1}**: **TIMEWALL REACHED** (${process.env.TIMEWALL/1000}s) :clock10:\n`
 						+ `${program_output}Test was: \`.${current.substring("./programs".length)}\``);
 				} else {
-					msg_update = update(output_msg, output, `\n**Test ${i + 1}**: **EXECUTION ERROR** :x:\n`
-						+ `\`\`\`${exc.stdout}\n${exc.stderr}\`\`\`\nTest was: \`.${current.substring("./programs".length)}\``);
+					if (exc.stdout.length + exc.stderr.length > 0) {
+						msg_update = update(output_msg, output, `\n**Test ${i + 1}**: **EXECUTION ERROR** :x:\n`
+							+ `\`\`\`${exc.stdout}\n${exc.stderr}\`\`\`\nTest was: \`.${current.substring("./programs".length)}\``);
+					} else {
+						msg_update = update(output_msg, output, `\n**Test ${i + 1}**: **EXECUTION ERROR** :x:\n`
+							+ `Test was: \`.${current.substring("./programs".length)}\``);
+					}
 				}
 				output_msg = msg_update.msg;
 				output = msg_update.content;
 
-				errors++;
 				tests_error.push(i + 1);
 
-				break;
+				//break;
+				continue;
 			}
 
 			fs.writeFileSync(`./outputs/${i}.txt`, result);
 
 			try {
-				execSync(`diff ./outputs/c${i}.txt ./outputs/${i}.txt`);
-				// In case the time is exactly the same (has happened):
+				let output_type = queue === "cuda" ? "c" : "o";
+				execSync(`diff ./outputs/${output_type}${i}.txt ./outputs/${i}.txt`);
 				let msg_update = await update(output_msg, output,
 					`\n**Test ${i + 1}**: Passed :white_check_mark:\n`
 					+ `${result.split("\n")[1]}\n`);
@@ -86,7 +97,6 @@ exports.run = async (bot, msg, args) => {
 					output_msg = msg_update.msg;
 					output = msg_update.content;
 
-					failed++;
 					tests_failed.push(i + 1);
 
 					break;
@@ -105,18 +115,18 @@ exports.run = async (bot, msg, args) => {
 		}
 
 		let summary = `**Summary**:\n${passed} tests passed.\n${failed} tests failed.\n${errors} errors.\n`;
-		if (failed > 0) summary += `\nFailed tests: ${tests_failed}`;
-		if (errors > 0) summary += `\nErroneous tests: ${tests_error}`;
+		if (test_failed.length > 0) summary += `\nFailed tests: ${tests_failed}`;
+		if (test_error.length > 0) summary += `\nErroneous tests: ${tests_error}`;
 
-		if (failed + errors === 0) {
+		if (tests_failed.length + tests_error.length === 0) {
 			summary += `\nSum of times: ${time}`
 		}
 
 		msg.reply(summary);
 
-		execSync(`cd ./programs; make clean; rm -f *.cu *.h Makefile`);
+		execSync(`cd ./programs; make clean; rm -f *.c *.h *.cpp *.hpp *.cu Makefile`);
 
-		return (failed + errors) == 0;
+		return (tests_failed.length + tests_error.length) == 0;
 
 	// Non-tests executions:
 	} else {
@@ -131,7 +141,7 @@ exports.run = async (bot, msg, args) => {
 			} catch (exc) {
 				fs.unlinkSync(`./programs/${process.env.PROGRAM}.tgz`);
 
-				return update(reply, reply.content, `\n**COMPILATION ERROR**:\n\`\`\`\n${exc.stderr}\n\`\`\`\n`);
+				return update(reply, reply.content, `**COMPILATION ERROR**:\n\`\`\`${exc.stderr}\`\`\``);
 			}
 
 			let exec_args = "";
@@ -152,15 +162,15 @@ exports.run = async (bot, msg, args) => {
 			}
 
 			try {
-				let output = execSync(`./programs/evolution ${exec_args}`, { timeout: parseInt(process.env.TIMEWALL) });
+				let output = execSync(`./programs/${process.env.PROGRAM} ${exec_args}`, { timeout: parseInt(process.env.TIMEWALL) });
 				execSync(`cd ./programs; make clean; rm -f *.cu *.h Makefile`);	
 
-				return update(reply, reply.content, `\n\`\`\`\n${output}\n\`\`\``);
+				return update(reply, reply.content, `\`\`\`${output}\`\`\``);
 
 			} catch (exc) {
 				execSync(`cd ./programs; make clean; rm -f *.cu *.h Makefile`);
 
-				return update(reply, reply.content, `**ERROR**:\n\`\`\`\n${exc.stdout.toString().substring(0, 1500)}\n${exc.stderr.toString().substring(0, 480)}\n\`\`\``);
+				return update(reply, reply.content, `**ERROR**:\n\`\`\`${exc.stdout.toString().substring(0, 1500)}\n${exc.stderr.toString().substring(0, 480)}\`\`\``);
 			}
 		} else {
 			// Just in case the source file hasn't been deleted yet:
@@ -173,18 +183,24 @@ exports.run = async (bot, msg, args) => {
 }
 
 async function update(msg, original, addon) {
+	let header = original.split("\n")[0];
+
+	if (addon.length > 2000 - header.length) {
+		addon = addon.substring(0, 2000 - header.length);
+	}
 	let new_content = original + addon;
 
 	if (new_content.length > 2000) {
-		let header = original.split("\n")[0] + " (continued)";
-		while (addon.length > 2000 - 1 - 4 - 4) {
-			let send = header + addon.substring(0, 2000 - header.length - 1 - 4 - 4);
-			addon = addon.substring(2000 - header.length);
-			await msg.channel.send("\`\`\`\n" + send + "\`\`\`\n");
-			header = original.split("\n")[0] + " (continued)";
+		// TODO: take into account more than 10 continuations?
+		let continuation = header.substring(header.length - 2, header.length - 1) == NaN ?
+			1 : parseInt(header.substring(header.length - 2, header.length - 1)) + 1;
+		if (continuation === 1) {
+			header += `(continued 1)`
 		}
+		header = `${header.substring(0, header.length - 2)}${continuation})`
+		// TODO; allow addons larger than 2000 characters?
 
-		addon = header + " (continued)\n\`\`\`\n" + addon + "\`\`\`\n";
+		addon = header + `\n${addon}\n`;
 		let new_msg = await msg.channel.send(addon);
 
 		return { msg: new_msg, content: addon };

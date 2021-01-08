@@ -1,5 +1,9 @@
 const fs = require("fs");
 
+/**
+ * Returns the specification for the given test,
+ * as a bash executable command.
+ */
 exports.run = async (bot, msg, args) => {
 	if (args.length < 1) {
 		return msg.reply(`invalid usage: ${process.env.PRE}test <number>`);
