@@ -1,6 +1,10 @@
 const fs = require("fs");
 
 exports.run = async (bot, msg, args) => {
+	/* FEATURE NOT APPLICABLE BY HERMES */
+	return msg.reply("feature not implemented yet.");
+
+	/*--- ORIGINAL SOURCE CODE ---*/
 	if (args.length < 1) return msg.reply("you must specify the number of the test to delete.");
 
 	for (i of args) {

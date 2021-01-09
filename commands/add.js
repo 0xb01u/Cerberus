@@ -2,6 +2,10 @@ const fs = require("fs");
 const { execSync } = require("child_process");
 
 exports.run = async (bot, msg, args) => {
+	/* FEATURE NOT APPLICABLE BY HERMES */
+	return msg.reply("feature not implemented yet.");
+
+	/*--- ORIGINAL SOURCE CODE ---*/
 	if (args.length < 1 || (args[0].startsWith("./") && args.length < 2))
 		return msg.reply("invalid amount of arguments for the test.");
 
