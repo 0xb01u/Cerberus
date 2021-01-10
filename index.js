@@ -34,10 +34,10 @@ bot.on("message", async msg => {
 			let download = response.pipe(file);
 			download.on("finish", async () => {
 				try {
-					delete require.cache[require.resolve(`./commands/test_${}.js`)];
+					delete require.cache[require.resolve(`./commands/test_${""}.js`)];
 
 					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-					await require(`./commands/test_${}.js`).run(bot, msg, args, att_name);
+					await require(`./commands/test_${""}.js`).run(bot, msg, args, att.name);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					fs.unlinkSync(filepath);
@@ -58,7 +58,7 @@ bot.on("message", async msg => {
 		let serverID = 0;
 		if (msg.channel.type === "dm") {
 			if (!fs.existsSync(`./guilds/guildMap.json`)) {
-				return msg.reply(`sorry, I must join a server before executing any command.`);
+				return msg.reply(`sorry, I must join at least one server before executing any commands.`);
 			}
 
 			let guildMap = JSON.parse(`./guilds/guildMap.json`);

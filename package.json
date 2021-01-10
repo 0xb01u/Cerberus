@@ -1,7 +1,7 @@
 {
-  "name": "cerberus",
+  "name": "hermes",
   "version": "1.0.1",
-  "description": "Discord bot simulating http://frontendv.infor.uva.es/, including test executions, with execution outputs and feedback.",
+  "description": "Discord bot serving as intermediary with http://frontendv.infor.uva.es/ and other different request queues.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,9 +15,9 @@
   "bugs": {
     "url": "https://github.com/0xb01u/Cerberus/issues"
   },
-  "homepage": "https://github.com/0xb01u/Cerberus#readme",
+  "homepage": "https://github.com/0xb01u/Cerberus/tree/hermes#readme",
   "dependencies": {
-    "discord.js": "^12.2.0",
+    "discord.js": "^12.5.1",
     "dotenv": "^8.2.0"
   }
 }
