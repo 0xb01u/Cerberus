@@ -13,15 +13,16 @@ class Team {
 	 *
 	 * The team's name is temporarily set as the identifier.
 	 */
-	constructor(id, server) {
+	constructor(id, server, save=true) {
 		this.id = id;			// Team identifier (immutable).
+		this.passwd = null;
 		this.server = server;	// ID for the server the team belongs to.
 		this.name = id;			// Team name (mutable).
 		this.members = [];		// Team members.
 		this.confirmed = false;	// Whether this team has been confirmed
 								// as "closed" (immutable in members)
 								// by its members or not.
-		this.save();
+		if (save) this.save();
 
 		// Add to the server-name map:
 		nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(`./teams/${this.server}/nameMap.json`) : {};
@@ -113,6 +114,17 @@ class Team {
 	}
 
 	/**
+	 * Sets the password for the team.
+	 */
+	setPassword(passwd) {
+		if (this.passwd !== null) {
+			this.passwd = passwd;
+		} else {
+			// TODO: handle this exception.
+		}
+	}
+
+	/**
 	 * Deletes the given user from the team.
 	 */
 	leave(userID) {
@@ -143,6 +155,7 @@ class Team {
 	 * Deletes this team from the system.
 	 */
 	delete() {
+		// TODO: delete from the teamMap!
 		// Delete the team JSON and all its pending confirmations.
 		for (let file of fs.readdirSync(`./teams/${this.server}`)) {
 			if (file.startsWith(this.id)) {
@@ -152,7 +165,7 @@ class Team {
 	}
 
 	/**
-	 * Saves the team as a file.
+	 * Saves the team as a JSON file.
 	 *
 	 * Teams are saved as /teams/<guild_id>/<team_id>.json
 	 */
@@ -171,7 +184,7 @@ class Team {
 	// TODO: control when things are saved, instead of saving every time
 	// a function is executed?
 	static fromJSON(json) {
-		return Object.assign(new Team("g110"), json);
+		return Object.assign(new Team("g110", -1, false), json);
 	}
 }
 

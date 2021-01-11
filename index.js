@@ -7,7 +7,10 @@ const bot = new Discord.Client();
 bot.login(process.env.TOKEN);
 
 bot.on("ready", async () => {
-	await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+	bot.user.setPresence({ activity: {name: ``}, status: `online` });
+	bot.user.setAvatar("./images/hermes.png");
+	// Cerberus image taken from: https://imgbin.com/png/XKxfm3Sc/hades-dog-cerberus-greek-mythology-graphics-png
+	// Hermes image taken from: https://www.theoi.com/Gallery/M12.5.html
 });
 
 bot.on("guildCreate", guild => {
@@ -23,6 +26,8 @@ bot.on("guildCreate", guild => {
 bot.on("message", async msg => {
 	if (msg.author.bot) return;
 
+	userLevel = (msg.member.hasPermission("ADMINISTRATOR")) ? "administrator" : "";
+
 	if (msg.channel.type === "dm" && msg.attachments.size > 0) {
 		// Download attachement:
 		let att = msg.attachments.first();
@@ -34,10 +39,10 @@ bot.on("message", async msg => {
 			let download = response.pipe(file);
 			download.on("finish", async () => {
 				try {
-					delete require.cache[require.resolve(`./commands/test_${""}.js`)];
+					delete require.cache[require.resolve(`./commands/${userLevel}/test_${""}.js`)];
 
 					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-					await require(`./commands/test_${""}.js`).run(bot, msg, args, att.name);
+					await require(`./commands/${userLevel}/test_${""}.js`).run(bot, msg, args, att.name);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					fs.unlinkSync(filepath);
@@ -78,9 +83,9 @@ bot.on("message", async msg => {
 		}
 
 		try {
-			delete require.cache[require.resolve(`./commands/${cmd}.js`)];
+			delete require.cache[require.resolve(`./commands/${userLevel}/${cmd}.js`)];
 
-			require(`./commands/${cmd}.js`).run(bot, msg, args, serverID);
+			require(`./commands/${userLevel}/${cmd}.js`).run(bot, msg, args, serverID);
 
 		} catch (e) { 
 			if (msg.channel.type === "dm") msg.reply("nonexistent command.");

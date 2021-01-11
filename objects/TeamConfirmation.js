@@ -15,13 +15,13 @@ class TeamConfirmation {
 	 * Constructor for a confirmation for the given user to join
 	 * the given team.
 	 */
-	constructor(team, userID) {
+	constructor(team, userID, save=true) {
 		this.usr = userID;
 		this.tm = team;
 		this.server = team.server;
 		this.delegates = new Set(team.members);
 		this.requestSent = false;
-		this.save();
+		if (save) this.save();
 	}
 
 	/**
@@ -82,7 +82,7 @@ class TeamConfirmation {
 	}
 
 	/**
-	 * Saves the confirmation request as a file.
+	 * Saves the confirmation request as a JSON file.
 	 *
 	 * Confirmations are saved as /teams/<guild_id>/<team_id>#<user_requesting_id>.json
 	 */
@@ -99,7 +99,7 @@ class TeamConfirmation {
 	 * Retrieves a confirmation request from a JSON file and returns it.
 	 */
 	static fromJSON(json) {
-		return Object.assign(new TeamConfirmation(null, null, null), json);
+		return Object.assign(new TeamConfirmation("g110", -1, false), json);
 	}
 } 
 
