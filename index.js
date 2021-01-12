@@ -60,7 +60,7 @@ bot.on("message", async msg => {
 		let cmd = args.shift().toLowerCase();
 
 		// Retrieve the server ID:
-		let serverID = 0;
+		let serverID = -1;
 		if (msg.channel.type === "dm") {
 			if (!fs.existsSync(`./guilds/guildMap.json`)) {
 				return msg.reply(`sorry, I must join at least one server before executing any commands.`);
@@ -68,10 +68,10 @@ bot.on("message", async msg => {
 
 			let guildMap = JSON.parse(`./guilds/guildMap.json`);
 
-			let guild_name = args.shift();
-			if (guildMap.contains(guild_name)) {
+			let guildName = args.shift();
+			if (!(guildName in guildMap)) {
 				return msg.reply(
-					`I don't know about any server named "${guild_name}, can you check that again?"\n` +
+					`I don't know about any server named "${guildName}, can you check that again?"\n` +
 					`(Remember that on direct message channels you must specify the name of the Discord server` +
 					`you are refering to as the first argument of any command, replacing any space " " with underscores "_".)`
 				);
@@ -93,3 +93,47 @@ bot.on("message", async msg => {
 		}
 	}
 });
+
+/**
+ * Retrieves a guild ID given its name.
+ */
+global.getServer = function getServer(serverName) {
+	if (!fs.existsSync(`./guilds/guildMap.json`)) {
+		// TODO: handle this exception.
+		return null;
+	}
+
+	let guildMap = JSON.parse(`./guilds/guildMap.json`);
+	if (!(serverName in guildMap)) {
+		// TODO: handle this exception.
+		return null;
+	}
+
+	return guildMap[serverName];
+}
+
+/**
+ * Retrieves an user object given the user's ID.
+ */
+global.getStudent = function getStudent(userID) {
+	if (!fs.existsSync(`./users/${userID}.json`)) {
+		// TODO: handle this exception.
+		return null;
+	}
+
+	const User = require("./objects/Student.js");
+	return User.fromJSON(JSON.parse(`./users/${userID}.json`));
+}
+
+/**
+ * Retrieves a Team given its ID.
+ */
+global.getTeam = function getTeam(teamID, guildID) {
+	if (!fs.existsSync(`./teams/${guildID}/${teamID}.json`)) {
+		// TODO: handle this exception..
+		return null;
+	}
+
+	const Team = require("./objects/Team.js");
+	return Team.fromJSON(JSON.parse(`./teams/${guildID}/${teamID}.json`));
+}

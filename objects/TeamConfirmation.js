@@ -32,15 +32,17 @@ class TeamConfirmation {
 		// Send only once ever:
 		if (this.requestSent) return false;
 
-		let reply = `Sent a confirmation request to join ${this.tm.name} on server ${await bot.guilds.fetch(this.server).name} to:\n`;
+		let serverName = await bot.guilds.fetch(this.server).name;
+
+		let reply = `Sent a confirmation request to join ${this.tm.name} on server ${serverName} to:\n`;
 		for (let m of delegates) {
 			let member = await bot.users.fetch(m);
 			member.send(
 				`<@${this.usr}> wants to join team ${this.tm.name}\n` +
-				`To accept them, send "${process.env.PRE}team accept ${this.server} ${this.tm.id}#${this.usr}" to me.\n` +
-				`To cancel and delete the request, send "${process.env.PRE}team cancel ${this.server} ${this.tm.id}#${this.usr}" to me. ` +
+				`To accept them, send "${process.env.PRE}team ${serverName} accept ${this.tm.id}#${this.usr}" to me.\n` +
+				`To reject and delete the request, send "${process.env.PRE}team ${serverName} reject ${this.tm.id}#${this.usr}" to me. ` +
 				this.delegates.size() > 1 ? `(Can't be undone by any other team member.)` : ``
-			)
+			);
 			reply += `<@${m}>\n`;
 		}
 
@@ -69,9 +71,31 @@ class TeamConfirmation {
 		if (delegates.size === 0) {
 			this.tm.join(this.usr);
 			this.delete();
+		} else {
+			this.save();
+		}
+	}
+
+	/**
+	 * Rejects the new member's request, and informs the other team members.
+	 */
+	reject(rejecter, bot) {
+		if (!this.delegates.has(rejecter)) {
+			// TODO: handle this exception.
+			return;
 		}
 
-		this.save();
+		bot.users.fetch(this.usr).send(`Your request to join ${this.tm.name} has been rejected.`);
+		for (let member of this.tm.members) {
+			if (member != rejecter) {
+				bot.users.fetch(member).send(`<@${rejecter}> has rejected the request of <@${this.usr}> to join ${this.tm.name}`);
+			}
+		}
+
+		reply = `The request has been rejected` + this.tm.members.length > 1 ? `, and all the other team members have been notified.` : `.`;
+		bot.users.fetch(rejecter).send(reply);
+
+		this.delete();
 	}
 
 	/**

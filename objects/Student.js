@@ -12,14 +12,19 @@ class Student {
 	 * Every student must be in at least one server. (It wouldn't make sense
 	 * if they weren't.)
 	 */
-	constructor(userID, serverID, username, userNo, save=true) {
+	constructor(userID, serverName, username, userNo, save=true) {
 		this.id = userID;
 		this.username = `${username}#${userNo}`
+
+		let guildMap = JSON.parse(`./guilds/guildMap.json`);
+		let serverID = guildMap[serverName];	// TODO: check this.
+
 		this.preferredServer = serverID;
 		this.guilds = new [serverID];
 		this.credentials = {};
 		this.preferredQueue = null;
 		this.latestClientCommand = null;
+		this.aliases = {serverName: serverID};
 
 		if (save) this.save();
 	}
@@ -41,7 +46,7 @@ class Student {
 			this.addServer(serverID);
 		}
 
-		let team = Team.fromJSON(JSON.parse(`./teams/${guild}/${teamID}.json`));
+		let team = global.getTeam(teamID, guild);
 		this.credentials[serverID] = {"team": teamID, "passwd": team.passwd};
 
 		this.save();
@@ -80,6 +85,16 @@ class Student {
 	}
 
 	/**
+	 * Adds an alias for a server name.
+	 */
+	addAlias(serverName, alias) {
+		let guildMap = JSON.parse(`./guilds/guildMap.json`);
+		let serverID = guildMap[serverName];
+
+		aliases[alias] = serverID;
+	}
+
+	/**
 	 * Saves the student's information as a JSON file.
 	 *
 	 * Students are saved as /users/username#discriminator.json, for readability.
@@ -87,7 +102,7 @@ class Student {
 	save() {
 		if (!fs.existsSync(`./users/`)) fs.mkdirSync(`./users/`);
 		// TODO: account for name changes.
-		fs.writeFileSync(`./users/${this.username}.json`, JSON.stringify(this));
+		fs.writeFileSync(`./users/${this.id}.json`, JSON.stringify(this));
 	}
 
 	/**
