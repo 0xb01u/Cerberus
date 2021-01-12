@@ -10,7 +10,7 @@ exports.run = async (bot, msg, args) => {
 		return msg.reply("invalid amount of arguments for the test.");
 
 	if (args[0].startsWith("./")) args.shift();
-	let test = args.reduce((a, b) => `${a} ${b}`);
+	let test = args.join(" ");
 
 	try {
 		execSync(`cd ./programs; tar xzf original.tgz; make`);

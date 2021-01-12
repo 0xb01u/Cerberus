@@ -17,7 +17,7 @@ class Student {
 		this.username = `${username}#${userNo}`
 
 		let guildMap = JSON.parse(`./guilds/guildMap.json`);
-		let serverID = guildMap[serverName];	// TODO: check this.
+		let serverID = guildMap[serverName];
 
 		this.preferredServer = serverID;
 		this.guilds = new [serverID];
@@ -30,24 +30,49 @@ class Student {
 	}
 
 	/**
-	 * Add a guild to the list of guilds this student is in.
+	 * Adds a guild to the list of guilds this student is in.
 	 */
-	addServer(serverID) {
+	addServer(serverName) {
+		let guildMap = JSON.parse(`./guilds/guildMap.json`);
+		let serverID = guildMap[serverName];
+
+		if (guilds.includes(serverID)) {
+			// TODO: handle this exception.
+			return;
+		}
+
 		this.guilds.push(serverID);
+		this.aliases[severName] = serverID;
 
 		this.save();
 	}
 
 	/**
-	 * Add a team for one of the guilds this student is in.
+	 * Adds a team for one of the guilds this student is in.
 	 */
 	addTeam(serverID, teamID) {
 		if (!guilds.includes(serverID)) {
 			this.addServer(serverID);
 		}
 
-		let team = global.getTeam(teamID, guild);
+		let team = global.getTeam(teamID, serverID);
 		this.credentials[serverID] = {"team": teamID, "passwd": team.passwd};
+
+		this.save();
+	}
+
+	/**
+	 * Removes the team for one of the guilds this student is in.
+	 *
+	 * The removed team is probably not confirmed (definitive),
+	 * so their members could join and leave at will.
+	 */
+	removeTeam(serverID) {
+		if (!guild.include(serverID)) {
+			// TODO: handle this exception.
+			return;
+		}
+		delete this.credentials[serverID];
 
 		this.save();
 	}
@@ -92,6 +117,8 @@ class Student {
 		let serverID = guildMap[serverName];
 
 		aliases[alias] = serverID;
+
+		this.save();
 	}
 
 	/**

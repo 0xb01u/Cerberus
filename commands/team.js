@@ -14,6 +14,9 @@ exports.run = async (bot, msg, args, serverID) => {
 	let user = msg.author.id;
 	let guild = await bot.guilds.fetch(serverID);	// Server object.
 	let serverName = guild.name;
+	let student = global.getStudent(user);	// Student object.
+	let userTeams = student.credentials.
+
 
 	// Create directories if they don't exist:
 	if (!fs.existsSync(`./teams`)) fs.mkdirSync(`./teams/${server}`, { recursive: true });
@@ -27,17 +30,14 @@ exports.run = async (bot, msg, args, serverID) => {
 		// TODO: split into team join and create?
 		// TODO: check exact number of arguments.
 		case "join":
-			// Check if the author is already on a team.
-			if (fs.existsSync(`./teams/${server}/teamMap.json`)) {
-				let teamMap = JSON.parse(`./teams/${server}/teamMap.json`);
-				if (user in teamMap) {
-					// TODO: Handle this exception;
-					return msg.author.send(
-						`Looks like your trying to join a team on server ${serverName}, ` +
-						`but you're already on team ${teamMap[user]} there. ` +
-						`You cannot join more than one team!`
-					);
-				}
+			// Check if the author is already on a team for that server.
+			if (server in userTeams) {
+				// TODO: Handle this exception;
+				return msg.author.send(
+					`Looks like your trying to join a team on server ${serverName}, ` +
+					`but you're already on team ${userTeams[server].team} there. ` +
+					`You cannot join more than one team!`
+				);
 			}
 
 			let teamID = "g110";
@@ -127,7 +127,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			return;	// Feedback message in the if-elses above.
 
 		case "leave":
-			if (!fs.existsSync(`./teams/${server}/teamMap.json`)) {
+			if (!(server in userTeams)) {
 				// TODO: Handle this exception.
 				return msg.author.send(
 					`Looks like you are trying to **leave** your team on server ${serverName}, ` +
@@ -135,16 +135,7 @@ exports.run = async (bot, msg, args, serverID) => {
 				);
 			}
 
-			let teamMap = JSON.parse(`./teams/${server}/teamMap.json`);
-			if (!(user in teamMap)) {
-				// TODO: Handle this exception;
-				return msg.author.send(
-					`Looks like you are trying to **leave** your team on server ${serverName}, ` +
-					`but you are not part of any team there!`
-				);
-			}
-
-			let team = global.getTeam(teamMap[user], server);
+			let team = global.getTeam(userTeams[server], server);
 
 			if (team.confirmed) {
 				return msg.author.send(
@@ -160,16 +151,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			);
 
 		case "rename":
-			if (!fs.existsSync(`./teams/${server}/teamMap.json`)) {
-				// TODO: Handle this exception.
-				return msg.author.send(
-					`Looks like you are trying to **rename** your team on server ${serverName}, ` +
-					`but you are not part of any team there!`
-				);
-			}
-
-			let teamMap = JSON.parse(`./teams/${server}/teamMap.json`);
-			if (!(user in teamMap)) {
+			if (!(server in userTeams)) {
 				// TODO: Handle this exception;
 				return msg.author.send(
 					`Looks like you are trying to **rename** your team on server ${serverName}, ` +
@@ -177,7 +159,7 @@ exports.run = async (bot, msg, args, serverID) => {
 				);
 			}
 
-			let team = global.getTeam(teamMap[user], server);
+			let team = global.getTeam(userTeams[server], server);
 
 			if (args.length < 3) {
 				// TODO: Handle this exception;
@@ -203,8 +185,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			);
 
 		case "accept":
-			let teamMap = JSON.parse(`./teams/${server}/teamMap.json`);
-			if (!(user in teamMap)) {
+			if (!(server in userTeams)) {
 				// TODO: Handle this exception.
 				return msg.author.send(
 					`Looks like you are trying to **accept** a member on a team on server ${serverName}, ` +
@@ -216,7 +197,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			if (!fs.existsSync(`./teams/${server}/${reqID}.json`)) {
 				// TODO: Handle this exception.
 				return msg.author.send(
-					`Looks like you are trying to **accept** a member on team ${teamMap[user]} on server ${serverName}, ` +
+					`Looks like you are trying to **accept** a member on team ${userTeams[server]} on server ${serverName}, ` +
 					`but they didn't send any request to join it! Did you get the request number wrong?`
 				);
 			}
@@ -229,8 +210,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			);
 
 		case "reject":
-			let teamMap = JSON.parse(`./teams/${server}/teamMap.json`);
-			if (!(user in teamMap)) {
+			if (!(server in userTeams)) {
 				// TODO: Handle this exception.
 				return msg.author.send(
 					`Looks like you are trying to **reject** a member on a team on server ${serverName}, ` +
@@ -242,7 +222,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			if (!fs.existsSync(`./teams/${server}/${reqID}.json`)) {
 				// TODO: Handle this exception.
 				return msg.author.send(
-					`Looks like you are trying to **reject** a member on team ${teamMap[user]} on server ${serverName}, ` +
+					`Looks like you are trying to **reject** a member on team ${userTeams[server]} on server ${serverName}, ` +
 					`but they didn't send any request to join it! Did you get the request number wrong?`
 				);
 			}
@@ -251,5 +231,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			request.reject(user, bot);
 
 			return; // Feedback message in reject() method.
+
+		// TODO: add default.
 	}
 }

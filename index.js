@@ -13,16 +13,50 @@ bot.on("ready", async () => {
 	// Hermes image taken from: https://www.theoi.com/Gallery/M12.5.html
 });
 
+/**
+ * When the bot joins a new server, it adds it to its server list,
+ * and adds all the non-administrator users as students for the server.
+ */
 bot.on("guildCreate", guild => {
 	console.log(`Hermes joined the guild ${guild.name} (${guild.id}).`);
 
 	if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
 	let guildMap = !fs.existsSync(`./guilds/guildMap.json`) ? JSON.parse(`./guilds/guildMap.json`) : {};
 
-	guildMap[guild.name.replace(/ /g, "_")] = guild.id;
+	let guildName = guild.name.replace(/ /g, "_");
+	guildMap[guildName] = guild.id;
 	fs.writeSync(`./guilds/guildMap.json`, JSON.stringify(guildMap));
+
+	const Student = require("./objects/Student.js");
+
+	for (let member of guild.members) {
+		if (!member.hasPermission("ADMINISTRATOR")) {
+			if (!fs.existsSync(`./users/${member.id}.json`)) {
+				let student = new Student(member.id, guildName, member.name, member.user.username, member.user.discriminator);
+			} else {
+				global.getStudent(member.id).addServer(guildName);
+			}
+		}
+	}
 });
 
+/**
+ * When a new user joins a server the bot is in, it adds them as students
+ * for the server.
+ */
+bot.on("guildMemberAdd", member => {
+	let guildMap = JSON.parse(`./guilds/guildMap.json`);
+
+	if (!fs.existsSync()`./users/${member.id}.json`) {
+		let student = new Student(member.id, guildMap[member.guild.id], member.name, member.user.username, member.user.discriminator);		
+	} else {
+		global.getStudent(member.id).addServer(guildName);
+	}
+});
+
+/**
+ * Message and command handling.
+ */
 bot.on("message", async msg => {
 	if (msg.author.bot) return;
 
@@ -61,7 +95,9 @@ bot.on("message", async msg => {
 
 		// Retrieve the server ID:
 		let serverID = -1;
-		if (msg.channel.type === "dm") {
+
+		if (cmd === "set") { /* Do nothing with the server ID */ }
+		else if (msg.channel.type === "dm") {
 			if (!fs.existsSync(`./guilds/guildMap.json`)) {
 				return msg.reply(`sorry, I must join at least one server before executing any commands.`);
 			}

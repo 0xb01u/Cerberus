@@ -15,7 +15,7 @@ class Team {
 	 */
 	constructor(id, server, save=true) {
 		this.id = id;			// Team identifier (immutable).
-		this.passwd = null;
+		this.passwd = null;		// Password for the team (ADMIN-managed).
 		this.server = server;	// ID for the server the team belongs to.
 		this.name = id;			// Team name (mutable).
 		this.members = [];		// Team members.
@@ -44,20 +44,11 @@ class Team {
 
 		this.members.push(userID);
 
+		global.getStudent(userID).addTeam(this.server, this.id);
+
 		// If the team gets completely filled, close and confirm the team.
 		if (this.members.length == process.env.TEAM_CAPACITY) {
 			this.confirmed = true;
-
-			// Create the member-team map:
-			teamMap = {};
-			// Create directories if they don't exist:
-			if (!fs.existsSync(`./teams`)) fs.mkdirSync(`./teams/${this.server}`, { recursive: true });
-			else if (!fs.existsSync(`./teams/${this.server}`)) fs.mkdirSync(`./teams/${this.server}`);
-			else if (fs.existsSync(`./teams/${this.server}/teamMap.json`)) teamMap = JSON.parse(`./teams/${this.server}/teamMap.json`);
-
-			for (let member of this.members) {
-				teamMap[member] = this.id;
-			}
 		}
 
 		this.save();
@@ -135,6 +126,8 @@ class Team {
 
 		this.members.splice(this.members.indexOf(userID), 1);
 
+		global.getStudent(userID).removeTeam(this.server);
+
 		this.save();
 
 		if (this.members.length === 0) this.delete();
@@ -155,7 +148,6 @@ class Team {
 	 * Deletes this team from the system.
 	 */
 	delete() {
-		// TODO: delete from the teamMap!
 		// Delete the team JSON and all its pending confirmations.
 		for (let file of fs.readdirSync(`./teams/${this.server}`)) {
 			if (file.startsWith(this.id)) {
