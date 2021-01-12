@@ -1,6 +1,6 @@
-const fs = require("fs"):
+const fs = require("fs");
 
-const Team = require("../objects/Team.js")
+const Team = require("../objects/Team.js");
 
 /**
  * Student data and preferences object.
@@ -16,11 +16,11 @@ class Student {
 		this.id = userID;
 		this.username = `${username}#${userNo}`
 
-		let guildMap = JSON.parse(`./guilds/guildMap.json`);
+		let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 		let serverID = guildMap[serverName];
 
 		this.preferredServer = serverID;
-		this.guilds = new [serverID];
+		this.guilds = [serverID];
 		this.credentials = {};
 		this.preferredQueue = null;
 		this.latestClientCommand = null;
@@ -33,16 +33,16 @@ class Student {
 	 * Adds a guild to the list of guilds this student is in.
 	 */
 	addServer(serverName) {
-		let guildMap = JSON.parse(`./guilds/guildMap.json`);
+		let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 		let serverID = guildMap[serverName];
 
-		if (guilds.includes(serverID)) {
+		if (this.guilds.includes(serverID)) {
 			// TODO: handle this exception.
 			return;
 		}
 
 		this.guilds.push(serverID);
-		this.aliases[severName] = serverID;
+		this.aliases[serverName] = serverID;
 
 		this.save();
 	}
@@ -51,7 +51,7 @@ class Student {
 	 * Adds a team for one of the guilds this student is in.
 	 */
 	addTeam(serverID, teamID) {
-		if (!guilds.includes(serverID)) {
+		if (!this.guilds.includes(serverID)) {
 			this.addServer(serverID);
 		}
 
@@ -68,7 +68,7 @@ class Student {
 	 * so their members could join and leave at will.
 	 */
 	removeTeam(serverID) {
-		if (!guild.include(serverID)) {
+		if (!this.guilds.include(serverID)) {
 			// TODO: handle this exception.
 			return;
 		}
@@ -113,7 +113,7 @@ class Student {
 	 * Adds an alias for a server name.
 	 */
 	addAlias(serverName, alias) {
-		let guildMap = JSON.parse(`./guilds/guildMap.json`);
+		let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 		let serverID = guildMap[serverName];
 
 		aliases[alias] = serverID;

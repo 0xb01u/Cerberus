@@ -8,9 +8,38 @@ bot.login(process.env.TOKEN);
 
 bot.on("ready", async () => {
 	bot.user.setPresence({ activity: {name: ``}, status: `online` });
-	bot.user.setAvatar("./images/hermes.png");
+	//bot.user.setAvatar("./images/hermes.png");
 	// Cerberus image taken from: https://imgbin.com/png/XKxfm3Sc/hades-dog-cerberus-greek-mythology-graphics-png
 	// Hermes image taken from: https://www.theoi.com/Gallery/M12.5.html
+
+	// Rename to "Hermes":
+	for (let guild of bot.guilds.cache.array()) {
+		(await guild.members.fetch(bot.user.id)).setNickname("Hermes");
+
+		if (guild.id === "699906186043981892") {
+			console.log(`Hermes joined the guild ${guild.name} (${guild.id}).`);
+
+			if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
+			let guildMap = fs.existsSync(`./guilds/guildMap.json`) ? JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) : {};
+
+			let guildName = guild.name.replace(/ /g, "_");
+			guildMap[guildName] = guild.id;
+			console.log(guildMap);
+			fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap));
+
+			const Student = require("./objects/Student.js");
+
+			for (let member of guild.members.cache.array()) {
+				if (!member.hasPermission("ADMINISTRATOR")) {
+					if (!fs.existsSync(`./users/${member.id}.json`)) {
+						let student = new Student(member.id, guildName, member.user.username, member.user.discriminator);
+					} else {
+						global.getStudent(member.id).addServer(guildName);
+					}
+				}
+			}
+		}
+	}
 });
 
 /**
@@ -20,12 +49,14 @@ bot.on("ready", async () => {
 bot.on("guildCreate", guild => {
 	console.log(`Hermes joined the guild ${guild.name} (${guild.id}).`);
 
+	//(await guild.members.fetch(bot.user.id)).setNickname("Hermes");
+
 	if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
-	let guildMap = !fs.existsSync(`./guilds/guildMap.json`) ? JSON.parse(`./guilds/guildMap.json`) : {};
+	let guildMap = !fs.existsSync(`./guilds/guildMap.json`) ? JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) : {};
 
 	let guildName = guild.name.replace(/ /g, "_");
 	guildMap[guildName] = guild.id;
-	fs.writeSync(`./guilds/guildMap.json`, JSON.stringify(guildMap));
+	fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap));
 
 	const Student = require("./objects/Student.js");
 
@@ -45,7 +76,7 @@ bot.on("guildCreate", guild => {
  * for the server.
  */
 bot.on("guildMemberAdd", member => {
-	let guildMap = JSON.parse(`./guilds/guildMap.json`);
+	let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 
 	if (!fs.existsSync()`./users/${member.id}.json`) {
 		let student = new Student(member.id, guildMap[member.guild.id], member.name, member.user.username, member.user.discriminator);		
@@ -102,7 +133,7 @@ bot.on("message", async msg => {
 				return msg.reply(`sorry, I must join at least one server before executing any commands.`);
 			}
 
-			let guildMap = JSON.parse(`./guilds/guildMap.json`);
+			let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 
 			let guildName = args.shift();
 			if (!(guildName in guildMap)) {
@@ -139,7 +170,7 @@ global.getServer = function getServer(serverName) {
 		return null;
 	}
 
-	let guildMap = JSON.parse(`./guilds/guildMap.json`);
+	let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 	if (!(serverName in guildMap)) {
 		// TODO: handle this exception.
 		return null;
@@ -158,7 +189,7 @@ global.getStudent = function getStudent(userID) {
 	}
 
 	const User = require("./objects/Student.js");
-	return User.fromJSON(JSON.parse(`./users/${userID}.json`));
+	return User.fromJSON(JSON.parse(fs.readFileSync(`./users/${userID}.json`)));
 }
 
 /**
@@ -171,5 +202,5 @@ global.getTeam = function getTeam(teamID, guildID) {
 	}
 
 	const Team = require("./objects/Team.js");
-	return Team.fromJSON(JSON.parse(`./teams/${guildID}/${teamID}.json`));
+	return Team.fromJSON(JSON.parse(fs.readFileSync(`./teams/${guildID}/${teamID}.json`)));
 }

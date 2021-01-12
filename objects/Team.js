@@ -25,9 +25,9 @@ class Team {
 		if (save) this.save();
 
 		// Add to the server-name map:
-		nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(`./teams/${this.server}/nameMap.json`) : {};
+		let nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) : {};
 		nameMap[id] = this.name;
-		fs.writeSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap));
+		fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap));
 	}
 
 	/**
@@ -90,7 +90,7 @@ class Team {
 		}
 
 		// The name cannot be the same as another team's name:
-		nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(`./teams/${this.server}/nameMap.json`) : {};
+		nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) : {};
 		if (Object.values(nameMap).includes(newName)) {
 			// TODO: handle this exception.
 			return;
@@ -99,7 +99,7 @@ class Team {
 		this.name = newName;
 		// Update the server-name map:
 		nameMap[id] = this.name;
-		fs.writeSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap));
+		fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap));
 
 		this.save();
 	}

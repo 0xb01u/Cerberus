@@ -28,11 +28,11 @@ class TeamConfirmation {
 	 * Sends the membership request to all team members, given the bot client
 	 * to send the messages with.
 	 */
-	sendRequest(bot) {
+	async sendRequest(bot) {
 		// Send only once ever:
 		if (this.requestSent) return false;
 
-		let serverName = await bot.guilds.fetch(this.server).name;
+		let serverName = (await bot.guilds.fetch(this.server)).name;
 
 		let reply = `Sent a confirmation request to join ${this.tm.name} on server ${serverName} to:\n`;
 		for (let m of delegates) {

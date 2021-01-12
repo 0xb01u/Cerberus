@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 const Team = require("../objects/Team.js");
-const TeamConfirmation = require("../objects/TeamConfirmation.js");
+const TeamConfirmation = require("../objects/TeamConfirmation.json");
 
 /**
  * Team manager command.
@@ -15,7 +15,7 @@ exports.run = async (bot, msg, args, serverID) => {
 	let guild = await bot.guilds.fetch(serverID);	// Server object.
 	let serverName = guild.name;
 	let student = global.getStudent(user);	// Student object.
-	let userTeams = student.credentials;
+	let userTeams = student.credentials.
 
 
 	// Create directories if they don't exist:
@@ -29,7 +29,7 @@ exports.run = async (bot, msg, args, serverID) => {
 	switch (args[0]) {
 		// TODO: split into team join and create?
 		// TODO: check exact number of arguments.
-		case "join":{
+		case "join":
 			// Check if the author is already on a team for that server.
 			if (server in userTeams) {
 				// TODO: Handle this exception;
@@ -101,7 +101,7 @@ exports.run = async (bot, msg, args, serverID) => {
 				}
 
 				let totalTeamsCopy = totalTeams;
-				let digits = 0;
+				let diigits = 0;
 
 				do {
 					totalTeamsCopy /= 10;
@@ -124,9 +124,9 @@ exports.run = async (bot, msg, args, serverID) => {
 					);
 				}
 			}
-			return;}	// Feedback message in the if-elses above.
+			return;	// Feedback message in the if-elses above.
 
-		case "leave":{
+		case "leave":
 			if (!(server in userTeams)) {
 				// TODO: Handle this exception.
 				return msg.author.send(
@@ -148,9 +148,9 @@ exports.run = async (bot, msg, args, serverID) => {
 			team.leave(user);
 			return msg.send(
 				`Succsesfully left team ${team.name}.`
-			);}
+			);
 
-		case "rename":{
+		case "rename":
 			if (!(server in userTeams)) {
 				// TODO: Handle this exception;
 				return msg.author.send(
@@ -182,9 +182,9 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			return msg.author.send(
 				`Correctly changed the name of the team ${team.id} on server ${serverName} to ${team.name}.`
-			);}
+			);
 
-		case "accept":{
+		case "accept":
 			if (!(server in userTeams)) {
 				// TODO: Handle this exception.
 				return msg.author.send(
@@ -207,9 +207,9 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			return msg.author.send(
 				`You accepted <@${request.usr}>'s request.`
-			);}
+			);
 
-		case "reject":{
+		case "reject":
 			if (!(server in userTeams)) {
 				// TODO: Handle this exception.
 				return msg.author.send(
@@ -230,7 +230,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			let request = TeamConfirmation.fromJSON(JSON.parse(fs.readFileSync(`./teams/${server}/${reqID}.json`)));
 			request.reject(user, bot);
 
-			return;} // Feedback message in reject() method.
+			return; // Feedback message in reject() method.
 
 		// TODO: add default.
 	}
