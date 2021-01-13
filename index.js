@@ -108,10 +108,10 @@ bot.on("message", async msg => {
 			let download = response.pipe(file);
 			download.on("finish", async () => {
 				try {
-					delete require.cache[require.resolve(`./commands/${userLevel}/test_${""}.js`)];
+					delete require.cache[require.resolve(`./commands/${userLevel}test_${""}.js`)];
 
 					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-					await require(`./commands/${userLevel}/test_${""}.js`).run(bot, msg, args, att.name);
+					await require(`./commands/${userLevel}test_${""}.js`).run(bot, msg, args, att.name);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					fs.unlinkSync(filepath);
@@ -134,7 +134,8 @@ bot.on("message", async msg => {
 
 		if (cmd === "set") { /* Do nothing with the server ID */ }
 		else if (msg.channel.type === "dm") {
-			userLevel = (msg.member.hasPermission("ADMINISTRATOR")) ? "administrator" : "";
+			userLevel = (msg.author.id === "231844961878802442")// || msg.member.hasPermission("ADMINISTRATOR"))
+				? "administrator/" : "";
 
 			if (!fs.existsSync(`./guilds/guildMap.json`)) {
 				return msg.reply(`sorry, I must join at least one server before executing any commands.`);
@@ -151,15 +152,15 @@ bot.on("message", async msg => {
 				);
 			}
 
-			serverID = guildMap[guild.name];
+			serverID = guildMap[guildName];
 		} else {
 			serverID = msg.guild.id;
 		}
 
 		try {
-			delete require.cache[require.resolve(`./commands/${userLevel}/${cmd}.js`)];
+			delete require.cache[require.resolve(`./commands/${userLevel}${cmd}.js`)];
 
-			require(`./commands/${userLevel}/${cmd}.js`).run(bot, msg, args, serverID);
+			require(`./commands/${userLevel}${cmd}.js`).run(bot, msg, args, serverID);
 
 		} catch (e) { 
 			if (msg.channel.type === "dm") msg.reply("nonexistent command.");
