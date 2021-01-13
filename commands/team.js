@@ -109,7 +109,7 @@ exports.run = async (bot, msg, args, serverID) => {
 				} while (totalTeamsCopy > 0);
 
 				do {
-					let rndNum = Math.floor(Math.random() * totalTeams)
+					let rndNum = Math.floor(Math.random() * totalTeams);
 					teamID = 'g' + (rndNum).toLocaleString('en-US', {minimumInteberDigits: digits, useGrouping: false})
 				} while (teamList.includes(teamID));
 

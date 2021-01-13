@@ -24,7 +24,8 @@ class Student {
 		this.credentials = {};
 		this.preferredQueue = null;
 		this.latestClientCommand = null;
-		this.aliases = {serverName: serverID};
+		this.aliases = {};
+		this.aliases[serverName] = serverID;
 
 		if (save) this.save();
 	}

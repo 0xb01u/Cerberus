@@ -16,7 +16,7 @@ bot.on("ready", async () => {
 	for (let guild of bot.guilds.cache.array()) {
 		(await guild.members.fetch(bot.user.id)).setNickname("Hermes");
 
-		if (guild.id === "699906186043981892") {
+		if (guild.id === "699906186043981892" || guild.id == "593934181525094427") {
 			console.log(`Hermes joined the guild ${guild.name} (${guild.id}).`);
 
 			if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
@@ -29,8 +29,9 @@ bot.on("ready", async () => {
 
 			const Student = require("./objects/Student.js");
 
+			// TODO: change cache for fetch; research Intents (GUILD_MEMBERS)
 			for (let member of guild.members.cache.array()) {
-				if (!member.hasPermission("ADMINISTRATOR")) {
+				if (!member.hasPermission("ADMINISTRATOR") || true) {
 					if (!fs.existsSync(`./users/${member.id}.json`)) {
 						let student = new Student(member.id, guildName, member.user.username, member.user.discriminator);
 					} else {
@@ -183,6 +184,7 @@ global.getServer = function getServer(serverName) {
  * Retrieves an user object given the user's ID.
  */
 global.getStudent = function getStudent(userID) {
+	console.log(userID)
 	if (!fs.existsSync(`./users/${userID}.json`)) {
 		// TODO: handle this exception.
 		return null;

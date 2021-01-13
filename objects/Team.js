@@ -22,12 +22,14 @@ class Team {
 		this.confirmed = false;	// Whether this team has been confirmed
 								// as "closed" (immutable in members)
 								// by its members or not.
-		if (save) this.save();
+		if (save) {
+			this.save();
 
-		// Add to the server-name map:
-		let nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) : {};
-		nameMap[id] = this.name;
-		fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap));
+			// Add to the server-name map:
+			let nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) : {};
+			nameMap[id] = this.name;
+			fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap));
+		}
 	}
 
 	/**
