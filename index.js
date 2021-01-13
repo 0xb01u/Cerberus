@@ -132,8 +132,7 @@ bot.on("message", async msg => {
 		// Retrieve the server ID:
 		let serverID = -1;
 
-		if (cmd === "set") { /* Do nothing with the server ID */ }
-		else if (msg.channel.type === "dm") {
+		if (msg.channel.type === "dm") {
 			userLevel = (msg.author.id === "231844961878802442")// || msg.member.hasPermission("ADMINISTRATOR"))
 				? "administrator/" : "";
 
@@ -143,16 +142,10 @@ bot.on("message", async msg => {
 
 			let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 
-			let guildName = args.shift();
-			if (!(guildName in guildMap)) {
-				return msg.reply(
-					`I don't know about any server named "${guildName}, can you check that again?"\n` +
-					`(Remember that on direct message channels you must specify the name of the Discord server` +
-					`you are refering to as the first argument of any command, replacing any space " " with underscores "_".)`
-				);
+			let guildName = args[0];
+			if (guildName in guildMap) {
+				serverID = guildMap[args.shift()];
 			}
-
-			serverID = guildMap[guildName];
 		} else {
 			serverID = msg.guild.id;
 		}
