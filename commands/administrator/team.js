@@ -63,7 +63,7 @@ exports.run = async (bot, msg, args, serverID) => {
 
 				// Create team if it doesn't exist already.
 				if (!fs.existsSync(`./teams/${server}/${teamID}.json`)) {
-					let team = new Team(teamID);
+					let team = new Team(teamID, server);
 					// Automatically join team: no confirmation needed,
 					// as it is the first user to request it:
 					if (team.join(msg.author.id)) {
@@ -113,7 +113,7 @@ exports.run = async (bot, msg, args, serverID) => {
 					teamID = 'g' + (rndNum).toLocaleString('en-US', {minimumInteberDigits: digits, useGrouping: false})
 				} while (teamList.includes(teamID));
 
-				let team = new Team(teamID);
+				let team = new Team(teamID, server);
 				if (team.join(msg.author.id)) {
 					msg.author.send(
 						`Correctly joined team ${teamID} on server ${serverName}.`

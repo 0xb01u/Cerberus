@@ -96,7 +96,7 @@ class Student {
 	 * Sets the preferred queue of the student.
 	 */
 	setQueue(queue) {
-		this.queue = queue;
+		this.preferredQueue = queue;
 
 		this.save();
 	}

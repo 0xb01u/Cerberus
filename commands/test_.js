@@ -20,35 +20,35 @@ exports.run = async (bot, msg, args, file) => {
 		line = student.latestClientCommand;
 
 	} else {
-		if (args.include("-u") || args.include("-q") || args.include("--")) {
+		if (args.includes("-u") || args.includes("-q") || args.includes("--")) {
 			line = args.join(" ").split("--")[0];
 		}
 
 		// Check if user and password were BOTH sent or not sent:
-		if ((!args.include("-u") && args.include("-x"))
-			|| (args.include("-u") && !args.include("-x"))) {
+		if ((!args.includes("-u") && args.includes("-x"))
+			|| (args.includes("-u") && !args.includes("-x"))) {
 			return msg.reply(
 				`**Error**: You must specify both an username (-u) `+
 				`and a password (-x) when sending a program to the queue.`
 			);
 		// Check and use default user and password:
-		} else if ((!args.include("-u"))) {
+		} else if ((!args.includes("-u"))) {
 			let credentials = student.credentials[student.preferredServer];
 			line += ` -u ${credentials.team} -x ${credentials.passwd} `
 		}
 
 		// Check if no queue was provided and there's no default one.
-		if (!args.include("-q") && student.preferredQueue === null) {
+		if (!args.includes("-q") && student.preferredQueue === null) {
 			return msg.reply(
 				`**Error**: You must specify a queue to send the program to.`
 			);
 		// Check and use default queue:
-		} else if (!args.include("-q")) {
+		} else if (!args.includes("-q")) {
 			line += ` -q ${student.preferredQueue} `;	
 		}
 
 		// Reconstruct the client command:
-		if (!args.include("-u") && !args.include("-q") && !args.include("--")) {
+		if (!args.includes("-u") && !args.includes("-q") && !args.includes("--")) {
 			line += ` -- ${args.join(" ")}`;
 		} else {
 			line += args.join(" ").split("--")[1] == null ? `` : `--${args.join(" ").split("--")[1]}`;
@@ -58,10 +58,10 @@ exports.run = async (bot, msg, args, file) => {
 	// Send the program to the corresponding queue:
 	try {
 		console.log(`python2 ./tools/client ./programs/${file} ${line}`);
-		let oùtput = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
+		let output = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
 		fs.unlinkSync(`./programs/${file}`);
 		student.setCommand(line);
-		msg.reply(output);
+		msg.reply(output.toString());
 	} catch (exc) {
 		fs.unlinkSync(`./programs/${file}`);
 		msg.reply(
