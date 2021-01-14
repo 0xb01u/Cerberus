@@ -61,7 +61,7 @@ exports.run = async (bot, msg, args, file) => {
 		let output = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
 		fs.unlinkSync(`./programs/${file}`);
 		student.setCommand(line);
-		msg.reply(output.toString());
+		msg.reply(`Sent: \`${line}\`\n` + output.toString());
 	} catch (exc) {
 		fs.unlinkSync(`./programs/${file}`);
 		msg.reply(

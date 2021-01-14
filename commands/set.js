@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-exports.run = async (bot, msg, args, ..._) => {
+exports.run = async (bot, msg, args) => {
 	if (msg.channel.type !== "dm") return;	// TODO: warn?
 
 	let user = msg.author.id;
