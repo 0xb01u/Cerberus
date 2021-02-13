@@ -1,7 +1,11 @@
 const fs = require("fs");
 
 exports.run = async (bot, msg, args) => {
-	if (msg.channel.type !== "dm") return;	// TODO: warn?
+	if (msg.channel.type !== "dm") {
+		let reply = await msg.reply("this command can only be used via DM. Message me directly!");
+		reply.delete(10000);
+		msg.delete(10000);
+	}
 
 	if (args.length > 0) {
 		return require("./set.js").run(bot, msg, args);

@@ -6,7 +6,7 @@ const TeamConfirmation = require("../../objects/TeamConfirmation.js");
 /**
  * Team manager command.
  *
- * Currently supports: join, leave, rename.
+ * Currently supports: join, leave, rename, accept and reject.
  */
 exports.run = async (bot, msg, args, serverID) => {
 	// Variables initialization:
@@ -21,18 +21,15 @@ exports.run = async (bot, msg, args, serverID) => {
 	// Create directories if they don't exist:
 	if (!fs.existsSync(`./teams`)) fs.mkdirSync(`./teams/${server}`, { recursive: true });
 	else if (!fs.existsSync(`./teams/${server}`)) fs.mkdirSync(`./teams/${server}`);
-	// TODO: remove checks from any other place in the code. (First time used is always here.)
 
 	// TODO: filter non-team files:
 	const teamList = fs.readdirSync(`./teams/${server}/`);
 
 	switch (args[0]) {
-		// TODO: split into team join and create?
 		// TODO: check exact number of arguments.
 		case "join":{
 			// Check if the author is already on a team for that server.
 			if (server in userTeams) {
-				// TODO: Handle this exception;
 				return msg.author.send(
 					`Looks like your trying to join a team on server ${serverName}, ` +
 					`but you're already on team ${userTeams[server].team} there. ` +

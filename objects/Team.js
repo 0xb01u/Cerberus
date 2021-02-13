@@ -165,8 +165,7 @@ class Team {
 	 */
 	save() {
 		// Create directories if they don't exist:
-		if (!fs.existsSync(`./teams`)) fs.mkdirSync(`./teams/${this.server}`, { recursive: true });
-		else if (!fs.existsSync(`./teams/${this.server}`)) fs.mkdirSync(`./teams/${this.server}`);
+		//  - Done on team.js -
 
 		// Write as JSON:
 		fs.writeFileSync(`./teams/${this.server}/${this.id}.json`, JSON.stringify(this));
