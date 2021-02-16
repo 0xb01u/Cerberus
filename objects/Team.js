@@ -28,7 +28,7 @@ class Team {
 			// Add to the server-name map:
 			let nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) : {};
 			nameMap[id] = this.name;
-			fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap));
+			fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap, null, 2));
 		}
 	}
 
@@ -103,7 +103,7 @@ class Team {
 		this.name = newName;
 		// Update the server-name map:
 		nameMap[id] = this.name;
-		fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap));
+		fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap, null, 2));
 
 		this.save();
 	}
@@ -179,7 +179,7 @@ class Team {
 		//  - Done on team.js -
 
 		// Write as JSON:
-		fs.writeFileSync(`./teams/${this.server}/${this.id}.json`, JSON.stringify(this));
+		fs.writeFileSync(`./teams/${this.server}/${this.id}.json`, JSON.stringify(this, null, 2));
 	}
 
 	/**

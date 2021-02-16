@@ -116,6 +116,7 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			// Generate random ID:
 			} else {
+				// TODO: account for !team leave!!!
 				let maxTeams = Math.ceil(guild.memberCount / process.env.TEAM_CAPACITY);
 
 				let maxTeamsCopy = maxTeams;

@@ -70,7 +70,7 @@ exports.run = async (bot, msg, args) => {
 			+ "That means, I will automatically know with which credentials (team and password) "
 			+ "I will have to send your programs, if you have that configured!\n"
 			+ "(If you're just in one server that uses me, it should be automatically set, "
-			+ "and you shouldn't worry about nor try to change this.\n\n"
+			+ "and you shouldn't worry about nor try to change this.)\n\n"
 			+ "`queue` sets the default queue to send programs to. "
 			+ "So you won't need to write `-q [queue]` all the time!\n\n"
 			+ "If you send a program specifying any option (team, password or queue) "

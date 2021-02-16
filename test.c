@@ -1,1 +1,0 @@
-main(int argc, char *argv[]){printf("Result: %d\nTime: %d", atoi(argv[1]) + atoi(argv[2]), (atoi(argv[1]) + atoi(argv[2])) << 2);}

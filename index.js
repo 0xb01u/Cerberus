@@ -7,6 +7,8 @@ process.env["TOKEN"] = env.TOKEN;
 process.env["PRE"] = env.PRE;
 process.env["TEAM_CAPACITY"] = env.TEAM_CAPACITY;
 process.env["TEAM_PRE"] = env.TEAM_PRE;
+process.env["BOT_CHANNEL"] = env.BOT_CHANNEL;
+delete env;
 
 const bot = new Discord.Client();
 bot.login(process.env.TOKEN);
@@ -19,7 +21,9 @@ bot.on("ready", async () => {
 	// Hermes image taken from: https://www.theoi.com/Gallery/M12.5.html
 
 	if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
-	let guildMap = fs.existsSync(`./guilds/guildMap.json`) ? JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) : {};
+	let guildMap = fs.existsSync(`./guilds/guildMap.json`) ?
+	JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) :
+	{};
 
 	// Rename to "Hermes":
 	for (let guild of bot.guilds.cache.array()) {
@@ -30,7 +34,7 @@ bot.on("ready", async () => {
 		if (!(guild.id in guildMap)) {
 			let guildName = guild.name.replace(/ /g, "_");
 			guildMap[guildName] = guild.id;
-			fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap));
+			fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap, null, 2));
 
 			const Student = require("./objects/Student.js");
 
@@ -58,11 +62,13 @@ bot.on("guildCreate", async guild => {
 	//(await guild.members.fetch(bot.user.id)).setNickname("Hermes");
 
 	if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
-	let guildMap = !fs.existsSync(`./guilds/guildMap.json`) ? JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) : {};
+	let guildMap = !fs.existsSync(`./guilds/guildMap.json`) ?
+	JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) :
+	{};
 
 	let guildName = guild.name.replace(/ /g, "_");
 	guildMap[guildName] = guild.id;
-	fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap));
+	fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap, null, 2));
 
 	const Student = require("./objects/Student.js");
 
@@ -136,7 +142,7 @@ bot.on("message", async msg => {
 	else if ((msg.channel.type !== "dm" && msg.member.hasPermission("ADMINISTRATOR"))
 		&& msg.attachments.size == 1 && msg.attachments.first().name.match(/\.teams$/)) {
 
-		if (msg.channel.name !== "bot") msg.delete({ timeout: 0 });
+		if (msg.channel.name !== process.env.BOT_CHANNEL) msg.delete({ timeout: 0 });
 
 		let att = msg.attachments.first();
 
@@ -201,11 +207,15 @@ bot.on("message", async msg => {
 		}
 
 		try {
-			delete require.cache[require.resolve(`./commands/${userLevel}${cmd}.js`)];
+			/* Execute the JavaScript file with same name as the specified command. */
 
+			// First update the command's file:
+			delete require.cache[require.resolve(`./commands/${userLevel}${cmd}.js`)];
+			// Then execute:
 			require(`./commands/${userLevel}${cmd}.js`).run(bot, msg, args, serverID);
 
-		} catch (e) { 
+		} catch (e) {
+			// If the command couldn't be executed.
 			if (msg.channel.type === "dm") msg.reply("nonexistent command.");
 			//console.log(e.stack);
 		}

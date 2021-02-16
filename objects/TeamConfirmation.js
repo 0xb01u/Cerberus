@@ -115,7 +115,7 @@ class TeamConfirmation {
 		//  - Done on team.js -
 
 		// Write as JSON:
-		fs.writeFileSync(`./teams/${this.server}/${this.tm.id}#${this.usr}.json`, JSON.stringify(this));
+		fs.writeFileSync(`./teams/${this.server}/${this.tm.id}#${this.usr}.json`, JSON.stringify(this, null, 2));
 	}
 
 	/**

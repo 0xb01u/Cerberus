@@ -144,7 +144,7 @@ class Student {
 	save() {
 		if (!fs.existsSync(`./users/`)) fs.mkdirSync(`./users/`);
 		// TODO: account for name changes.
-		fs.writeFileSync(`./users/${this.id}.json`, JSON.stringify(this));
+		fs.writeFileSync(`./users/${this.id}.json`, JSON.stringify(this, null, 2));
 	}
 
 	/**
