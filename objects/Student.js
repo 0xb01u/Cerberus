@@ -49,6 +49,20 @@ class Student {
 	}
 
 	/**
+	 * Adds the password for a server the student is in.
+	 */
+	addPassword(serverID, password) {
+		if (!(serverID in this.credentials)) {
+			// TODO: handle this exception.
+			return;
+		}
+
+		this.credentials[serverID].passwd = password;
+
+		this.save();
+	}
+
+	/**
 	 * Adds a team for one of the guilds this student is in.
 	 */
 	addTeam(serverID, teamID) {
@@ -69,7 +83,7 @@ class Student {
 	 * so their members could join and leave at will.
 	 */
 	removeTeam(serverID) {
-		if (!this.guilds.include(serverID)) {
+		if (!this.guilds.includes(serverID)) {
 			// TODO: handle this exception.
 			return;
 		}

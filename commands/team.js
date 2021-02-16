@@ -18,11 +18,11 @@ exports.run = async (bot, msg, args, serverID) => {
 	let userTeams = student.credentials;
 
 	if (args.length < 1) {
-		let reply = msg.reply("please, choose an option for the command:\n"
-			+ `\`${process.env.PRE}team [join|leave|rename|accept|reject]\`\n\n`);
+		let reply = await msg.reply("please, choose an option for the command:\n" +
+			`\`${process.env.PRE}team [join|leave|accept|reject]\`\n\n`);
 		if (msg.channel.type !== "dm") {
-			reply.delete(30000);
-			msg.delete(30000);
+			reply.delete({ timeout: 30000 });
+			msg.delete({ timeout: 30000 });
 		}
 
 		return;
@@ -33,20 +33,11 @@ exports.run = async (bot, msg, args, serverID) => {
 	if (!fs.existsSync(`./teams`)) fs.mkdirSync(`./teams/${server}`, { recursive: true });
 	else if (!fs.existsSync(`./teams/${server}`)) fs.mkdirSync(`./teams/${server}`);
 
-	let teams = fs.readdirSync(`./teams/${server}/`);
-	const teamList = teams.filter(team => team.startsWith(process.env.TEAM_PRE));
+	let teamFiles = fs.readdirSync(`./teams/${server}/`);
+	const teamList = teamFiles.filter(team => RegExp(`^${process.env.TEAM_PRE}\\d+`).test(team));
 
 	switch (args[0]) {
-		// TODO: check exact number of arguments.
 		case "join":{
-			if (args.length < 2) {
-				let reply = msg.reply("please, let me know what team you want to join! :(");
-
-				if (msg.channel.type !== "dm") {
-					reply.delete(30000);
-					msg.delete(30000);
-				}
-			}
 
 			// Check if the author is already on a team for that server.
 			if (server in userTeams) {
@@ -62,13 +53,13 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			// Check if a team ID was given.
 			if (args.length > 1) {
-				if (!RegExp(`^${process.env.TEAM_PRE}\d+`).test(args[1])) {
-					let reply = msg.reply("the team ID you've entered is not correct. "
-						+ `It should be a number preceded by ${process.env.TEAM_PRE}.`);
+				if (!RegExp(`^${process.env.TEAM_PRE}\\d+`).test(args[1])) {
+					let reply = await msg.reply("the team ID you've entered is not correct. " +
+						`It should be a number preceded by ${process.env.TEAM_PRE}.`);
 					
 					if (msg.channel.type !== "dm") {
-						reply.delete(30000);
-						msg.delete(30000);
+						reply.delete({ timeout: 30000 });
+						msg.delete({ timeout: 30000 });
 					}
 				} else {
 					IDgiven = true;
@@ -80,8 +71,17 @@ exports.run = async (bot, msg, args, serverID) => {
 			if (IDgiven) {
 				// TODO: add support to join by name.
 				if (!teamList.includes(teamID)) {
-					// TODO: handle this exception.
-					return;
+					let reply = await msg.author.send(`there's no team with ID ${teamID} on server` +
+						`${serverName} yet.\n` +
+						"Currently, creating a team with a predefined ID is not supported. " +
+						`Use \`${process.env.PRE}team join\` to create and join a team with ` +
+						"a random ID, or specify the ID of an existing team to request " +
+						"joining it.\nIf you think this is an error, contact the system admin!"
+					);
+
+					if (msg.channel.type !== "dm") {
+						msg.delete({ timeout: 30000 });
+					}
 				}
 
 				// Create team if it doesn't exist already.
@@ -106,7 +106,8 @@ exports.run = async (bot, msg, args, serverID) => {
 						);
 					} else {
 						msg.author.send(
-							`There was a problem trying to send a request to join team ${teamID} on server ${serverName}.\n` +
+							`There was a problem trying to send a request to join team ` +
+							`${teamID} on server ${serverName}.\n` +
 							`Maybe the team is already full?`
 						);
 					}
@@ -115,26 +116,18 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			// Generate random ID:
 			} else {
-				// TODO: filter teachers and other non-students;
-				let totalTeams = Math.ceil(guild.memberCount / process.env.TEAM_CAPACITY);
+				let maxTeams = Math.ceil(guild.memberCount / process.env.TEAM_CAPACITY);
 
-				if (teamList.length - 2 >= totalTeams) {
-					// TODO: handle this exception.
-					return;
-				}
-
-				let totalTeamsCopy = totalTeams;
+				let maxTeamsCopy = maxTeams;
 				let digits = 0;
 
 				do {
-					totalTeamsCopy /= 10;
+					maxTeamsCopy /= 10;
 					digits++;
-				} while (totalTeamsCopy > 0);
+				} while (maxTeamsCopy > 0);
 
-				do {
-					let rndNum = Math.floor(Math.random() * totalTeams);
-					teamID = 'g' + (rndNum).toLocaleString('en-US', {minimumInteberDigits: digits, useGrouping: false})
-				} while (teamList.includes(teamID));
+				let num = teamList.length + 1;
+				teamID = 'g' + (num).toLocaleString('en-US', {minimumInteberDigits: digits, useGrouping: false});
 
 				let team = new Team(teamID, server);
 				if (team.join(msg.author.id)) {
@@ -151,14 +144,13 @@ exports.run = async (bot, msg, args, serverID) => {
 
 		case "leave":{
 			if (!(server in userTeams)) {
-				// TODO: Handle this exception.
 				return msg.author.send(
 					`Looks like you are trying to **leave** your team on server ${serverName}, ` +
 					`but you are not part of any team there!`
 				);
 			}
 
-			let team = global.getTeam(userTeams[server], server);
+			let team = global.getTeam(userTeams[server].team, server);
 
 			if (team.confirmed) {
 				return msg.author.send(
@@ -169,13 +161,22 @@ exports.run = async (bot, msg, args, serverID) => {
 			}
 
 			team.leave(user);
-			return msg.send(
+			return msg.author.send(
 				`Succsesfully left team ${team.name}.`
 			);}
 
+		/*
 		case "rename":{
+			if (args.length < 2) {
+				let reply = await msg.reply("you should tell me what team you want me to rename!");
+
+				if (msg.channel.type !== "dm") {
+					reply.delete({ timeout: 30000 });
+					msg.delete({ timeout: 30000 });
+				}
+			}
+
 			if (!(server in userTeams)) {
-				// TODO: Handle this exception;
 				return msg.author.send(
 					`Looks like you are trying to **rename** your team on server ${serverName}, ` +
 					`but you are not part of any team there!`
@@ -185,7 +186,6 @@ exports.run = async (bot, msg, args, serverID) => {
 			let team = global.getTeam(userTeams[server], server);
 
 			if (args.length < 3) {
-				// TODO: Handle this exception;
 				return msg.author.send(
 					`Looks like you are trying to **rename** your team ${team.name} on server ${serverName}, ` +
 					`but you didn't provide any new name! Use the command like this:\n`
@@ -194,7 +194,6 @@ exports.run = async (bot, msg, args, serverID) => {
 			}
 
 			if (args[2].length > 16) {
-				// TODO: Handle this exception;
 				return msg.author.send(
 					`Looks like you are trying to **rename** your team  ${team.name} on server ${serverName}, ` +
 					`but the name given is too long. Team names must be at most 16 characters long.`
@@ -206,10 +205,10 @@ exports.run = async (bot, msg, args, serverID) => {
 			return msg.author.send(
 				`Correctly changed the name of the team ${team.id} on server ${serverName} to ${team.name}.`
 			);}
+		*/
 
 		case "accept":{
 			if (!(server in userTeams)) {
-				// TODO: Handle this exception.
 				return msg.author.send(
 					`Looks like you are trying to **accept** a member on a team on server ${serverName}, ` +
 					`but you are not part of any team there!`
@@ -218,9 +217,9 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			let reqID = args[1];
 			if (!fs.existsSync(`./teams/${server}/${reqID}.json`)) {
-				// TODO: Handle this exception.
 				return msg.author.send(
-					`Looks like you are trying to **accept** a member on team ${userTeams[server]} on server ${serverName}, ` +
+					`Looks like you are trying to **accept** a member on team` +
+					`${userTeams[server]} on server ${serverName}, ` +
 					`but they didn't send any request to join it! Did you get the request number wrong?`
 				);
 			}
@@ -234,7 +233,6 @@ exports.run = async (bot, msg, args, serverID) => {
 
 		case "reject":{
 			if (!(server in userTeams)) {
-				// TODO: Handle this exception.
 				return msg.author.send(
 					`Looks like you are trying to **reject** a member on a team on server ${serverName}, ` +
 					`but you are not part of any team there!`
@@ -243,7 +241,6 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			let reqID = args[1];
 			if (!fs.existsSync(`./teams/${server}/${reqID}.json`)) {
-				// TODO: Handle this exception.
 				return msg.author.send(
 					`Looks like you are trying to **reject** a member on team ${userTeams[server]} on server ${serverName}, ` +
 					`but they didn't send any request to join it! Did you get the request number wrong?`

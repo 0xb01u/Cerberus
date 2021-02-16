@@ -1,7 +1,12 @@
 const Discord = require("discord.js");
 const http = require("https");
 const fs = require("fs");
-require("dotenv").config();
+
+var env = JSON.parse(fs.readFileSync("env.json"));
+process.env["TOKEN"] = env.TOKEN;
+process.env["PRE"] = env.PRE;
+process.env["TEAM_CAPACITY"] = env.TEAM_CAPACITY;
+process.env["TEAM_PRE"] = env.TEAM_PRE;
 
 const bot = new Discord.Client();
 bot.login(process.env.TOKEN);
@@ -13,25 +18,25 @@ bot.on("ready", async () => {
 	// Cerberus image taken from: https://imgbin.com/png/XKxfm3Sc/hades-dog-cerberus-greek-mythology-graphics-png
 	// Hermes image taken from: https://www.theoi.com/Gallery/M12.5.html
 
+	if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
+	let guildMap = fs.existsSync(`./guilds/guildMap.json`) ? JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) : {};
+
 	// Rename to "Hermes":
 	for (let guild of bot.guilds.cache.array()) {
-		(await guild.members.fetch(bot.user.id)).setNickname("Hermes");
+		console.log(`Hermes entered the guild ${guild.name} (${guild.id}).`);
 
-		if (guild.id === "699906186043981892" || guild.id == "593934181525094427") {
-			console.log(`Hermes joined the guild ${guild.name} (${guild.id}).`);
+		// (await guild.members.fetch(bot.user.id)).setNickname("Hermes");
 
-			if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
-			let guildMap = fs.existsSync(`./guilds/guildMap.json`) ? JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) : {};
-
+		if (!(guild.id in guildMap)) {
 			let guildName = guild.name.replace(/ /g, "_");
 			guildMap[guildName] = guild.id;
 			fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap));
 
 			const Student = require("./objects/Student.js");
 
-			// TODO: change cache for fetch; research Intents (GUILD_MEMBERS)
+			// IMPORTANT: Intents (GUILD_MEMBERS)
 			for (let member of (await guild.members.fetch()).array()) {
-				if (!member.user.bot && (!member.hasPermission("ADMINISTRATOR") || true)) {
+				if (!member.user.bot) {
 					if (!fs.existsSync(`./users/${member.id}.json`)) {
 						let student = new Student(member.id, guildName, member.user.username, member.user.discriminator);
 					} else {
@@ -62,8 +67,7 @@ bot.on("guildCreate", async guild => {
 	const Student = require("./objects/Student.js");
 
 	for (let member of (await guild.members.fetch()).array()) {
-		// TODO: change ADMINISTRATOR to a role.
-		if (!member.hasPermission("ADMINISTRATOR")) {
+		if (!member.user.bot) {
 			if (!fs.existsSync(`./users/${member.id}.json`)) {
 				let student = new Student(member.id, guildName, member.user.username, member.user.discriminator);
 			} else {
@@ -95,7 +99,10 @@ bot.on("message", async msg => {
 
 	let userLevel = "";
 
-	if (msg.channel.type === "dm" && msg.attachments.size > 0) {
+	/*
+	 * Sending a program to the queue.
+	 */
+	if (msg.channel.type === "dm" && msg.attachments.size == 1) {
 		// Download attachement:
 		let att = msg.attachments.first();
 		let args = msg.content.split(" ");
@@ -123,9 +130,51 @@ bot.on("message", async msg => {
 		});
 	}
 
+	/*
+	 * Sending a team-password file to update the teams.
+	 */
+	else if ((msg.channel.type !== "dm" && msg.member.hasPermission("ADMINISTRATOR"))
+		&& msg.attachments.size == 1 && msg.attachments.first().name.match(/\.teams$/)) {
+
+		if (msg.channel.name !== "bot") msg.delete({ timeout: 0 });
+
+		let att = msg.attachments.first();
+
+		/*
+		 * Fetch the file and process it.
+		 */
+		http.get(att.url).on("response", async response => {
+			response.setEncoding("utf8");
+			let body = "";	// Text file.
+
+			response.on("data", chunk => {
+				body += chunk;
+			});
+
+			response.on("end", () => {
+				let passwds = body.split("\n");
+
+				for (let line of passwds) {
+					let teamID = line.split(" ")[0];
+					let passwd = line.split(" ")[1];
+
+					global.getTeam(teamID, msg.guild.id).setPassword(passwd);
+				}
+				msg.reply("the passwords for the teams have been updated succesfully!");
+			});
+
+			response.on("error", e => {
+				msg.reply("there was an error trying to update the passwords for the teams >:(");
+			});
+		});
+	}
+
+	/*
+	 * Usage of a regular command.
+	 */
 	else if (msg.content.startsWith(process.env.PRE)) {
 		let args = msg.content.substring(process.env.PRE.length).split(" ");
-		// Remove epty elements on args array:
+		// Remove empty elements on args array:
 		args = args.filter((e) => e != "");
 		let cmd = args.shift().toLowerCase();
 
@@ -133,7 +182,8 @@ bot.on("message", async msg => {
 		let serverID = -1;
 
 		if (msg.channel.type === "dm") {
-			userLevel = (msg.author.id === "231844961878802442")// || msg.member.hasPermission("ADMINISTRATOR"))
+			// TODO: admins outside guilds.
+			userLevel = false // || msg.member.hasPermission("ADMINISTRATOR"))
 				? "administrator/" : "";
 
 			if (!fs.existsSync(`./guilds/guildMap.json`)) {
@@ -157,7 +207,7 @@ bot.on("message", async msg => {
 
 		} catch (e) { 
 			if (msg.channel.type === "dm") msg.reply("nonexistent command.");
-			console.log(e.stack);
+			//console.log(e.stack);
 		}
 	}
 });
@@ -167,13 +217,13 @@ bot.on("message", async msg => {
  */
 global.getServer = function getServer(serverName) {
 	if (!fs.existsSync(`./guilds/guildMap.json`)) {
-		// TODO: handle this exception.
+		// Exception.
 		return null;
 	}
 
 	let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 	if (!(serverName in guildMap)) {
-		// TODO: handle this exception.
+		// Exception.
 		return null;
 	}
 
@@ -185,7 +235,7 @@ global.getServer = function getServer(serverName) {
  */
 global.getStudent = function getStudent(userID) {
 	if (!fs.existsSync(`./users/${userID}.json`)) {
-		// TODO: handle this exception.
+		// Exception.
 		return null;
 	}
 
@@ -198,7 +248,7 @@ global.getStudent = function getStudent(userID) {
  */
 global.getTeam = function getTeam(teamID, guildID) {
 	if (!fs.existsSync(`./teams/${guildID}/${teamID}.json`)) {
-		// TODO: handle this exception..
+		// Exception.
 		return null;
 	}
 

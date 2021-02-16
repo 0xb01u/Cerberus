@@ -92,7 +92,9 @@ class Team {
 		}
 
 		// The name cannot be the same as another team's name:
-		nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) : {};
+		nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ?
+		JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) :
+		{};
 		if (Object.values(nameMap).includes(newName)) {
 			// TODO: handle this exception.
 			return;
@@ -110,8 +112,17 @@ class Team {
 	 * Sets the password for the team.
 	 */
 	setPassword(passwd) {
-		if (this.passwd !== null) {
+		if (this.passwd === null) {
+			console.log(this.id, passwd);
 			this.passwd = passwd;
+
+			for (let member of this.members) {
+				let student = global.getStudent(member);
+
+				student.addPassword(this.server, this.passwd);
+			}
+
+			this.save();
 		} else {
 			// TODO: handle this exception.
 		}

@@ -65,7 +65,7 @@ exports.run = async (bot, msg, args, file) => {
 	} catch (exc) {
 		fs.unlinkSync(`./programs/${file}`);
 		msg.reply(
-			`**Error while sending the program to the queue:**\n${exc.stderr.toString()}`
+			`**Error while sending the program to the queue.**\n${exc.stderr.toString()}`
 		);
 	}
 }
