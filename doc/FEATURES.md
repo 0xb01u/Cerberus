@@ -1,18 +1,18 @@
 # Bot features
 
-This file contains a list with the entirety of Hermes' currently supported features, as well as a brief explanation for all of them.
+This file contains a list with the entirety of Hermes' currently supported features, as well as a moderately-in-depth explanation for all of them.
 
 ## Table of contents
-1. [Sending programs to the queue](#sending)
-  1. [Default arguments](#default)
-  2. [Resend last arguments](#last)
-2. [Commands](#commands)
-  1. [set](#set)
-  2. [config](#config)
-  3. [team](#team)
+ 1. [Sending programs to a queue](#sending)
+   1.1. [Default arguments](#default)
+   1.2. [Resend last arguments](#last)
+ 2. [Commands](#commands)
+   2.1. [set](#set)
+   2.2. [config](#config)
+   2.3. [team](#team)
 
 
-## Sending programs to the queue <a name=sending></a>
+## Sending programs to a queue <a name=sending></a>
 
 To send a program to a Tablón queue, is as easy as sending the source code to the bot, via its Direct Message channel. This is, send the source code directly to the bot as a Discord user, not to any server the bot might be in. The body of the message with the source code attached must contain the request arguments. The request arguments to specify are:
  * `-u TEAM` - The team identifier.
@@ -48,6 +48,8 @@ In the examples for the commands usage, the character `!` will be used as the pr
 
 ### set
 
+**This command can only be sent to the bot via Direct Message.**
+
 `set` sets default values for the [request arguments](#sending) (see above), for the user.
 
 The current settable elements are:
@@ -75,6 +77,8 @@ If the Discord server has any space in its name, you must replace them with unde
 
 ### config
 
+**This command can only be sent to the bot via Direct Message.**
+
 `config` lets you see your current default values for the request arguments. Just send:
 ```
 !config
@@ -83,6 +87,8 @@ If the Discord server has any space in its name, you must replace them with unde
 `config` can also be used as an alias for `set`. So `config server` and `config queue` are effectively equivalent to `set server` and `set queue`, respectively. (Note that `set`, without any option, is not an alias for `config` and, thus, won't do anything.)
 
 ### team
+
+**This command is associated to a server, and thus must be sent to a server (if possible), or must specify its associated server as its first argument (`!team [serverName] <args>`).** Unless the corresponding command cannot be sent to a server, the `serverName` will be ommited in the explanations and examples.
 
 `team` is used to manage teams of students.
 

@@ -2,7 +2,13 @@
 
 This guide will help you go through the process of setting up a Discord bot that runs Hermes, from the ground up. The only prerrequisites needed are a Discord account and administrator privileges on the server you want to use Hermes.
 
-## Creating a bot
+## Table of contents
+ 1. [Creating a bot](#create)
+   1.1. [Deleting a bot](#delete)
+ 2. [Making the bot join a server](#join)
+ 3. [Installing Hermes](#install)
+
+## Creating a bot <a name=create></a>
 
 These are the steps needed to create a Discord bot user and properly configure it to be able of running Hermes.
 
@@ -14,7 +20,11 @@ These are the steps needed to create a Discord bot user and properly configure i
  6. Scroll down the page and uncheck "Public bot". This way, only the user who is creating the app/bot will be able to join the bot on Discord servers.
  7. Scroll down a bit more and check "Server members intent". This is **needed** so that the bot can **keep track of the students** (the server's users) properly.
 
-## Joining a server
+### Deleting an app/bot <a name=delete></a>
+
+You can delete your app, and effectively your bot too, in the "General Information" page of your application, in the [Developer Portal](https://discord.com/developers/applications). The button is located in the bottom right of the page. You just need to enter the app name to confirm the deletion, and click on "Delete app".
+
+## Making the bot join a server <a name=join></a>
 
 A bot can only join servers you are an admin on (which is, you have Administrator permissions). So make sure you have the correct role on the server before attempting to join the bot.
 
@@ -26,11 +36,7 @@ A bot can only join servers you are an admin on (which is, you have Administrato
 
 After this, your bot will have succesfully joined the specified server.
 
-### Deleting an app/bot
-
-You can delete your app, and effectively your bot too, in the "General Information" page of your application, in the [Developer Portal](https://discord.com/developers/applications). The button is located in the bottom right of the page. You just need to enter the app name to confirm the deletion, and click on "Delete app".
-
-## Installing Hermes
+## Installing Hermes <a name=install></a>
  1. Install [Node.js](https://nodejs.org/en/). This can be done via the webpage, apt (although probably an outdated version), or from [NodeSource repository](https://github.com/nodesource/distributions#debinstall). The latter is recommended, as is the option I've had the least problems with.
  2. Verify npm has been installed with Node.js by running on a terminal:
  ```
