@@ -123,11 +123,13 @@ exports.run = async (bot, msg, args, serverID) => {
 					for (let member of team.members) {
 						teamCreationLog += `<@${member}> `
 					}
-					teamCreationLog += `).`
+					teamCreationLog += `).`;
 
-					// TODO: check if the channel exists!
-					let guldChannels = await guild.channels.cache;
-					guildChannels.filter(chn => chn.name == process.env.BOT_CHANNEL)[0].send(teamCreationLog);
+					for (channel of await guild.channels.cache.array()) {
+						if (channel.name === process.env.BOT_CHANNEL) {
+							channel.send(teamCreationLog);
+						}
+					}
 				}
 
 				return;	// Feedback message sent in the if-elses above.
@@ -247,7 +249,24 @@ exports.run = async (bot, msg, args, serverID) => {
 			}
 
 			let request = TeamConfirmation.fromJSON(JSON.parse(fs.readFileSync(`./teams/${server}/${reqID}.json`)));
+			let teamID = request.tm.id;
 			request.accept(user, bot);
+
+			// Check if the team has been completed, and log it.
+			let team = global.getTeam(teamID, server);
+			if (team.confirmed) {
+				let teamCreationLog = `Team ${teamID} has been created! ( `;
+				for (let member of team.members) {
+					teamCreationLog += `<@${member}> `
+				}
+				teamCreationLog += `).`;
+
+				for (channel of await guild.channels.cache.array()) {
+					if (channel.name === process.env.BOT_CHANNEL) {
+						channel.send(teamCreationLog);
+					}
+				}
+			}
 
 			return msg.author.send(
 				`You accepted <@${request.usr}>'s request.`

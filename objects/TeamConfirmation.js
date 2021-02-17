@@ -71,8 +71,10 @@ class TeamConfirmation {
 		if (this.delegates.size === 0) {
 			this.tm.join(this.usr);
 			if (bot !== null) {
-				(await bot.users.fetch(member)).send(`You've been accepted on team ${this.tm.name}!`);
+				(await bot.users.fetch(this.usr)).send(`You've been accepted on team ${this.tm.name} on ${(await bot.guilds.fetch(this.server)).name}.`);
 			}
+
+
 			this.delete();
 		} else {
 			this.save();
