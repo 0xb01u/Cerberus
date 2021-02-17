@@ -66,7 +66,7 @@ class Team {
 	 * confirmation request to the other team members.
 	 */
 	request(userID, middlebot=null) {
-		if (members.length === 0) {
+		if (this.members.length === 0) {
 			return this.join(userID);
 		} else {
 			if (this.confirmed) {
@@ -77,7 +77,7 @@ class Team {
 				return false;
 			}
 			let req = new TeamConfirmation(this, userID);
-			return req.sendRequest(bot);
+			return req.sendRequest(middlebot);
 		}
 	}
 

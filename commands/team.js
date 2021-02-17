@@ -28,13 +28,13 @@ exports.run = async (bot, msg, args, serverID) => {
 		return;
 	}
 
-
 	// Create directories if they don't exist:
 	if (!fs.existsSync(`./teams`)) fs.mkdirSync(`./teams/${server}`, { recursive: true });
 	else if (!fs.existsSync(`./teams/${server}`)) fs.mkdirSync(`./teams/${server}`);
 
 	let teamFiles = fs.readdirSync(`./teams/${server}/`);
-	const teamList = teamFiles.filter(team => RegExp(`^${process.env.TEAM_PRE}\\d+`).test(team));
+	const teamList = teamFiles.filter(team => RegExp(`^${process.env.TEAM_PRE}\\d+`).test(team)
+		&& !team.includes("#"));
 
 	switch (args[0]) {
 		case "join":{
@@ -42,7 +42,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			// Check if the author is already on a team for that server.
 			if (server in userTeams) {
 				return msg.author.send(
-					`Looks like your trying to join a team on server ${serverName}, ` +
+					`It looks like your trying to join a team on server ${serverName}, ` +
 					`but you're already on team ${userTeams[server].team} there. ` +
 					`You cannot join more than one team!`
 				);
@@ -70,7 +70,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			// Join an existing team, if specified.
 			if (IDgiven) {
 				// TODO: add support to join by name.
-				if (!teamList.includes(teamID)) {
+				if (!teamList.includes(`${teamID}.json`)) {
 					let reply = await msg.author.send(`there's no team with ID ${teamID} on server` +
 						`${serverName} yet.\n` +
 						"Currently, creating a team with a predefined ID is not supported. " +
@@ -82,6 +82,8 @@ exports.run = async (bot, msg, args, serverID) => {
 					if (msg.channel.type !== "dm") {
 						msg.delete({ timeout: 30000 });
 					}
+
+					return;
 				}
 
 				// Create team if it doesn't exist already.
@@ -146,7 +148,7 @@ exports.run = async (bot, msg, args, serverID) => {
 		case "leave":{
 			if (!(server in userTeams)) {
 				return msg.author.send(
-					`Looks like you are trying to **leave** your team on server ${serverName}, ` +
+					`It looks like you are trying to **leave** your team on server ${serverName}, ` +
 					`but you are not part of any team there!`
 				);
 			}
@@ -155,7 +157,7 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			if (team.confirmed) {
 				return msg.author.send(
-					`Looks like you are trying to **leave** team ${team.name} on server ${serverName}, ` +
+					`It looks like you are trying to **leave** team ${team.name} on server ${serverName}, ` +
 					`but that team is definitive, and only a server admin can edit it now. ` +
 					`Maybe you'd want to message them instead and explain why you want to leave your team.`
 				);
@@ -179,7 +181,7 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			if (!(server in userTeams)) {
 				return msg.author.send(
-					`Looks like you are trying to **rename** your team on server ${serverName}, ` +
+					`It looks like you are trying to **rename** your team on server ${serverName}, ` +
 					`but you are not part of any team there!`
 				);
 			}
@@ -188,7 +190,7 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			if (args.length < 3) {
 				return msg.author.send(
-					`Looks like you are trying to **rename** your team ${team.name} on server ${serverName}, ` +
+					`It looks like you are trying to **rename** your team ${team.name} on server ${serverName}, ` +
 					`but you didn't provide any new name! Use the command like this:\n`
 					`!team rename newCoolName`
 				);				
@@ -196,7 +198,7 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			if (args[2].length > 16) {
 				return msg.author.send(
-					`Looks like you are trying to **rename** your team  ${team.name} on server ${serverName}, ` +
+					`It looks like you are trying to **rename** your team  ${team.name} on server ${serverName}, ` +
 					`but the name given is too long. Team names must be at most 16 characters long.`
 				);				
 			}
@@ -211,7 +213,7 @@ exports.run = async (bot, msg, args, serverID) => {
 		case "accept":{
 			if (!(server in userTeams)) {
 				return msg.author.send(
-					`Looks like you are trying to **accept** a member on a team on server ${serverName}, ` +
+					`It looks like you are trying to **accept** a member on a team on server ${serverName}, ` +
 					`but you are not part of any team there!`
 				);
 			}
@@ -219,7 +221,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			let reqID = args[1];
 			if (!fs.existsSync(`./teams/${server}/${reqID}.json`)) {
 				return msg.author.send(
-					`Looks like you are trying to **accept** a member on team` +
+					`It looks like you are trying to **accept** a member on team` +
 					`${userTeams[server]} on server ${serverName}, ` +
 					`but they didn't send any request to join it! Did you get the request number wrong?`
 				);
@@ -235,7 +237,7 @@ exports.run = async (bot, msg, args, serverID) => {
 		case "reject":{
 			if (!(server in userTeams)) {
 				return msg.author.send(
-					`Looks like you are trying to **reject** a member on a team on server ${serverName}, ` +
+					`It looks like you are trying to **reject** a member on a team on server ${serverName}, ` +
 					`but you are not part of any team there!`
 				);
 			}
@@ -243,7 +245,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			let reqID = args[1];
 			if (!fs.existsSync(`./teams/${server}/${reqID}.json`)) {
 				return msg.author.send(
-					`Looks like you are trying to **reject** a member on team ${userTeams[server]} on server ${serverName}, ` +
+					`It looks like you are trying to **reject** a member on team ${userTeams[server]} on server ${serverName}, ` +
 					`but they didn't send any request to join it! Did you get the request number wrong?`
 				);
 			}

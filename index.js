@@ -90,7 +90,7 @@ bot.on("guildCreate", async guild => {
 bot.on("guildMemberAdd", member => {
 	let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 
-	if (!fs.existsSync()`./users/${member.id}.json`) {
+	if (!fs.existsSync(`./users/${member.id}.json`)) {
 		let student = new Student(member.id, guildMap[member.guild.id], member.name, member.user.username, member.user.discriminator);		
 	} else {
 		global.getStudent(member.id).addServer(guildName);
@@ -142,7 +142,7 @@ bot.on("message", async msg => {
 	else if ((msg.channel.type !== "dm" && msg.member.hasPermission("ADMINISTRATOR"))
 		&& msg.attachments.size == 1 && msg.attachments.first().name.match(/\.teams$/)) {
 
-		if (msg.channel.name !== process.env.BOT_CHANNEL) msg.delete({ timeout: 0 });
+		if (msg.channel.name !== process.env.BOT_CHANNEL) return msg.delete({ timeout: 0 });
 
 		let att = msg.attachments.first();
 
