@@ -26,7 +26,7 @@ You can delete your app, and effectively your bot too, in the "General Informati
 
 ## Making the bot join a server <a name=join></a>
 
-A bot can only join servers you are an admin on (which is, you have Administrator permissions). So make sure you have the correct role on the server before attempting to join the bot.
+A bot can only join servers you can create instant invites to. So make sure you have the correct role on the server before attempting to join the bot.
 
  1. On the Discord Developer Portal, access "OAuth2".
  2. Scroll down. On "Scopes", select "bot".
