@@ -6,6 +6,10 @@ This file records the planned features for Hermes, in a quick and dirty way.
 
 A way of showing a summarized snapshot of the leaderboard(s) at a given moment in time, maybe updating periodically.
 
+### Team names
+
+Renaming a team to show a cooler name in the leaderboard's snapshot.
+
 ### Position updates notifications
 
 A way of notifying the students when a new team enters the leaderboard or beats their time.
@@ -13,6 +17,14 @@ A way of notifying the students when a new team enters the leaderboard or beats 
 ## Admin configuration
 
 Any way for the admins/professors to manage the students' teams and other settings directly from Discord. Also, any way for the admins to change the bot's configuration directly from Discord, no need to restart.
+
+## Student identification
+
+A way to keep track of which student (name and surnames) is which Discord user. Also, automatically giving them some kind of @Student rank.
+
+## Team tracking
+
+Get students that aren't part of any team.
 
 ## Admin contact
 

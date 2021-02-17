@@ -49,7 +49,8 @@ exports.run = async (bot, msg, args) => {
 			);
 
 		case "help":
-			return msg.author.send(`Usage: \`${process.env.PRE}set [server|queue]\`\n\n`
+			return msg.author.send(
+				`Usage: \`${process.env.PRE}set [server|queue]\`\n\n`
 			+ "`server` sets the your default server to send programs to. "
 			+ "That means, I will automatically know with which credentials (team and password) "
 			+ "I will have to send your programs, if you have that configured!\n"
@@ -58,7 +59,10 @@ exports.run = async (bot, msg, args) => {
 			+ "`queue` sets the default queue to send programs to. "
 			+ "So you won't need to write `-q [queue]` all the time!\n\n"
 			+ "If you send a program specifying any option (team, password or queue) "
-			+ "different than the default ones, I will use those ones and not the defaults!");
+			+ "different than the default ones, I will use those ones and not the defaults!\n\n"
+			+ `Oh, and \`${process.env.PRE}config\` can be used as an alias for \`${process.env.PRE}set\``
+			+ "(but not the other way round)."
+			);
 			
 		default:
 			return msg.author.send("I don't recognize that option :(\n"

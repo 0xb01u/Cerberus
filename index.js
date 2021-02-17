@@ -185,7 +185,7 @@ bot.on("message", async msg => {
 		let cmd = args.shift().toLowerCase();
 
 		// Retrieve the server ID:
-		let serverID = -1;
+		let serverID = null;
 
 		if (msg.channel.type === "dm") {
 			// TODO: admins outside guilds.
@@ -217,7 +217,7 @@ bot.on("message", async msg => {
 		} catch (e) {
 			// If the command couldn't be executed.
 			if (msg.channel.type === "dm") msg.reply("nonexistent command.");
-			//console.log(e.stack);
+			console.log(e.stack);
 		}
 	}
 });

@@ -1,7 +1,5 @@
 const fs = require("fs");
 
-const TeamConfirmation = require("../objects/TeamConfirmation.js")
-
 /**
  * Class defining a team of students that compete in a leaderboard.
  */
@@ -76,6 +74,8 @@ class Team {
 				// TODO: handle this exception.
 				return false;
 			}
+			
+			const TeamConfirmation = require("./TeamConfirmation.js")
 			let req = new TeamConfirmation(this, userID);
 			return req.sendRequest(middlebot);
 		}
@@ -113,7 +113,6 @@ class Team {
 	 */
 	setPassword(passwd) {
 		if (this.passwd === null) {
-			console.log(this.id, passwd);
 			this.passwd = passwd;
 
 			for (let member of this.members) {

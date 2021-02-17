@@ -9,6 +9,7 @@ const TeamConfirmation = require("../objects/TeamConfirmation.js");
  * Currently supports: join, leave, rename, accept and reject.
  */
 exports.run = async (bot, msg, args, serverID) => {
+	if (serverID == null) return;
 	// Variables initialization:
 	let server = serverID;
 	let user = msg.author.id;
@@ -71,7 +72,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			if (IDgiven) {
 				// TODO: add support to join by name.
 				if (!teamList.includes(`${teamID}.json`)) {
-					let reply = await msg.author.send(`there's no team with ID ${teamID} on server` +
+					let reply = await msg.author.send(`There's no team with ID ${teamID} on server ` +
 						`${serverName} yet.\n` +
 						"Currently, creating a team with a predefined ID is not supported. " +
 						`Use \`${process.env.PRE}team join\` to create and join a team with ` +
@@ -114,12 +115,28 @@ exports.run = async (bot, msg, args, serverID) => {
 						);
 					}
 				}
+
+				// Check if the team has been completed, and log it.
+				let team = global.getTeam(teamID, server);
+				if (team.confirmed) {
+					let teamCreationLog = `Team ${teamID} has been created! ( `;
+					for (let member of team.members) {
+						teamCreationLog += `<@${member}> `
+					}
+					teamCreationLog += `).`
+
+					// TODO: check if the channel exists!
+					let guldChannels = await guild.channels.cache;
+					guildChannels.filter(chn => chn.name == process.env.BOT_CHANNEL)[0].send(teamCreationLog);
+				}
+
 				return;	// Feedback message sent in the if-elses above.
 
 			// Generate random ID:
 			} else {
 				// TODO: account for !team leave!!!
-				let maxTeams = Math.ceil(guild.memberCount / process.env.TEAM_CAPACITY);
+
+				/*let maxTeams = Math.ceil(guild.memberCount / process.env.TEAM_CAPACITY);
 
 				let maxTeamsCopy = maxTeams;
 				let digits = 0;
@@ -128,9 +145,11 @@ exports.run = async (bot, msg, args, serverID) => {
 					maxTeamsCopy /= 10;
 					digits++;
 				} while (maxTeamsCopy > 0);
+				*/
+				let digits = 2;
 
 				let num = teamList.length + 1;
-				teamID = 'g' + (num).toLocaleString('en-US', {minimumInteberDigits: digits, useGrouping: false});
+				teamID = 'g' + (num).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false});
 
 				let team = new Team(teamID, server);
 				if (team.join(msg.author.id)) {
@@ -228,7 +247,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			}
 
 			let request = TeamConfirmation.fromJSON(JSON.parse(fs.readFileSync(`./teams/${server}/${reqID}.json`)));
-			request.accept(user);
+			request.accept(user, bot);
 
 			return msg.author.send(
 				`You accepted <@${request.usr}>'s request.`
@@ -255,6 +274,30 @@ exports.run = async (bot, msg, args, serverID) => {
 
 			return;} // Feedback message in reject() method.
 
-		// TODO: add default.
+
+		case "help":
+			return msg.author.send(
+				`Usage: \`${process.env.PRE}team <serverName> [option] <args>\`\n\n`
+			+ `The \`serverName\` must be specified when using these commands via DM. `
+			+ "When using them on a server, it mustn't be specified.\n"
+			+ "The `serverName` must replace all spaces with underscores (`_`).\n\n"
+			+ `With \`${process.env.PRE}team join\` you can create and join a new team.\n`
+			+ `With \`${process.env.PRE}team join [teamID]\` you can join an already existing team.\n`
+			+ `**DM only:** With \`${process.env.PRE}team [serverName] accept [requestID], you can accept`
+			+ `a membership request for your team (I will tell you when to do this).\n`
+			+ `**DM only:** With \`${process.env.PRE}team [serverName] reject [requestID], you can reject`
+			+ `a membership request for your team (I will tell you when to do this).\n`
+			+ `With \`${process.env.PRE}team leave\`, you can leave your team, as long as `
+			+ "it **isn't full**"
+			);
+
+		default:
+			msg.author.send("I don't recognize that option :(\n"
+				+ `Use \`${process.env.PRE}team help\` for help.`)
+
+			if (msg.channel.type !== "dm") {
+				msg.delete({ timeout: 30000 });
+			}
+			return;
 	}
 }

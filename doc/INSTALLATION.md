@@ -1,6 +1,6 @@
 # Hermes Installation Guide
 
-This guide will help you go through the process of setting up a Discord bot that runs Hermes, from the ground up. The only prerrequisites needed are a Discord account and administrator privileges on the server you want to use Hermes.
+This guide will help you go through the process of setting up a Discord bot that runs Hermes, from the ground up. The only prerrequisites needed are a Discord account and instant invite creation privileges on the server you want to use Hermes.
 
 ## Table of contents
  1. [Creating a bot](#create)
