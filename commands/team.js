@@ -261,7 +261,7 @@ exports.run = async (bot, msg, args, serverID) => {
 				}
 				teamCreationLog += `).`;
 
-				for (channel of await guild.channels.cache.array()) {
+				for (channel of guild.channels.cache.array()) {
 					if (channel.name === process.env.BOT_CHANNEL) {
 						channel.send(teamCreationLog);
 					}
