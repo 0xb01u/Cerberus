@@ -14,19 +14,25 @@ const bot = new Discord.Client();
 bot.login(process.env.TOKEN);
 
 bot.on("ready", async () => {
-	// TODO: create directories here.
+	if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
+	let guildMap = fs.existsSync(`./guilds/guildMap.json`) ?
+		JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) :
+		{};
+
+	if (!fs.existsSync(`./users`)) fs.mkdirSync(`./users`);
+	let userMap = fs.existsSync(`./users/userMap.json`) ?
+		JSON.parse(fs.readFileSync(`./users/ùserMap.json`)) :
+		{};
+
+	if (!fs.existsSync(`./teams`)) fs.mkdirSymc(`./teams`);
+
 	bot.user.setPresence({ activity: {name: ``}, status: `online` });
 	//bot.user.setAvatar("./images/hermes.png");
 	// Cerberus image taken from: https://imgbin.com/png/XKxfm3Sc/hades-dog-cerberus-greek-mythology-graphics-png
 	// Hermes image taken from: https://www.theoi.com/Gallery/M12.5.html
 
-	if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
-	let guildMap = fs.existsSync(`./guilds/guildMap.json`) ?
-	JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) :
-	{};
-
-	// Rename to "Hermes":
 	for (let guild of bot.guilds.cache.array()) {
+		// Rename to "Hermes":
 		console.log(`Hermes entered the guild ${guild.name} (${guild.id}).`);
 
 		// (await guild.members.fetch(bot.user.id)).setNickname("Hermes");
@@ -46,6 +52,10 @@ bot.on("ready", async () => {
 					} else {
 						global.getStudent(member.id).addServer(guildName);
 					}
+
+					if (!(member.id in userMap)) {
+						userMap[member.id] = `${member.username}#${member.discriminator}`;
+					}
 				}
 			}
 		}
@@ -63,8 +73,8 @@ bot.on("guildCreate", async guild => {
 
 	if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
 	let guildMap = !fs.existsSync(`./guilds/guildMap.json`) ?
-	JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) :
-	{};
+		JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) :
+		{};
 
 	let guildName = guild.name.replace(/ /g, "_");
 	guildMap[guildName] = guild.id;
@@ -103,8 +113,6 @@ bot.on("guildMemberAdd", member => {
 bot.on("message", async msg => {
 	if (msg.author.bot) return;
 
-	let userLevel = "";
-
 	/*
 	 * Sending a program to the queue.
 	 */
@@ -121,10 +129,10 @@ bot.on("message", async msg => {
 			let download = response.pipe(file);
 			download.on("finish", async () => {
 				try {
-					delete require.cache[require.resolve(`./commands/${userLevel}test_${""}.js`)];
+					delete require.cache[require.resolve(`./commands/test_${""}.js`)];
 
 					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-					await require(`./commands/${userLevel}test_${""}.js`).run(bot, msg, args, att.name);
+					await require(`./commands/test_${""}.js`).run(bot, msg, args, att.name);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					fs.unlinkSync(filepath);
@@ -187,11 +195,7 @@ bot.on("message", async msg => {
 		// Retrieve the server ID:
 		let serverID = null;
 
-		if (msg.channel.type === "dm") {
-			// TODO: admins outside guilds.
-			userLevel = false // || msg.member.hasPermission("ADMINISTRATOR"))
-				? "administrator/" : "";
-
+		if (msg.channel.type === "dm") { // TODO: admins outside guilds.
 			if (!fs.existsSync(`./guilds/guildMap.json`)) {
 				return msg.reply(`sorry, I must join at least one server before executing any commands.`);
 			}
@@ -210,9 +214,9 @@ bot.on("message", async msg => {
 			/* Execute the JavaScript file with same name as the specified command. */
 
 			// First update the command's file:
-			delete require.cache[require.resolve(`./commands/${userLevel}${cmd}.js`)];
+			delete require.cache[require.resolve(`./commands/${cmd}.js`)];
 			// Then execute:
-			require(`./commands/${userLevel}${cmd}.js`).run(bot, msg, args, serverID);
+			require(`./commands/${cmd}.js`).run(bot, msg, args, serverID);
 
 		} catch (e) {
 			// If the command couldn't be executed.

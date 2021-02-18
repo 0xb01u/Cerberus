@@ -18,6 +18,10 @@ A way of notifying the students when a new team enters the leaderboard or beats 
 
 Any way for the admins/professors to manage the students' teams and other settings directly from Discord. Also, any way for the admins to change the bot's configuration directly from Discord, no need to restart.
 
+### Admin configuration per guild
+
+A way to set different configurations for different guilds on the same bot.
+
 ## Student identification
 
 A way to keep track of which student (name and surnames) is which Discord user. Also, automatically giving them some kind of @Student rank.
