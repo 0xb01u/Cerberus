@@ -22,6 +22,10 @@ Because "UVa\_-\_Computación\_Paralela\_20/21" is too long and we all know it.
 
 Any way for the admins/professors to manage the students' teams and other settings directly from Discord.
 
+### Admin documentation
+
+Document the admin's features.
+
 ### Admin configuration per guild
 
 A way to set different configurations for different guilds on the same bot.

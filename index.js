@@ -296,54 +296,8 @@ async function refreshLeaderboard(reaction, user) {
 		}
 	}
 
-
-
 	/* Create the embeds: */
-	let date = new Date();
-	let embedList = [];
-	let embed = new Discord.MessageEmbed()
-		.setColor(0x00ff00);
-	embed.setTitle(`Leaderboard ${lb.name}`)
-		.setURL(lb.url)
-		.setFooter(lb.name)
-		.setTimestamp(date);
-	if (lb.description !== null) {
-		embed.setDescription(lb.description);
-	}
-	embed.addFields(
-		{ name: "Pos", value: "\u200B", inline: true },
-		{ name: "Team", value: "\u200B", inline: true },
-		{ name: targetColumn, value: "\u200B", inline: true }
-	);
-
-	let fieldCount = 1;
-	let i = 1;
-	for (let entry of table) {
-		if (entry["Pos"] == "") {
-			embed.addFields(
-				{ name: "\u200B", value: "\u200B", inline: true },
-				{ name: "\u200B", value: entry["Program"], inline: true },
-				{ name: "\u200B", value: entry[targetColumn], inline: true }
-			);
-		} else {
-			embed.addFields(
-				{ name: "\u200B", value: entry["Pos"], inline: true },
-				{ name: "\u200B", value: entry["User"], inline: true },
-				{ name: "\u200B", value: entry[targetColumn], inline: true }
-			);
-		}
-
-		fieldCount++;
-		if (fieldCount % 8 === 0) {
-			embedList.push(embed);
-			embed = new Discord.MessageEmbed()
-				.setDescription(lb.description)
-				.setColor(0x00ff00)
-				.setFooter(lb.name)
-				.setTimestamp(date);
-		}
-	}
-	embedList.push(embed);
+	let embedList = lb.toEmbeds();
 
 	// Send embeds:
 	for (let i = 0; i < lbMsgs.length; i++) {

@@ -10,6 +10,7 @@ This file contains a list with the entirety of Hermes' currently supported featu
    2.1. [set](#set)
    2.2. [config](#config)
    2.3. [team](#team)
+ 3. [Leaderboards](#leaderboards)
 
 
 ## Sending programs to a queue <a name=sending></a>
@@ -124,3 +125,28 @@ Also, as long as a team hasn't reached its maximum capacity, their members can l
 ```
 !team leave
 ```
+
+## Leaderboards
+
+Admins can create visualizations for Tablón leaderboards hosted on the web, in a dedicated channel (specified as the environmental variable `LB_CHANNEL`). These visualizations will only show the positions, teams, and another of the leaderboard columns, at choice. The syntax to create leaderboard visualizations is:
+```
+!leaderboard [url] [name] [desiredField] <description ...>
+```
+where
+ * `[url]` is the URL of the webpage hosting the leaderboard.
+ * `[name]` is the name of the leaderboard in the webpage.
+ * `[desiredField]` is the name of the third column to show.
+ * `<description ...>` is an optional multiple word description. So, all the words written after `[desiredField]`, will count as description.
+
+As said before, these visualizations are only compatible with leaderboards from webpages using Tablón. Both the URL and the name are needed to locate the desired leaderboard.
+
+Examples of valid commands are:
+```
+!leaderboard http://frontendv.infor.uva.es/leaderboards cudalb Time Leaderboard CUDA para la Simulacion de la Evolución.
+!leaderboard http://frontendv.infor.uva.es/leaderboards mpilb_score Total Leaderboard MPI para la Simulacion de la Evolución, con clasificación por puntos.
+!leaderboard http://tablon-aoc.infor.uva.es/leaderboards lb_mars Score Check the program with a set of unknown reference inputs, to rank the program.
+```
+
+Leaderboard are displaeyed via [message embeds](https://discordjs.guide/popular-topics/embeds.html). Due to Discord limitations, various embeds will probably be needed to represent one leaderboard (as embeds can only have up to 25 fields, approximately 8 rows of data), so a visualization will probably need to be split among various messages. Other Discord limitations include: limiting the number of columns to 3, having to have so much space between rows, and having to show the leaderboard's description in all embeds, so their width is the same. (Well, at least is better than nothing.)
+
+Leaderboard visualizations are not refreshed automatically. All Discord users (students and admins) can **refresh leaderboard visualizations by reacting** or de-reacting to any of the messages composing them with :arrows_counterclockwise:. The bot will re-fetch the leaderboard, re-create the embeds, and edit the corresponding messages with updated values. While updating a leaderboard, the bot will appear to be writing on the chat until the information is up to date; so trying to refresh while the bot appears writing on the chat is useless and discouraged. Also, the leaderboards will constantly show the date of the last time the information was updated, up to the minutes, in the bottom of each embed composing them. To avoid high network load and the bot malfunctioning, refreshes will only be processed as frequently as once every 10 seconds.

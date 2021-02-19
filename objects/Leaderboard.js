@@ -80,6 +80,61 @@ class Leaderboard {
 	}
 
 	/**
+	 * Turn the leaderboard into multiple message embeds to send.
+	 */
+	toEmbeds() {
+		const Discord = require("discord.js");
+
+		let date = new Date();
+		let embedList = [];
+		let embed = new Discord.MessageEmbed()
+			.setColor(0x00ff00);
+		embed.setTitle(`Leaderboard ${this.name}`)
+			.setURL(this.url)
+			.setFooter(this.name)
+			.setTimestamp(date);
+		if (this.description !== null) {
+			embed.setDescription(this.description);
+		}
+		embed.addFields(
+			{ name: "Pos", value: "\u200B", inline: true },
+			{ name: "Team", value: "\u200B", inline: true },
+			{ name: targetColumn, value: "\u200B", inline: true }
+		);
+
+		let fieldCount = 1;
+		let i = 1;
+		for (let entry of table) {
+			if (entry["Pos"] == "") {
+				embed.addFields(
+					{ name: "\u200B", value: "\u200B", inline: true },
+					{ name: "\u200B", value: entry["Program"], inline: true },
+					{ name: "\u200B", value: entry[targetColumn], inline: true }
+				);
+			} else {
+				embed.addFields(
+					{ name: "\u200B", value: entry["Pos"], inline: true },
+					{ name: "\u200B", value: entry["User"], inline: true },
+					{ name: "\u200B", value: entry[targetColumn], inline: true }
+				);
+			}
+
+			fieldCount++;
+			if (fieldCount % 8 === 0) {
+				embedList.push(embed);
+				embed = new Discord.MessageEmbed()
+					.setDescription(this.description)
+					.setColor(0x00ff00)
+					.setFooter(this.name)
+					.setTimestamp(date);
+			}
+		}
+		embedList.push(embed);
+
+		return embedList;
+	}
+
+	/**
 	 * Saves the leaderboard as a JSON file.
 	 *
 	 * Leaderboards are saved as /guild/<guild_id>/<leaderboard_name>.json
