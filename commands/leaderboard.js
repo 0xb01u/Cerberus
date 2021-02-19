@@ -46,7 +46,7 @@ exports.run = async (bot, msg, args, serverID) => {
 		lb.setDescription(args.splice(3).join(" "));
 	}
 
-	let embedList = lb.toEmbeds();
+	let embedList = lb.toEmbeds(targetColumn);
 
 	// Fetch destination channel:
 	let channel;

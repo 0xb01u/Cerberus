@@ -82,7 +82,7 @@ class Leaderboard {
 	/**
 	 * Turn the leaderboard into multiple message embeds to send.
 	 */
-	toEmbeds() {
+	toEmbeds(targetColumn) {
 		const Discord = require("discord.js");
 
 		let date = new Date();
@@ -104,13 +104,25 @@ class Leaderboard {
 
 		let fieldCount = 1;
 		let i = 1;
-		for (let entry of table) {
+		for (let entry of this.table) {
+			// Create new embed if the current one is full:
+			if (fieldCount % 8 === 0) {
+				embedList.push(embed);
+				embed = new Discord.MessageEmbed()
+					.setDescription(this.description)
+					.setColor(0x00ff00)
+					.setFooter(this.name)
+					.setTimestamp(date);
+			}
+
+			// Add Reference:
 			if (entry["Pos"] == "") {
 				embed.addFields(
 					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "\u200B", value: entry["Program"], inline: true },
 					{ name: "\u200B", value: entry[targetColumn], inline: true }
 				);
+			// Add team's program:
 			} else {
 				embed.addFields(
 					{ name: "\u200B", value: entry["Pos"], inline: true },
@@ -120,14 +132,6 @@ class Leaderboard {
 			}
 
 			fieldCount++;
-			if (fieldCount % 8 === 0) {
-				embedList.push(embed);
-				embed = new Discord.MessageEmbed()
-					.setDescription(this.description)
-					.setColor(0x00ff00)
-					.setFooter(this.name)
-					.setTimestamp(date);
-			}
 		}
 		embedList.push(embed);
 
