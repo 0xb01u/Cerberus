@@ -125,9 +125,9 @@ exports.run = async (bot, msg, args, serverID) => {
 					}
 					teamCreationLog += `).`;
 
-					for (channel of await guild.channels.cache.array()) {
-						if (channel.name === process.env.BOT_CHANNEL) {
-							channel.send(teamCreationLog);
+					for (let ch of await guild.channels.cache.array()) {
+						if (ch.name === process.env.BOT_CHANNEL) {
+							ch.send(teamCreationLog);
 						}
 					}
 				}
@@ -261,9 +261,9 @@ exports.run = async (bot, msg, args, serverID) => {
 				}
 				teamCreationLog += `).`;
 
-				for (channel of guild.channels.cache.array()) {
-					if (channel.name === process.env.BOT_CHANNEL) {
-						channel.send(teamCreationLog);
+				for (let ch of guild.channels.cache.array()) {
+					if (ch.name === process.env.BOT_CHANNEL) {
+						ch.send(teamCreationLog);
 					}
 				}
 			}

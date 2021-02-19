@@ -62,6 +62,8 @@ exports.run = async (bot, msg, args) => {
 				}
 				ch.send(outMsg);
 				sent = true;
+
+				break;
 			}
 		}
 

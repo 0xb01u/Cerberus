@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/0xb01u/Cerberus/tree/hermes#readme",
   "dependencies": {
-    "discord.js": "^12.5.1"
+    "discord.js": "^12.5.1",
+    "table-scraper": "^1.0.3"
   }
 }

@@ -2,21 +2,25 @@
 
 This file records the planned features for Hermes, in a quick and dirty way.
 
-## Leaderboard overview
-
-A way of showing a summarized snapshot of the leaderboard(s) at a given moment in time, maybe updating periodically.
-
-### Team names
+## Team names
 
 Renaming a team to show a cooler name in the leaderboard's snapshot.
 
-### Position updates notifications
+### Team roles
+
+Create role per team. Comfortably mention an entire team with that role.
+
+## Position updates notifications
 
 A way of notifying the students when a new team enters the leaderboard or beats their time.
 
+## Server alias
+
+Because "UVa\_-\_Computación\_Paralela\_20/21" is too long and we all know it.
+
 ## Admin configuration
 
-Any way for the admins/professors to manage the students' teams and other settings directly from Discord. Also, any way for the admins to change the bot's configuration directly from Discord, no need to restart.
+Any way for the admins/professors to manage the students' teams and other settings directly from Discord.
 
 ### Admin configuration per guild
 

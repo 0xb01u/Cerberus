@@ -54,6 +54,7 @@ After this, your bot will have succesfully joined the specified server.
    * "TEAM_CAPACITY": the number of members a team of student has to have exactly. Currently, different sized teams are not supported.
    * "TEAM_PRE": the prefix for the team's identifiers, between quotation marks. For example, if you want the teams to be identified as g01, g02, g03..., this should be "g".
    * "BOT_CHANNEL": the name of the server's private channel dedicated for special bot commands and activity monitoring.
+   * "LB_CHANNEL": the name of the server's public channel dedicated to leaderboard posting.
  An example for such a file would be:
  ```json
  {
@@ -61,7 +62,8 @@ After this, your bot will have succesfully joined the specified server.
  	"PRE": "!",
  	"TEAM_CAPACITY": 1,
  	"TEAM_PRE": "g",
- 	"BOT_CHANNEL": "bot"
+ 	"BOT_CHANNEL": "bot",
+ 	"LB_CHANNEL": "leaderboards"
  }
  ```
  For that bot, all commands would start with "!", team IDs would start with "g", teans would be of just 1 person, and the special private bot channel in the server would be #bot.

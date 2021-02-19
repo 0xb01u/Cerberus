@@ -30,6 +30,8 @@ exports.run = async (bot, msg, args) => {
 	if (args.length === 0) {
 		let envCopy = Object.assign({}, env);
 		envCopy.TOKEN = "=== OMITTED ===";
+
+		delete env;
 		return msg.channel.send(`Current configuration:\n\`\`\`\n${JSON.stringify(envCopy, null, 2)}\`\`\``);
 	/*
 	 * Change or delete a configuration field.
@@ -65,6 +67,8 @@ exports.run = async (bot, msg, args) => {
 
 			msg.channel.send(`Changed \`${field}\` field to \`${env[field]}\`.`);
 		}
+		
+		delete env;
 		// Save the env file:
 		return fs.writeFileSync("env.json", JSON.stringify(env, null, 2));
 	}

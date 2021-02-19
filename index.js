@@ -3,11 +3,9 @@ const http = require("https");
 const fs = require("fs");
 
 var env = JSON.parse(fs.readFileSync("env.json"));
-process.env["TOKEN"] = env.TOKEN;
-process.env["PRE"] = env.PRE;
-process.env["TEAM_CAPACITY"] = env.TEAM_CAPACITY;
-process.env["TEAM_PRE"] = env.TEAM_PRE;
-process.env["BOT_CHANNEL"] = env.BOT_CHANNEL;
+for (let key in env) {
+	process.env[key] = env[key];
+}
 delete env;
 
 const bot = new Discord.Client();
@@ -32,18 +30,23 @@ bot.on("ready", async () => {
 	// Hermes image taken from: https://www.theoi.com/Gallery/M12.5.html
 
 	for (let guild of bot.guilds.cache.array()) {
-		// Rename to "Hermes":
 		console.log(`Hermes entered the guild ${guild.name} (${guild.id}).`);
 
+		if (!fs.existsSync(`./guilds/${guild.id}`)) fs.mkdirSync(`./guilds/${guild.id}`);
+
+		// Rename to "Hermes":
 		// (await guild.members.fetch(bot.user.id)).setNickname("Hermes");
 
+		// New channel found: add to database.
 		if (!(guild.id in guildMap)) {
 			let guildName = guild.name.replace(/ /g, "_");
 			guildMap[guildName] = guild.id;
 			fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap, null, 2));
 
+			/*
+			 * Create or update the student's objects on the database.
+			 */
 			const Student = require("./objects/Student.js");
-
 			// IMPORTANT: Intents (GUILD_MEMBERS)
 			for (let member of (await guild.members.fetch()).array()) {
 				if (!member.user.bot) {
@@ -57,6 +60,16 @@ bot.on("ready", async () => {
 						userMap[member.id] = `${member.username}#${member.discriminator}`;
 					}
 				}
+			}
+		}
+
+		/*
+		 * Fetch messages on the leaderboard channels:
+		 */
+		for (let ch of guild.channels.cache.array()) {
+			if (ch.name === process.env.LB_CHANNEL) {
+				ch.messages.fetch({ limit: 20 });
+				break;
 			}
 		}
 	}
@@ -125,7 +138,7 @@ bot.on("message", async msg => {
 
 		let filepath = `./programs/${att.name}`;
 		const file = fs.createWriteStream(filepath);
-		await http.get(att.url, async response => {
+		http.get(att.url, async response => {
 			let download = response.pipe(file);
 			download.on("finish", async () => {
 				try {
@@ -148,7 +161,8 @@ bot.on("message", async msg => {
 	 * Sending a team-password file to update the teams.
 	 */
 	else if ((msg.channel.type !== "dm" && msg.member.hasPermission("ADMINISTRATOR"))
-		&& msg.attachments.size == 1 && msg.attachments.first().name.match(/\.teams$/)) {
+		&& msg.attachments.size == 1 &&
+			(msg.attachments.first().name.match(/\.(teams|pass|passwords?)$/))) {
 
 		if (msg.channel.name !== process.env.BOT_CHANNEL) return msg.delete({ timeout: 0 });
 
@@ -225,6 +239,120 @@ bot.on("message", async msg => {
 		}
 	}
 });
+
+bot.on("messageReactionAdd", async (reaction, user) => {
+	refreshLeaderboard(reaction, user);
+});
+
+bot.on("messageReactionRemove", async (reaction, user) => {
+	refreshLeaderboard(reaction, user);
+});
+
+bot.on("error", (e) => console.error(e));
+bot.on("warn", (e) => console.warn(e));
+//bot.on("debug", (e) => console.info(e));
+
+async function refreshLeaderboard(reaction, user) {
+	// Filter reactions that are not requests to refresh a leaderboard:
+	if (user.bot) return;
+	if (reaction.message.channel.name !== process.env.LB_CHANNEL) return;
+	if (reaction.message.author.id !== bot.user.id) return;
+	if (reaction.emoji.name !== "🔄") return;
+	if (reaction.message.embeds.length === 0) return;
+
+	let server = reaction.message.guild;
+	let channel;
+	for (let ch of server.channels.cache.array()) {
+		if (ch.name === process.env.LB_CHANNEL) {
+			channel = ch;
+			break;
+		}
+	}
+
+	channel.startTyping();
+
+	let msg = reaction.message;
+	let src = reaction.message.embeds[0];
+	let name = src.footer.text;
+
+	const Leaderboard = require("./objects/Leaderboard.js");
+	let lb = Leaderboard.fromJSON(JSON.parse(fs.readFileSync(`./guilds/${server.id}/${name}.json`)));
+	let table = await lb.refresh();
+	// If the refresh request wasn't processed, return.
+	if (!table) return channel.stopTyping();
+
+	// Get all the multiple messages forming the leaderboard:
+	let lbMsgs = channel.messages.cache.array()
+		.filter(msg => msg.embeds.length > 0 && msg.embeds[0].footer.text === name)
+		.sort(msg => { return msg.createdAt });
+	// Get the desired column for the leaderboard:
+	let targetColumn;
+	for (let m of lbMsgs) {
+		src = m.embeds[0];
+		if (src.fields[2].name !== "\u200B") {
+			targetColumn = src.fields[2].name;
+
+			break;
+		}
+	}
+
+
+
+	/* Create the embeds: */
+	let date = new Date();
+	let embedList = [];
+	let embed = new Discord.MessageEmbed()
+		.setColor(0x00ff00);
+	embed.setTitle(`Leaderboard ${lb.name}`)
+		.setURL(lb.url)
+		.setFooter(lb.name)
+		.setTimestamp(date);
+	if (lb.description !== null) {
+		embed.setDescription(lb.description);
+	}
+	embed.addFields(
+		{ name: "Pos", value: "\u200B", inline: true },
+		{ name: "Team", value: "\u200B", inline: true },
+		{ name: targetColumn, value: "\u200B", inline: true }
+	);
+
+	let fieldCount = 1;
+	let i = 1;
+	for (let entry of table) {
+		if (entry["Pos"] == "") {
+			embed.addFields(
+				{ name: "\u200B", value: "\u200B", inline: true },
+				{ name: "\u200B", value: entry["Program"], inline: true },
+				{ name: "\u200B", value: entry[targetColumn], inline: true }
+			);
+		} else {
+			embed.addFields(
+				{ name: "\u200B", value: entry["Pos"], inline: true },
+				{ name: "\u200B", value: entry["User"], inline: true },
+				{ name: "\u200B", value: entry[targetColumn], inline: true }
+			);
+		}
+
+		fieldCount++;
+		if (fieldCount % 8 === 0) {
+			embedList.push(embed);
+			embed = new Discord.MessageEmbed()
+				.setDescription(lb.description)
+				.setColor(0x00ff00)
+				.setFooter(lb.name)
+				.setTimestamp(date);
+		}
+	}
+	embedList.push(embed);
+
+	// Send embeds:
+	for (let i = 0; i < lbMsgs.length; i++) {
+		lbMsgs[i].edit(embedList[i]);
+	}
+
+	channel.stopTyping();
+	console.log(`Updated ${name}.`);
+}
 
 /**
  * Retrieves a guild ID given its name.

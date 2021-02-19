@@ -7,7 +7,7 @@ class Team {
 	/**
 	 * Constructor for a team given as its identifier.
 	 *
-	 * Team IDs must be of the regex form "g\d+" // Temp or definitive?
+	 * Team IDs must be formed by a team prefix and a number.
 	 *
 	 * The team's name is temporarily set as the identifier.
 	 */
@@ -24,7 +24,9 @@ class Team {
 			this.save();
 
 			// Add to the server-name map:
-			let nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ? JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) : {};
+			let nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ?
+				JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) :
+				{};
 			nameMap[id] = this.name;
 			fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap, null, 2));
 		}
@@ -86,7 +88,7 @@ class Team {
 	 */
 	changeName(newName) {
 		// The name cannot be a different ID:
-		if (/^g\d+/.test(newName)) {
+		if (RegExp(`^${process.env.TEAM_PRE}\\d+`).test(newName)) {
 			// TODO: handle this exception.
 			return;
 		}
@@ -184,8 +186,6 @@ class Team {
 	/**
 	 * Retrieves a team from a JSON file and returns it.
 	 */
-	// TODO: control when things are saved, instead of saving every time
-	// a function is executed?
 	static fromJSON(json) {
 		return Object.assign(new Team("g110", -1, false), json);
 	}
