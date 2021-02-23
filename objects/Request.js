@@ -61,14 +61,15 @@ class Request {
 					for (let i = 0; i < fields.length; i++) {
 						this.table[fields[i]] = req[0][i].Output;
 						// The scraper puts all values in a field called "Output".
-						if (fields[i] == "Status"
-							&& (this.table.Status.includes("finished") || this.table.Status.includes("error"))) {
-							this.closed = true;
-						}
+					}
+					if (this.table.Status.includes("finished")
+							|| this.table.Status.includes("error")
+							|| this.table.Status.includes("cancelled")) {
+						this.closed = true;
 					}
 
 					this.output = this.table.Output !== "" ?
-						`**Output:**\n\`\`\`\n${this.table["Output"]}\n\`\`\``; :
+						`**Output:**\n\`\`\`\n${this.table["Output"]}\n\`\`\`` :
 						"";
 
 					this.save();
@@ -99,9 +100,18 @@ class Request {
 			}
 		}
 
+		let color = 0x888888;
+		if (this.table.Status.includes("finished")) {
+			color = 0x00ffff;
+		} else if (this.table.Status.includes("error")) {
+			color = 0xff0000;
+		} else if (this.table.Status.includes("cancelled")) {
+			color = 0xffff00;
+		}
+
 		let date = new Date();
 		let embed = new Discord.MessageEmbed()
-			.setColor(0x00ffff)
+			.setColor(color)
 			.setTitle(`Request: ${this.id}`)
 			.setURL(this.url)
 			.setFooter(`${serverName}#${this.id}`)
