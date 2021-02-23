@@ -19,7 +19,7 @@ bot.on("ready", async () => {
 
 	if (!fs.existsSync(`./users`)) fs.mkdirSync(`./users`);
 	let userMap = fs.existsSync(`./users/userMap.json`) ?
-		JSON.parse(fs.readFileSync(`./users/ùserMap.json`)) :
+		JSON.parse(fs.readFileSync(`./users/userMap.json`)) :
 		{};
 
 	if (!fs.existsSync(`./teams`)) fs.mkdirSymc(`./teams`);
@@ -41,7 +41,6 @@ bot.on("ready", async () => {
 		if (!(guild.id in guildMap)) {
 			let guildName = guild.name.replace(/ /g, "_");
 			guildMap[guildName] = guild.id;
-			fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap, null, 2));
 
 			/*
 			 * Create or update the student's objects on the database.
@@ -62,6 +61,9 @@ bot.on("ready", async () => {
 				}
 			}
 		}
+
+		fs.writeFileSync(`./users/userMap.json`, JSON.stringify(userMap, null, 2));
+		fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap, null, 2));
 
 		/*
 		 * Fetch messages on the leaderboard channels:
@@ -148,7 +150,7 @@ bot.on("message", async msg => {
 					await require(`./commands/test_${""}.js`).run(bot, msg, args, att.name);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
-					fs.unlinkSync(filepath);
+					if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 					msg.reply("there was an error trying to send your program to the queue :(");
 					console.log(e.stack);
@@ -241,33 +243,71 @@ bot.on("message", async msg => {
 });
 
 bot.on("messageReactionAdd", async (reaction, user) => {
-	refreshLeaderboard(reaction, user);
+	// Filter reactions that are not requests to refresh a table:
+	if (user.bot) return;
+	if (reaction.emoji.name !== "🔄") return;
+	if (reaction.message.author.id !== bot.user.id) return;
+	if (reaction.message.embeds.length === 0) return;
+
+	if (reaction.message.channel.type === "dm") {
+		refreshRequest(reaction, user);
+	}
+	else {
+		refreshLeaderboard(reaction, user);
+	}
 });
 
 bot.on("messageReactionRemove", async (reaction, user) => {
-	refreshLeaderboard(reaction, user);
+	// Filter reactions that are not requests to refresh a table:
+	if (user.bot) return;
+	if (reaction.emoji.name !== "🔄") return;
+	if (reaction.message.author.id !== bot.user.id) return;
+	if (reaction.message.embeds.length === 0) return;
+
+	if (reaction.message.channel.type === "dm") {
+		refreshRequest(reaction, user);
+	}
+	else {
+		refreshLeaderboard(reaction, user);
+	}
 });
 
 bot.on("error", (e) => console.error(e));
 bot.on("warn", (e) => console.warn(e));
 //bot.on("debug", (e) => console.info(e));
 
+async function refreshRequest(reaction, user) {
+	let channel = reaction.message.channel;
+
+	channel.startTyping();
+
+	let msg = reaction.message;
+	let src = reaction.message.embeds[0];
+	let footer = src.footer.text.split("#");
+	let serverName = footer[0];
+	let rid = footer[1];
+
+	const Request = require("./objects/Request.js");
+	let req = Request.fromJSON(JSON.parse(fs.readFileSync(`./guilds/${global.getServer(serverName)}/${rid}.json`)));
+	let table = await req.refresh();
+	// If the refresh request wasn't processed, return.
+	if (!table) return channel.stopTyping();
+
+	// Edit the message:
+	let embed = req.toEmbed();
+	if (req.output !== "") {
+		reaction.message.edit(req.output, embed);
+	} else {
+		reaction.message.edit(embed);
+	}
+	channel.stopTyping();
+}
+
 async function refreshLeaderboard(reaction, user) {
-	// Filter reactions that are not requests to refresh a leaderboard:
-	if (user.bot) return;
 	if (reaction.message.channel.name !== process.env.LB_CHANNEL) return;
-	if (reaction.message.author.id !== bot.user.id) return;
-	if (reaction.emoji.name !== "🔄") return;
-	if (reaction.message.embeds.length === 0) return;
 
 	let server = reaction.message.guild;
-	let channel;
-	for (let ch of server.channels.cache.array()) {
-		if (ch.name === process.env.LB_CHANNEL) {
-			channel = ch;
-			break;
-		}
-	}
+	let channel = reaction.message.channel;
 
 	channel.startTyping();
 
@@ -305,7 +345,7 @@ async function refreshLeaderboard(reaction, user) {
 	}
 
 	channel.stopTyping();
-	console.log(`Updated ${name}.`);
+	//console.log(`Updated ${name}.`);
 }
 
 /**

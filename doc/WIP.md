@@ -2,6 +2,10 @@
 
 This file records the planned features for Hermes, in a quick and dirty way.
 
+## Commands
+
+A command to **close leaderboards** and a command to **edit teams**.
+
 ## Team names
 
 Renaming a team to show a cooler name in the leaderboard's snapshot.

@@ -11,6 +11,7 @@ This file contains a list with the entirety of Hermes' currently supported featu
    2.2. [config](#config)
    2.3. [team](#team)
  3. [Leaderboards](#leaderboards)
+   3.1. [Updating the leaderboards' contents](#refresh)
 
 
 ## Sending programs to a queue <a name=sending></a>
@@ -25,6 +26,8 @@ For example, if I'd like to send my program as team "g110" with password "abcd98
 ```
 -u g110 -x abcd9876 -q testq -- 1 2 3
 ```
+
+The bot will send an [embed](https://discordjs.guide/popular-topics/embeds.html) with the execution summary, as it may be seen on the corresponding webpage for the request. The information on this embed can be updated ("refreshed") by reacting or de-reacting with :arrows_counterclockwise: to the corresponding message, similar to how leaderboards work. See [the corresponding section on updating the leaderboards' contents](#refresh) for more information.
 
 ### Default arguments <a name=default></a>
 
@@ -149,4 +152,6 @@ Examples of valid commands are:
 
 Leaderboard are displaeyed via [message embeds](https://discordjs.guide/popular-topics/embeds.html). Due to Discord limitations, various embeds will probably be needed to represent one leaderboard (as embeds can only have up to 25 fields, approximately 8 rows of data), so a visualization will probably need to be split among various messages. Other Discord limitations include: limiting the number of columns to 3, having to have so much space between rows, and having to show the leaderboard's description in all embeds, so their width is the same. (Well, at least is better than nothing.)
 
-Leaderboard visualizations are not refreshed automatically. All Discord users (students and admins) can **refresh leaderboard visualizations by reacting** or de-reacting to any of the messages composing them with :arrows_counterclockwise:. The bot will re-fetch the leaderboard, re-create the embeds, and edit the corresponding messages with updated values. While updating a leaderboard, the bot will appear to be writing on the chat until the information is up to date; so trying to refresh while the bot appears writing on the chat is useless and discouraged. Also, the leaderboards will constantly show the date of the last time the information was updated, up to the minutes, in the bottom of each embed composing them. To avoid high network load and the bot malfunctioning, refreshes will only be processed as frequently as once every 10 seconds.
+### Updating the leaderboards' contents <a name=refresh></a>
+
+Leaderboard visualizations are not updated ("refreshed") automatically. All Discord users (students and admins) can **refresh leaderboard visualizations by reacting** or de-reacting to any of the messages composing them with :arrows_counterclockwise:. The bot will re-fetch the leaderboard, re-create the embeds, and edit the corresponding messages with updated values. While updating a leaderboard, the bot will appear to be writing on the chat until the information is up to date; so trying to refresh while the bot appears writing on the chat is useless and discouraged. Also, the leaderboards will constantly show the date of the last time the information was updated, up to the minutes, in the bottom of each embed composing them. To avoid high network load and the bot malfunctioning, refreshes will only be processed as frequently as once every 10 seconds.

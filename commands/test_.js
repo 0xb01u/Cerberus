@@ -57,13 +57,50 @@ exports.run = async (bot, msg, args, file) => {
 
 	// Send the program to the corresponding queue:
 	try {
-		console.log(`python2 ./tools/client ./programs/${file} ${line}`);
+		//console.log(`python2 ./tools/client ./programs/${file} ${line}`);
 		let output = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
 		fs.unlinkSync(`./programs/${file}`);
 		student.setCommand(line);
-		msg.reply(`Sent: \`${line}\`\n` + output.toString());
+		await msg.reply(`Sent: \`${line}\`\n` + output.toString());
+
+		/* Create the request as a refreshable embed: */
+
+		msg.channel.startTyping();
+
+		// Fetch request url:
+		let outputLines = output.toString().split("\n");
+		let reqURL = outputLines[outputLines.length - 2];
+
+		// Fetch request server:
+		let server = "";
+		for (let id of student.guilds) {
+			if (line.includes(student.credentials[id].team)
+				&& line.includes(student.credentials[id].passwd)) {
+				server = id;
+				break;
+			}
+		}
+
+		// Create request object:
+		const Request = require("../objects/Request.js");
+		let req = new Request(reqURL, server);
+		await req.refresh();
+
+		// Create and send embed:
+		let embed = req.toEmbed();
+		let reply;
+		if (req.output !== "") {
+			reply = await msg.reply(req.output, embed);
+		} else {
+			reply = await msg.reply(embed);
+		}
+		reply.react("🔄");
+
+		msg.channel.stopTyping();
 	} catch (exc) {
-		fs.unlinkSync(`./programs/${file}`);
+		msg.channel.stopTyping();
+		console.log(exc.stack);
+		//if (fs.existsSync(`./programs/${file}`)) fs.unlinkSync(`./programs/${file}`);
 		msg.reply(
 			`**Error while sending the program to the queue.**\n${exc.stderr.toString()}`
 		);

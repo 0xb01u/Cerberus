@@ -3,12 +3,12 @@ const http = require("http");
 const scraper = require("table-scraper");
 
 /**
- * Class defininf a leaderboard (table).
+ * Class defining a leaderboard (table).
  */
 class Leaderboard {
 
 	/**
-	 * Constructor for a leaderboard, given its host url and identifier.
+	 * Constructor for a leaderboard, given its host url, identifier and server.
 	 */
 	constructor(url, name, server, save=true) {
 		this.server = server;
@@ -18,6 +18,7 @@ class Leaderboard {
 		this.refreshCount = -1;
 		this.table = {};
 		this.date = (new Date(0)).toString();
+		this.closed = false;
 
 		if (save) {
 			this.save();
@@ -33,6 +34,8 @@ class Leaderboard {
 
 		// Only resolve refresh requests at most every 10s.
 		if ((new Date()) - new Date(this.date) < 10000) return false;
+		// If the leaderboard is closed, simulate a correct fetch:
+		if (this.closed) return true;
 
 		let leaderboards = await scraper.get(this.url);
 
@@ -80,7 +83,14 @@ class Leaderboard {
 	}
 
 	/**
-	 * Turn the leaderboard into multiple message embeds to send.
+	 * Closes the leaderboard: signals it will no longer accept requests.
+	 */
+	close() {
+		this.closed = true;
+	}
+
+	/**
+	 * Turns the leaderboard into multiple message embeds to send.
 	 */
 	toEmbeds(targetColumn) {
 		const Discord = require("discord.js");
@@ -88,8 +98,8 @@ class Leaderboard {
 		let date = new Date();
 		let embedList = [];
 		let embed = new Discord.MessageEmbed()
-			.setColor(0x00ff00);
-		embed.setTitle(`Leaderboard ${this.name}`)
+			.setColor(this.closed ? 0x00ff00 : 0xff0000)
+			.setTitle(`Leaderboard ${this.name}`)
 			.setURL(this.url)
 			.setFooter(this.name)
 			.setTimestamp(date);
