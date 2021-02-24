@@ -151,7 +151,7 @@ exports.run = async (bot, msg, args, serverID) => {
 				let digits = 2;
 
 				let num = teamList.length + 1;
-				teamID = 'g' + (num).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false});
+				teamID = process.env.TEAM_PRE + (num).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false});
 
 				let team = new Team(teamID, server);
 				if (team.join(msg.author.id)) {

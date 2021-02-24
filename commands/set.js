@@ -27,7 +27,6 @@ exports.run = async (bot, msg, args) => {
 					`Did you remember to replace the spaces " " in the name with underscores "_"?`
 				);
 			}
-			console.log(guildMap, serverName, guildMap[serverName], student.credentials);
 			if (!(guildMap[serverName] in student.credentials)) {
 				return msg.reply(
 					`Looks like you're trying to set your default server to ` +

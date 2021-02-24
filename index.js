@@ -208,6 +208,15 @@ bot.on("message", async msg => {
 		args = args.filter((e) => e != "");
 		let cmd = args.shift().toLowerCase();
 
+		if (cmd === "test_") {
+			return msg.reply(
+				"Congratulations! You've stumbled into an `ìf` block " +
+				"that is there to keep the bot from crashing. Auch! " +
+				"You could have caused so much harm :(\n" +
+				"I wonder how many people will find this message..."
+			);
+		}
+
 		// Retrieve the server ID:
 		let serverID = null;
 

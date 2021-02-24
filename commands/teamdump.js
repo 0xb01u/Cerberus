@@ -12,7 +12,7 @@ exports.run = async (bot, msg, args) => {
 	// TODO: Role
 	// "Admin"-only command:
 	if (!msg.member.hasPermission("MANAGE_GUILD")) {
-		return msg.reply("nice try.");
+		return msg.reply("why'd you want to dump your team?? :(");
 	}
 
 	// Open the list of teams:

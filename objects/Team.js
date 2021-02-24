@@ -39,10 +39,10 @@ class Team {
 	 * beforehand.
 	 */
 	join(userID) {
-		if (this.confirmed) {
+		/*if (this.confirmed) {
 			// TODO: handle this exception.
 			return false;
-		}
+		}*/
 
 		this.members.push(userID);
 
@@ -147,6 +147,15 @@ class Team {
 		if (this.members.length === 0) this.delete();
 
 		return true;
+	}
+
+	/**
+	 * Confirms the team, so it becomes immutable.
+	 */
+	confirm() {
+		this.confirmed = true;
+
+		this.save();
 	}
 
 	/**
