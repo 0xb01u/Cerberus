@@ -37,9 +37,10 @@ class Request {
 
 		let req = [];
 		let tryN = 0;
-		while (req.length < 1 && tryN < 10) {
+		while (req.length < 1 && tryN < 25) {
 			req = await scraper.get(this.url);
 			tryN++;
+			sleep(20 * tryN - 20);
 		}
 		// TODO: exit failure.
 
@@ -62,6 +63,7 @@ class Request {
 						this.table[fields[i]] = req[0][i].Output;
 						// The scraper puts all values in a field called "Output".
 					}
+					//console.log(tryN);
 					if (this.table.Status.includes("finished")
 							|| this.table.Status.includes("error")
 							|| this.table.Status.includes("cancelled")) {
@@ -150,3 +152,12 @@ class Request {
 }
 
 module.exports = Request;
+
+function sleep(milliseconds) {
+	if (milliseconds <= 0) return;
+	const date = Date.now();
+	let currentDate = null;
+	do {
+		currentDate = Date.now();
+	} while (currentDate - date < milliseconds);
+}
