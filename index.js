@@ -326,10 +326,133 @@ async function refreshLeaderboard(reaction, user) {
 
 	const Leaderboard = require("./objects/Leaderboard.js");
 	let lb = Leaderboard.fromJSON(JSON.parse(fs.readFileSync(`./guilds/${server.id}/${name}.json`)));
+
+	let prevTop = lb.table.filter(entry => !entry.Program.startsWith("Ref")).slice(0, process.env.LEADERS)
+		.map(entry => entry.User);
+
 	let table = await lb.refresh();
 	// If the refresh request wasn't processed, return.
 	if (!table) return channel.stopTyping();
 
+
+
+	/* Position updates */
+	if (process.env.NOTIFY_LEADERS) {
+
+		let top = lb.table.filter(entry => !entry.Program.startsWith("Ref")).slice(0, process.env.LEADERS)
+			.map(entry => entry.User);
+
+		// Fetch news channel:
+		let newsCh;
+		for (let ch of msg.guild.channels.cache.array()) {
+			if (ch.name === process.env.BOT_NEWS) {
+				newsCh = ch;
+				break;
+			}
+		}
+
+		// Firsts entering the leaderboard:
+		if (prevTop.length == 0) {
+			if (top.length > 0) {
+				let congratz;
+				if (top.length > 1) {
+					congratz = `Congratulations on being the first teams on the leaderboard ${lb.name}! ` +
+						`:partying_face: :confetti_ball: `
+					for (let tm of top) {
+						let team = global.getTeam(tm, server.id);
+						congratz += `${team.id} + ( `;
+						for (let member of tm.members) {
+							congratz += `<@${member}> `;
+						}
+						congratz += ") ";
+					}
+
+				} else {
+					let team = global.getTeam(top[0], server.id);
+					congratz = `Congratulations on being the first team on the leaderboard ${lb.name}, ` +
+						`${team.id}! :partying_face:`;
+					for (let member of team.members) {
+						congratz += ` <@${member}>`;
+					}
+				}
+				newsCh.send(congratz);
+			}
+		}
+
+		// New #1!
+		if (prevTop[0] !== top[0]) {
+			let n1 = top[0];
+			let old1 = prevTop[0];
+
+			notifyTeamPrivately(old1, server.id,
+				`The team ${old1} has claimed position #1 on ${lb.name}! :grimacing:`
+			);
+
+			notifyTeamPublicly(n1, server.id,
+				`Congratulations to ${n1} for becoming #1 on ${lb.name}! :hash::one:\n` +
+				`For how long can you hold that position? :thinking:`
+			);
+		// Any other change in top:
+		} else {
+			let noTop = [];
+			let displaced = [];
+			let dislpacers = [];
+			let newTop = [];
+			for (let topTeam of top) {
+				if (!(topTeam in prevTop)) {
+					newTop.push(topTeam);
+				} else if (top.indexOf(topTeam) < prevTop.indexOf(topTeam)) {
+					displacers.push(topTeam);
+				} else if (top.indexOf(topTeam) > prevTop.indexOf(topTeam)) {
+					displaced.push(topTeam);
+				}
+			}
+			for (let topTeam of prevTop) {
+				if (!(topTeam in top)) {
+					noTop.push(topTeam);
+				}
+			}
+
+			// Notifications:
+			for (let newTeam of newTop) {
+				notifyTeamPublicly(newTeam, server.id,
+					`We have a new team on the top${process.env.LEADERS} of ${lb.name}! Congratulations!`
+				);
+			}
+			for (let better of displacers) {
+				notifyTeamPublicly(better, server.id,
+					`A team has improved his position on the top${process.env.LEADERS} of ${lb.name}! Congrats!`
+				);
+			}
+			for (let worse of newTop) {
+				notifyTeamPrivately(worse, server.id,
+					`You've been displaced to a lower top${process.env.LEADERS} position on ${lb.name}! :scream:`
+				);
+			}
+			for (let noMore of noTop) {
+				let despacito = notifyTeamPrivately(noMore, server.id,
+					`Oh no! Someone has got a better position than you on ${lb.name}, and you are no longer ` +
+					`part of the top${process.env.LEADERS}. :cry:`
+				);
+				for (let m of despacito) {
+					let _m = await m;
+					_m.react("🇩");
+					_m.react("🇪");
+					_m.react("🇸");
+					_m.react("🇵");
+					_m.react("🇦");
+					_m.react("🇨");
+					_m.react("🇮");
+					_m.react("🇹");
+					_m.react("🇴");
+				}
+			}
+		}
+	}
+
+
+
+	/* Leaderboard (embeds) update*/
 	// Get all the multiple messages forming the leaderboard:
 	let lbMsgs = channel.messages.cache.array()
 		.filter(msg => msg.embeds.length > 0 && msg.embeds[0].footer.text === name)
@@ -349,8 +472,13 @@ async function refreshLeaderboard(reaction, user) {
 	let embedList = lb.toEmbeds();
 
 	// Send embeds:
-	for (let i = 0; i < lbMsgs.length; i++) {
-		lbMsgs[i].edit(embedList[i]);
+	for (let lbMsg of lbMsgs) {
+		lbMsg.edit(embedList.shift());
+	}
+	for (let remaining of embedList) {
+		channel.send(remaining).then(m => {
+			m.react("🔄");	// :arrows_counterclockwise:
+		});
 	}
 
 	channel.stopTyping();
@@ -399,4 +527,44 @@ global.getTeam = function getTeam(teamID, guildID) {
 
 	const Team = require("./objects/Team.js");
 	return Team.fromJSON(JSON.parse(fs.readFileSync(`./teams/${guildID}/${teamID}.json`)));
+}
+
+/**
+ * Sends a notification message to all students in a team.
+ */
+function notifyTeamPrivately(tm, serverID, msg) {
+	let team = global.getTeam(tm, serverID);
+
+	let msgs = [];
+	for (let member of team.members) {
+		bot.users.fetch(member).then(usr => {
+			msgs.push(usr.send(msg));
+		});
+	}
+
+	return msgs;
+}
+
+/**
+ * Sends a notification message to a server, pinging all students in a team.
+ */
+function notifyTeamPublicly(tm, serverID, msg) {
+	if (!process.env.PUBLIC_NOTIFY) return;
+
+	let team = global.getTeam(tm, serverID);
+
+	let msgEnd = ` ${team.name}:`;
+	for (let member of team.members) {
+		msgEnd += ` <@${member}>`;
+	}
+
+	// Fetch news channel:
+	let channel;
+	for (let ch of msg.guild.channels.cache.array()) {
+		if (ch.name === process.env.BOT_NEWS) {
+			channel = ch;
+			break;
+		}
+	}
+	return channel.send(msg + msgEnd);
 }

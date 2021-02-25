@@ -55,6 +55,10 @@ After this, your bot will have succesfully joined the specified server.
    * "TEAM_PRE": the prefix for the team's identifiers, between quotation marks. For example, if you want the teams to be identified as g01, g02, g03..., this should be "g".
    * "BOT_CHANNEL": the name of the server's private channel dedicated for special bot commands and activity monitoring.
    * "LB_CHANNEL": the name of the server's public channel dedicated to leaderboard posting.
+   * "NOTIFY_LEADERS": (boolean) whether to publicly notify the top teams on the leaderboards of when their position change (true) or not (false).
+   * "LEADERS": amount of top teams susceptible to position notifications (see NOTIFY_LEADERS).
+   * "PUBLIC_NOTIFY": (boolean) whether to post the notifications in a server's public channel (true), or just notify the students privately (false).
+   * "BOT_NEWS": the name of the server's public channel where news and notifications such as position updates should be posted, if any.
  An example for such a file would be:
  ```json
  {
@@ -63,13 +67,17 @@ After this, your bot will have succesfully joined the specified server.
  	"TEAM_CAPACITY": 1,
  	"TEAM_PRE": "g",
  	"BOT_CHANNEL": "bot",
- 	"LB_CHANNEL": "leaderboards"
+ 	"LB_CHANNEL": "leaderboards",
+ 	"NOTIFY_LEADERS": true,
+ 	"LEADERS": 10,
+ 	"PUBLIC_NOTIFY": true,
+ 	"BOT_NEWS": "bot"
  }
  ```
- For that bot, all commands would start with "!", team IDs would start with "g", teans would be of just 1 person, and the special private bot channel in the server would be #bot.
+ For that bot, all commands would start with "!", team IDs would start with "g", teams would be of just 1 person, and the special private bot channel in the server would be #bot. The server's channel where the leaderboards would be shown would be #leaderboards, and the top 10 teams of each leaderboard would be notified whenever any team made their position change. Notifications would be posted publicly on the channel #bot.
  7. Execute `run.sh` on the bot's working directory. `run.sh` just contains:
  ```sh
- nohup node . > output.log 2> err.log &
+ nohup node . >> output.log 2>> err.log &
  ```
 
 There it is! Your bot up and running!

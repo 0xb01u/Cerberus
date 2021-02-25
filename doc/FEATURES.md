@@ -12,6 +12,7 @@ This file contains a list with the entirety of Hermes' currently supported featu
    2.3. [team](#team)
  3. [Leaderboards](#leaderboards)
    3.1. [Updating the leaderboards' contents](#refresh)
+ 4. [Notifications on leaderboard position changes](#notifications)
 
 
 ## Sending programs to a queue <a name=sending></a>
@@ -155,3 +156,7 @@ Leaderboard are displaeyed via [message embeds](https://discordjs.guide/popular-
 ### Updating the leaderboards' contents <a name=refresh></a>
 
 Leaderboard visualizations are not updated ("refreshed") automatically. All Discord users (students and admins) can **refresh leaderboard visualizations by reacting** or de-reacting to any of the messages composing them with :arrows_counterclockwise:. The bot will re-fetch the leaderboard, re-create the embeds, and edit the corresponding messages with updated values. While updating a leaderboard, the bot will appear to be writing on the chat until the information is up to date; so trying to refresh while the bot appears writing on the chat is useless and discouraged. Also, the leaderboards will constantly show the date of the last time the information was updated, up to the minutes, in the bottom of each embed composing them. To avoid high network load and the bot malfunctioning, refreshes will only be processed as frequently as once every 10 seconds.
+
+## Notifications on leaderboard position changes <a name=notifications></a>
+
+The bot can notify all members of the teams whenever their position on a certain leaderboard changes, if the environmental variable `"NOTIFY_LEADERS"` is set to true (in `env.json`). The amount of teams considered to be notified can be set with the environmental variable `"LEADERS`". "Positive" changes (that is, improving their position) would be notified publicly in a server's dedicated channel (set in the environmental variable `"BOT_NEWS"`), and "negative" changes (that is, having any other team surpassing their position) would be notified privately via DM. Public notifications are turned on by setting the environmental variable `"NOTIFY_LEADERS"` to true.

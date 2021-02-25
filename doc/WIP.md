@@ -4,7 +4,7 @@ This file records the planned features for Hermes, in a quick and dirty way.
 
 ## Commands
 
-A command to **close leaderboards** and a command to **edit teams**.
+A command to **close leaderboards**.
 
 ## Team names
 
@@ -14,6 +14,10 @@ Renaming a team to show a cooler name in the leaderboard's snapshot.
 
 Create role per team. Comfortably mention an entire team with that role.
 
+### Team passwords
+
+Store the passwords for not-created-yet teams.
+
 ## Position updates notifications
 
 A way of notifying the students when a new team enters the leaderboard or beats their time.
@@ -22,17 +26,13 @@ A way of notifying the students when a new team enters the leaderboard or beats 
 
 Because "UVa\_-\_Computación\_Paralela\_20/21" is too long and we all know it.
 
-## Admin configuration
-
-Any way for the admins/professors to manage the students' teams and other settings directly from Discord.
-
-### Admin documentation
-
-Document the admin's features.
-
-### Admin configuration per guild
+## Admin configuration per guild
 
 A way to set different configurations for different guilds on the same bot.
+
+## Admin documentation
+
+Document the admin's features.
 
 ## Student identification
 

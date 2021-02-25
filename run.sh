@@ -1,1 +1,1 @@
-nohup node . > output.log 2> err.log &
+nohup node . >> output.log 2>> err.log &

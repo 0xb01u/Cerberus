@@ -36,7 +36,6 @@ exports.run = async (bot, msg, args, serverID) => {
 	// Create new leaderboard:
 	let lb = new Leaderboard(url, name, serverID);
 	let table = await lb.refresh();
-
 	/* NOT NEEDED IN THIS CASE
 	// If the refresh request wasn't processed, return.
 	if (!table) return;
@@ -60,8 +59,9 @@ exports.run = async (bot, msg, args, serverID) => {
 
 	// Send embeds:
 	for (let table of embedList) {
-		let outMsg = await channel.send(table);
-		outMsg.react("🔄");	// :arrows_counterclockwise:
+		channel.send(table).then(outMsg => {
+			outMsg.react("🔄");	// :arrows_counterclockwise:
+		});
 	}
 	return;
 }
