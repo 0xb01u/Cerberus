@@ -98,7 +98,7 @@ class Leaderboard {
 		let date = new Date();
 		let embedList = [];
 		let embed = new Discord.MessageEmbed()
-			.setColor(this.closed ? 0x00ff00 : 0xff0000)
+			.setColor(this.closed ? 0xff0000 : 0x00ff00)
 			.setTitle(`Leaderboard ${this.name}`)
 			.setURL(this.url)
 			.setFooter(this.name)

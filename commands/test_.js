@@ -20,6 +20,7 @@ exports.run = async (bot, msg, args, file) => {
 		line = student.latestClientCommand;
 
 	} else {
+		/* DEFAULT ARGUMENTS COMPLETION */
 		if (args.includes("-u") || args.includes("-q") || args.includes("--")) {
 			line = args.join(" ").split("--")[0];
 		}
@@ -61,7 +62,28 @@ exports.run = async (bot, msg, args, file) => {
 		let output = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
 		fs.unlinkSync(`./programs/${file}`);
 		student.setCommand(line);
-		await msg.reply(`Sent: \`${line}\`\n` + output.toString());
+		msg.reply(`Sent: \`${line}\`\n` + output.toString());
+
+		// Fetch request server:
+		let server = "";
+		if (server == "") {
+			server = "593934181525094427";
+		}
+		for (let id of student.guilds) {
+			if (id in student.credentials && line.includes(student.credentials[id].team)
+				&& line.includes(student.credentials[id].passwd)) {
+				server = id;
+				break;
+			}
+		}
+
+		global.log(
+			msg,
+			server,
+			`New request:\n` +
+			`Sent: \`${line}\`\n` + output.toString()
+		);
+
 
 		/* Create the request as a refreshable embed: */
 
@@ -70,16 +92,6 @@ exports.run = async (bot, msg, args, file) => {
 		// Fetch request url:
 		let outputLines = output.toString().split("\n");
 		let reqURL = outputLines[outputLines.length - 2];
-
-		// Fetch request server:
-		let server = "";
-		for (let id of student.guilds) {
-			if (line.includes(student.credentials[id].team)
-				&& line.includes(student.credentials[id].passwd)) {
-				server = id;
-				break;
-			}
-		}
 
 		// Create request object:
 		const Request = require("../objects/Request.js");
@@ -100,6 +112,7 @@ exports.run = async (bot, msg, args, file) => {
 	} catch (exc) {
 		msg.channel.stopTyping();
 		console.log(exc.stack);
+		global.log(msg, `\`\`\`\n${exc.stack}\n\`\`\``);
 		//if (fs.existsSync(`./programs/${file}`)) fs.unlinkSync(`./programs/${file}`);
 		msg.reply(
 			`**Error while sending the program to the queue.**\n${exc.stderr.toString()}`

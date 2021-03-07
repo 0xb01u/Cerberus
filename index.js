@@ -385,7 +385,7 @@ async function refreshLeaderboard(reaction, user) {
 			let old1 = prevTop[0];
 
 			notifyTeamPrivately(old1, server.id,
-				`The team ${old1} has claimed position #1 on ${lb.name}! :grimacing:`
+				`The team ${n1} has claimed position #1 on ${lb.name}! :grimacing:`
 			);
 
 			notifyTeamPublicly(n1, server.id,
@@ -396,10 +396,10 @@ async function refreshLeaderboard(reaction, user) {
 		} else {
 			let noTop = [];
 			let displaced = [];
-			let dislpacers = [];
+			let displacers = [];
 			let newTop = [];
 			for (let topTeam of top) {
-				if (!(topTeam in prevTop)) {
+				if (!(prevTop.includes(topTeam))) {
 					newTop.push(topTeam);
 				} else if (top.indexOf(topTeam) < prevTop.indexOf(topTeam)) {
 					displacers.push(topTeam);
@@ -408,7 +408,7 @@ async function refreshLeaderboard(reaction, user) {
 				}
 			}
 			for (let topTeam of prevTop) {
-				if (!(topTeam in top)) {
+				if (!(top.includes(topTeam))) {
 					noTop.push(topTeam);
 				}
 			}
@@ -421,30 +421,29 @@ async function refreshLeaderboard(reaction, user) {
 			}
 			for (let better of displacers) {
 				notifyTeamPublicly(better, server.id,
-					`A team has improved his position on the top${process.env.LEADERS} of ${lb.name}! Congrats!`
+					`A team has improved their position on the top${process.env.LEADERS} of ${lb.name}! Congrats!`
 				);
 			}
-			for (let worse of newTop) {
+			for (let worse of displaced) {
 				notifyTeamPrivately(worse, server.id,
 					`You've been displaced to a lower top${process.env.LEADERS} position on ${lb.name}! :scream:`
 				);
 			}
 			for (let noMore of noTop) {
-				let despacito = notifyTeamPrivately(noMore, server.id,
+				let despacito = await notifyTeamPrivately(noMore, server.id,
 					`Oh no! Someone has got a better position than you on ${lb.name}, and you are no longer ` +
 					`part of the top${process.env.LEADERS}. :cry:`
 				);
 				for (let m of despacito) {
-					let _m = await m;
-					_m.react("🇩");
-					_m.react("🇪");
-					_m.react("🇸");
-					_m.react("🇵");
-					_m.react("🇦");
-					_m.react("🇨");
-					_m.react("🇮");
-					_m.react("🇹");
-					_m.react("🇴");
+					m.react("🇩");
+					m.react("🇪");
+					m.react("🇸");
+					m.react("🇵");
+					m.react("🇦");
+					m.react("🇨");
+					m.react("🇮");
+					m.react("🇹");
+					m.react("🇴");
 				}
 			}
 		}
@@ -469,7 +468,7 @@ async function refreshLeaderboard(reaction, user) {
 	}
 
 	/* Create the embeds: */
-	let embedList = lb.toEmbeds();
+	let embedList = lb.toEmbeds(targetColumn);
 
 	// Send embeds:
 	for (let lbMsg of lbMsgs) {
@@ -529,17 +528,41 @@ global.getTeam = function getTeam(teamID, guildID) {
 	return Team.fromJSON(JSON.parse(fs.readFileSync(`./teams/${guildID}/${teamID}.json`)));
 }
 
+global.log = async function log(triggerMsg, serverID, content) {
+	let server = await bot.guilds.fetch(serverID);
+	let channel;
+
+	for (let ch of await server.channels.cache.array()) {
+		if (ch.name === process.env.BOT_CHANNEL) {
+			channel = ch;
+			break;
+		}
+	}
+
+	if (channel !== null) {
+		if ((triggerMsg.content.length + content.length) < 1950) {
+			channel.send(
+				`${content}\n`
+				+ `Triggered by <@${triggerMsg.author.id}>:\n\`\`\`\n${triggerMsg.content}\n\`\`\``
+			);
+		} else {
+			channel.send(
+				`A log message longer than 2000 characters has been triggered by: <@${triggerMsg.author.id}>.`
+			);
+		}
+	}
+}
+
 /**
  * Sends a notification message to all students in a team.
  */
-function notifyTeamPrivately(tm, serverID, msg) {
+async function notifyTeamPrivately(tm, serverID, msg) {
 	let team = global.getTeam(tm, serverID);
 
 	let msgs = [];
 	for (let member of team.members) {
-		bot.users.fetch(member).then(usr => {
-			msgs.push(usr.send(msg));
-		});
+		let usr = await bot.users.fetch(member)
+		msgs.push(await usr.send(msg));
 	}
 
 	return msgs;
@@ -548,7 +571,7 @@ function notifyTeamPrivately(tm, serverID, msg) {
 /**
  * Sends a notification message to a server, pinging all students in a team.
  */
-function notifyTeamPublicly(tm, serverID, msg) {
+async function notifyTeamPublicly(tm, serverID, msg) {
 	if (!process.env.PUBLIC_NOTIFY) return;
 
 	let team = global.getTeam(tm, serverID);
@@ -560,7 +583,7 @@ function notifyTeamPublicly(tm, serverID, msg) {
 
 	// Fetch news channel:
 	let channel;
-	for (let ch of msg.guild.channels.cache.array()) {
+	for (let ch of (await bot.guilds.fetch(serverID)).channels.cache.array()) {
 		if (ch.name === process.env.BOT_NEWS) {
 			channel = ch;
 			break;

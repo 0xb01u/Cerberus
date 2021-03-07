@@ -125,11 +125,7 @@ exports.run = async (bot, msg, args, serverID) => {
 					}
 					teamCreationLog += `).`;
 
-					for (let ch of await guild.channels.cache.array()) {
-						if (ch.name === process.env.BOT_CHANNEL) {
-							ch.send(teamCreationLog);
-						}
-					}
+					global.log(msg, teamCreationLog);
 				}
 
 				return;	// Feedback message sent in the if-elses above.
