@@ -113,7 +113,7 @@ exports.run = async (bot, msg, args, file) => {
 		msg.channel.stopTyping();
 		console.log(exc.stack);
 		global.log(msg, `\`\`\`\n${exc.stack}\n\`\`\``);
-		//if (fs.existsSync(`./programs/${file}`)) fs.unlinkSync(`./programs/${file}`);
+		if (fs.existsSync(`./programs/${file}`)) fs.unlinkSync(`./programs/${file}`);
 		msg.reply(
 			`**Error while sending the program to the queue.**\n${exc.stderr.toString()}`
 		);
