@@ -18,10 +18,6 @@ Create role per team. Comfortably mention an entire team with that role.
 
 Store the passwords for not-created-yet teams.
 
-## Position updates notifications
-
-A way of notifying the students when a new team enters the leaderboard or beats their time.
-
 ## Server alias
 
 Because "UVa\_-\_Computación\_Paralela\_20/21" is too long and we all know it.
