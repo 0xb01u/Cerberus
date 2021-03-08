@@ -66,9 +66,6 @@ exports.run = async (bot, msg, args, file) => {
 
 		// Fetch request server:
 		let server = "";
-		if (server == "") {
-			server = "593934181525094427";
-		}
 		for (let id of student.guilds) {
 			if (id in student.credentials && line.includes(student.credentials[id].team)
 				&& line.includes(student.credentials[id].passwd)) {
@@ -87,11 +84,12 @@ exports.run = async (bot, msg, args, file) => {
 
 		/* Create the request as a refreshable embed: */
 
-		msg.channel.startTyping();
-
 		// Fetch request url:
 		let outputLines = output.toString().split("\n");
 		let reqURL = outputLines[outputLines.length - 2];
+		if (!reqURL.startsWith("http://")) return; // Return on failed executions.
+
+		msg.channel.startTyping();
 
 		// Create request object:
 		const Request = require("../objects/Request.js");
