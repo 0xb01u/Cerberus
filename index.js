@@ -22,7 +22,7 @@ bot.on("ready", async () => {
 		JSON.parse(fs.readFileSync(`./users/userMap.json`)) :
 		{};
 
-	if (!fs.existsSync(`./teams`)) fs.mkdirSymc(`./teams`);
+	if (!fs.existsSync(`./teams`)) fs.mkdirSync(`./teams`);
 
 	bot.user.setPresence({ activity: {name: ``}, status: `online` });
 	//bot.user.setAvatar("./images/hermes.png");
@@ -41,6 +41,7 @@ bot.on("ready", async () => {
 		if (!(guild.id in guildMap)) {
 			let guildName = guild.name.replace(/ /g, "_");
 			guildMap[guildName] = guild.id;
+			fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap, null, 2));
 
 			/*
 			 * Create or update the student's objects on the database.
@@ -56,14 +57,13 @@ bot.on("ready", async () => {
 					}
 
 					if (!(member.id in userMap)) {
-						userMap[member.id] = `${member.username}#${member.discriminator}`;
+						userMap[member.id] = `${member.user.username}#${member.user.discriminator}`;
 					}
 				}
 			}
 		}
 
 		fs.writeFileSync(`./users/userMap.json`, JSON.stringify(userMap, null, 2));
-		fs.writeFileSync(`./guilds/guildMap.json`, JSON.stringify(guildMap, null, 2));
 
 		/*
 		 * Fetch messages on the leaderboard channels:
@@ -87,7 +87,7 @@ bot.on("guildCreate", async guild => {
 	//(await guild.members.fetch(bot.user.id)).setNickname("Hermes");
 
 	if (!fs.existsSync(`./guilds`)) fs.mkdirSync(`./guilds`);
-	let guildMap = !fs.existsSync(`./guilds/guildMap.json`) ?
+	let guildMap = fs.existsSync(`./guilds/guildMap.json`) ?
 		JSON.parse(fs.readFileSync(`./guilds/guildMap.json`)) :
 		{};
 
@@ -326,6 +326,8 @@ async function refreshLeaderboard(reaction, user) {
 
 	const Leaderboard = require("./objects/Leaderboard.js");
 	let lb = Leaderboard.fromJSON(JSON.parse(fs.readFileSync(`./guilds/${server.id}/${name}.json`)));
+
+	if (lb.table == null) return channel.stopTyping();
 
 	let prevTop = lb.table.filter(entry => !entry.Program.startsWith("Ref")).slice(0, process.env.LEADERS)
 		.map(entry => entry.User);

@@ -16,7 +16,7 @@ class Leaderboard {
 		this.name = name;
 		this.description = null;
 		this.refreshCount = -1;
-		this.table = {};
+		this.table = null;
 		this.date = (new Date(0)).toString();
 		this.closed = false;
 
@@ -111,6 +111,8 @@ class Leaderboard {
 			{ name: "Team", value: "\u200B", inline: true },
 			{ name: targetColumn, value: "\u200B", inline: true }
 		);
+
+		if (this.table == null) return [embed];
 
 		let fieldCount = 1;
 		let i = 1;
