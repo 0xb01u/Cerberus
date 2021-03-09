@@ -21,10 +21,10 @@ exports.run = async (bot, msg, args, serverID) => {
 	if (args.length < 1) {
 		let reply = await msg.reply("please, choose an option for the command:\n" +
 			`\`${process.env.PRE}team [join|leave|accept|reject]\`\n\n`);
-		if (msg.channel.type !== "dm") {
+		/*if (msg.channel.type !== "dm") {
 			reply.delete({ timeout: 30000 });
 			msg.delete({ timeout: 30000 });
-		}
+		}*/
 
 		return;
 	}
@@ -43,7 +43,7 @@ exports.run = async (bot, msg, args, serverID) => {
 			// Check if the author is already on a team for that server.
 			if (server in userTeams) {
 				return msg.author.send(
-					`It looks like your trying to join a team on server ${serverName}, ` +
+					`It looks like you're trying to join a team on server ${serverName}, ` +
 					`but you're already on team ${userTeams[server].team} there. ` +
 					`You cannot join more than one team!`
 				);
@@ -58,10 +58,11 @@ exports.run = async (bot, msg, args, serverID) => {
 					let reply = await msg.reply("the team ID you've entered is not correct. " +
 						`It should be a number preceded by ${process.env.TEAM_PRE}.`);
 					
-					if (msg.channel.type !== "dm") {
+					/*if (msg.channel.type !== "dm") {
 						reply.delete({ timeout: 30000 });
 						msg.delete({ timeout: 30000 });
-					}
+					}*/
+					return;
 				} else {
 					IDgiven = true;
 					teamID = args[1];
@@ -80,9 +81,9 @@ exports.run = async (bot, msg, args, serverID) => {
 						"joining it.\nIf you think this is an error, contact the system admin!"
 					);
 
-					if (msg.channel.type !== "dm") {
+					/*if (msg.channel.type !== "dm") {
 						msg.delete({ timeout: 30000 });
-					}
+					}*/
 
 					return;
 				}
@@ -310,9 +311,9 @@ exports.run = async (bot, msg, args, serverID) => {
 			msg.author.send("I don't recognize that option :(\n"
 				+ `Use \`${process.env.PRE}team help\` for help.`)
 
-			if (msg.channel.type !== "dm") {
+			/*if (msg.channel.type !== "dm") {
 				msg.delete({ timeout: 30000 });
-			}
+			}*/
 			return;
 	}
 }

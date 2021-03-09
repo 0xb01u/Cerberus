@@ -170,7 +170,7 @@ exports.run = async (bot, msg, args) => {
 			let tm;
 
 			if (args.length < 3) {
-				msg.delete();
+				//msg.delete();
 				return msg.reply(
 					`you have to specify a team and its new password: ` +
 					`\`${process.env.PRE}teamedit ${args[1]} <teamID> <newPassword>\`.`
@@ -178,7 +178,7 @@ exports.run = async (bot, msg, args) => {
 			}
 
 			if (!RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[1])) {
-				msg.delete();
+				//msg.delete();
 				return msg.reply(
 					"no valid team ID was provided."
 				);
@@ -187,7 +187,7 @@ exports.run = async (bot, msg, args) => {
 			tm = args[1];
 
 			if (!teamList.includes(`${tm}.json`)) {
-				msg.delete();
+				//msg.delete();
 				return msg.reply(
 					"that team doesn't exist."
 				);
@@ -197,7 +197,7 @@ exports.run = async (bot, msg, args) => {
 
 			team.setPassword(args[2]);
 
-			msg.delete();
+			//msg.delete();
 			return msg.reply(
 				`The password for ${tm} was updated succesfully.`
 			);}

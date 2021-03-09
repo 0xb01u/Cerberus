@@ -166,7 +166,10 @@ bot.on("message", async msg => {
 		&& msg.attachments.size == 1 &&
 			(msg.attachments.first().name.match(/\.(teams|pass|passwords?)$/))) {
 
-		if (msg.channel.name !== process.env.BOT_CHANNEL) return msg.delete({ timeout: 0 });
+		if (msg.channel.name !== process.env.BOT_CHANNEL) {
+			//return msg.delete({ timeout: 0 });
+			msg.channel.send("This is not the correct channel to send that!");
+		}
 
 		let att = msg.attachments.first();
 

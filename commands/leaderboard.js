@@ -14,7 +14,7 @@ exports.run = async (bot, msg, args, serverID) => {
 
 	// Channel-specific command:
 	if (msg.channel.name !== process.env.LB_CHANNEL) {
-		msg.delete();
+		//msg.delete();
 		return msg.author.send(
 			`Oh no! :(\nYou used the \`${process.env.PRE}leaderboard\` command in the wrong channel!\n`
 			+ `It can only be used in #${process.env.LB_CHANNEL}.`
