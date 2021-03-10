@@ -123,7 +123,6 @@ exports.run = async (bot, msg, args, file) => {
 		msg.channel.stopTyping();
 		console.error(exc.stack);
 		console.error(exc.stdout.toString());
-		console.error(exc.stderr.toString());
 		//global.log(msg, `\`\`\`\n${exc.stack}\n\`\`\``);
 		if (fs.existsSync(`./programs/${file}`)) fs.unlinkSync(`./programs/${file}`);
 		msg.reply(

@@ -139,7 +139,11 @@ class Leaderboard {
 				let team = global.getTeam(entry["User"], this.server);
 				embed.addFields(
 					{ name: "\u200B", value: entry["Pos"], inline: true },
-					{ name: "\u200B", value: team != null ? team.name : entry["User"], inline: true },
+					{ name: "\u200B",
+						value: team != null ?
+							team.name + ` (${team.id})` :
+							entry["User"],
+						inline: true },
 					{ name: "\u200B", value: entry[targetColumn], inline: true }
 				);
 			}
