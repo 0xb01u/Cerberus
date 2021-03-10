@@ -34,6 +34,9 @@ bot.on("ready", async () => {
 
 		if (!fs.existsSync(`./guilds/${guild.id}`)) fs.mkdirSync(`./guilds/${guild.id}`);
 
+		if (!fs.existsSync(`./teams/${guild.id}/nameMap.json`))
+			fs.writeFileSync(`./teams/${guild.id}/nameMap.json`, "{}");
+
 		// Rename to "Hermes":
 		// (await guild.members.fetch(bot.user.id)).setNickname("Hermes");
 
@@ -228,11 +231,10 @@ bot.on("message", async msg => {
 				return msg.reply(`sorry, I must join at least one server before executing any commands.`);
 			}
 
-			let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
-
 			let guildName = args[0];
 			if (guildName in guildMap) {
-				serverID = guildMap[args.shift()];
+				let student = global.getStudent(msg.user.id);
+				serverID = student.aliases[args.shift()];
 			}
 		} else {
 			serverID = msg.guild.id;
@@ -342,7 +344,8 @@ async function refreshLeaderboard(reaction, user) {
 
 
 	/* Position updates */
-	if (process.env.NOTIFY_LEADERS) {
+	console.log(process.env, process.env.NOTIFY_LEADERS);
+	if (process.env.NOTIFY_LEADERS == "true") {
 
 		let top = lb.table.filter(entry => !entry.Program.startsWith("Ref")).slice(0, process.env.LEADERS)
 			.map(entry => entry.User);
@@ -523,14 +526,22 @@ global.getStudent = function getStudent(userID) {
 /**
  * Retrieves a Team given its ID.
  */
-global.getTeam = function getTeam(teamID, guildID) {
-	if (!fs.existsSync(`./teams/${guildID}/${teamID}.json`)) {
-		// Exception.
-		return null;
+global.getTeam = function getTeam(tm, guildID) {
+	let team = tm;
+	if (!fs.existsSync(`./teams/${guildID}/${team}.json`)) {
+		let nameMap = JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`));
+
+		// The name of the team was provided:
+		if (tm in nameMap) {
+			team = nameMap[tm];
+		} else {
+			// Exception.
+			return null;
+		}
 	}
 
 	const Team = require("./objects/Team.js");
-	return Team.fromJSON(JSON.parse(fs.readFileSync(`./teams/${guildID}/${teamID}.json`)));
+	return Team.fromJSON(JSON.parse(fs.readFileSync(`./teams/${guildID}/${team}.json`)));
 }
 
 global.log = async function log(triggerMsg, serverID, content) {
@@ -577,7 +588,7 @@ async function notifyTeamPrivately(tm, serverID, msg) {
  * Sends a notification message to a server, pinging all students in a team.
  */
 async function notifyTeamPublicly(tm, serverID, msg) {
-	if (!process.env.PUBLIC_NOTIFY) return;
+	if (process.env.PUBLIC_NOTIFY != "true") return;
 
 	let team = global.getTeam(tm, serverID);
 

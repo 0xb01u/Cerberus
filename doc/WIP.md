@@ -6,10 +6,6 @@ This file records the planned features for Hermes, in a quick and dirty way.
 
 A command to **close leaderboards**.
 
-## Team names
-
-Renaming a team to show a cooler name in the leaderboard's snapshot.
-
 ### Team roles
 
 Create role per team. Comfortably mention an entire team with that role.

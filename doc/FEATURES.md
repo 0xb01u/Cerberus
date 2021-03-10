@@ -9,7 +9,8 @@ This file contains a list with the entirety of Hermes' currently supported featu
  2. [Commands](#commands)
    2.1. [set](#set)
    2.2. [config](#config)
-   2.3. [team](#team)
+   2.3. [alias](#alias)
+   2.4. [team](#team)
  3. [Leaderboards](#leaderboards)
    3.1. [Updating the leaderboards' contents](#refresh)
  4. [Notifications on leaderboard position changes](#notifications)
@@ -78,6 +79,8 @@ If the Discord server has any space in its name, you must replace them with unde
 !set server HPC_Discord
 ```
 
+You could also use another [alias](#alias) for the server.
+
 **NOTE (again):** by default, Hermes will set your default server to be the very first server you join that already uses it. So, if you're just in one server using Hermes, that will be automatically set as your default server. The default queue won't be automatically set.
 
 ### config
@@ -90,6 +93,20 @@ If the Discord server has any space in its name, you must replace them with unde
 ```
 
 `config` can also be used as an alias for `set`. So `config server` and `config queue` are effectively equivalent to `set server` and `set queue`, respectively. (Note that `set`, without any option, is not an alias for `config` and, thus, won't do anything.)
+
+### alias
+
+**This command can only be sent to the bot via Direct Message.**
+
+`alias` lets you set aliases for servers:
+
+```
+!alias HPCDiscord hpc
+```
+
+this will let you refer to the Discord `HPCDiscord` simply as `hpc`.
+
+The name of a server with all spaces replaced by underscores (`_`) is a default alias for that server.
 
 ### team
 
@@ -115,7 +132,7 @@ Requests are accepted by sending a Direct Message to the bot with:
 ```
 !team accept [serverName] [requestID]
 ```
-where `[serverName]` is the name of the Discord server the team belongs to, replacing all the spaces with underscores (`_`), and `[requestID]` is the identifier for the request (don't worry, Hermes will let you know exactly what to write).
+where `[serverName]` is an [alias](#alias) for the Discord server, and `[requestID]` is the identifier for the request (don't worry, Hermes will let you know exactly what to write).
 
 Requests are rejected by sending a Direct Message to the bot with:
 ```
@@ -129,6 +146,14 @@ Also, as long as a team hasn't reached its maximum capacity, their members can l
 ```
 !team leave
 ```
+
+Teams can be renamed using `rename`:
+
+```
+!team rename newCoolName
+```
+
+The name of the team will only be used on [Leaderboard visualziations](#leaderboards), and has only aesthetic effects. Team IDs will still be usable to identify and manage teams. Team IDs are immutable.
 
 ## Leaderboards
 

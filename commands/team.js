@@ -126,15 +126,13 @@ exports.run = async (bot, msg, args, serverID) => {
 					}
 					teamCreationLog += `).`;
 
-					global.log(msg, teamCreationLog);
+					global.log(msg, server, teamCreationLog);
 				}
 
 				return;	// Feedback message sent in the if-elses above.
 
 			// Generate random ID:
 			} else {
-				// TODO: account for !team leave!!!
-
 				/*let maxTeams = Math.ceil(guild.memberCount / process.env.TEAM_CAPACITY);
 
 				let maxTeamsCopy = maxTeams;
@@ -147,7 +145,12 @@ exports.run = async (bot, msg, args, serverID) => {
 				*/
 				let digits = 2;
 
-				let num = teamList.length + 1;
+				let num = 1;
+				while (teamList.includes(
+					process.env.TEAM_PRE +
+					(num++).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false})) +
+					".json");
+
 				teamID = process.env.TEAM_PRE + (num).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false});
 
 				let team = new Team(teamID, server);
@@ -155,6 +158,8 @@ exports.run = async (bot, msg, args, serverID) => {
 					msg.author.send(
 						`Correctly joined team ${teamID} on server ${serverName}.`
 					);
+
+					global.log(msg, server, `Created team ${teamID}.`);
 				} else {
 					msg.author.send(
 						`There was a problem trying to join team ${teamID} on server ${serverName}.`
@@ -182,19 +187,21 @@ exports.run = async (bot, msg, args, serverID) => {
 			}
 
 			team.leave(user);
-			return msg.author.send(
+			msg.author.send(
 				`Succsesfully left team ${team.name}.`
-			);}
+			);
 
-		/*
+			global.log(msg, server, `Someone left team ${teamID}.`);
+			return;}
+
 		case "rename":{
 			if (args.length < 2) {
 				let reply = await msg.reply("you should tell me what team you want me to rename!");
 
-				if (msg.channel.type !== "dm") {
+				/*if (msg.channel.type !== "dm") {
 					reply.delete({ timeout: 30000 });
 					msg.delete({ timeout: 30000 });
-				}
+				}*/
 			}
 
 			if (!(server in userTeams)) {
@@ -209,24 +216,28 @@ exports.run = async (bot, msg, args, serverID) => {
 			if (args.length < 3) {
 				return msg.author.send(
 					`It looks like you are trying to **rename** your team ${team.name} on server ${serverName}, ` +
-					`but you didn't provide any new name! Use the command like this:\n`
+					`but you didn't provide the new name! Use the command like this:\n`
 					`!team rename newCoolName`
 				);				
 			}
 
-			if (args[2].length > 16) {
+			/*let charLimit = 16;
+			if (args[2].length > charLimit) {
 				return msg.author.send(
 					`It looks like you are trying to **rename** your team  ${team.name} on server ${serverName}, ` +
-					`but the name given is too long. Team names must be at most 16 characters long.`
+					`but the name given is too long. Team names must be at most ${charlimit} characters long.`
 				);				
-			}
+			}*/
 
-			team.changeName(newName);
+			args.shift();
+			team.changeName(args.join(" "));
 
-			return msg.author.send(
+			msg.author.send(
 				`Correctly changed the name of the team ${team.id} on server ${serverName} to ${team.name}.`
-			);}
-		*/
+			);
+
+			global.log(msg, server, `Team ${team.id} was renamed to ${team.name}.`);
+			return;}
 
 		case "accept":{
 			if (!(server in userTeams)) {
@@ -258,11 +269,7 @@ exports.run = async (bot, msg, args, serverID) => {
 				}
 				teamCreationLog += `).`;
 
-				for (let ch of guild.channels.cache.array()) {
-					if (ch.name === process.env.BOT_CHANNEL) {
-						ch.send(teamCreationLog);
-					}
-				}
+				global.log(msg, server, teamCreationLog);
 			}
 
 			return msg.author.send(

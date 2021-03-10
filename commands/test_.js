@@ -11,7 +11,7 @@ exports.run = async (bot, msg, args, file) => {
 	// Check if the last valid command should be used:
 	if (args.length == 1 && (args[0] === "last" || args[0] === "l")) {
 		// Check if there's a last command saved:
-		if (student.latestClientCommand === null) {
+		if (student.latestClientCommand == null) {
 			return msg.reply(
 				`**Error**: I don't have any record of any previous command, ` +
 				`so I cannot guess where you are trying to send it.`
@@ -34,12 +34,22 @@ exports.run = async (bot, msg, args, file) => {
 			);
 		// Check and use default user and password:
 		} else if ((!args.includes("-u"))) {
+			if (!student.preferredServer in student.credentials) {
+				return msg.reply(
+					`**Error**: You must join a team before launching any request.`
+				);
+			}
 			let credentials = student.credentials[student.preferredServer];
+			if (credentials.passwd == null || credentials.passwd == "null") {
+				return msg.reply(
+					`**Error**: You have no password set for ${credentials.team} yet.`
+				);
+			}
 			line += ` -u ${credentials.team} -x ${credentials.passwd} `
 		}
 
 		// Check if no queue was provided and there's no default one.
-		if (!args.includes("-q") && student.preferredQueue === null) {
+		if (!args.includes("-q") && student.preferredQueue == null) {
 			return msg.reply(
 				`**Error**: You must specify a queue to send the program to.`
 			);
@@ -74,12 +84,14 @@ exports.run = async (bot, msg, args, file) => {
 			}
 		}
 
-		global.log(
-			msg,
-			server,
-			`New request:\n` +
-			`Sent: \`${line}\`\n` + output.toString()
-		);
+		if (server !== "") {
+			global.log(
+				msg,
+				server,
+				`New request:\n` +
+				`Sent: \`${line}\`\n` + output.toString()
+			);
+		}
 
 
 		/* Create the request as a refreshable embed: */
@@ -109,8 +121,10 @@ exports.run = async (bot, msg, args, file) => {
 		msg.channel.stopTyping();
 	} catch (exc) {
 		msg.channel.stopTyping();
-		console.log(exc.stack);
-		global.log(msg, `\`\`\`\n${exc.stack}\n\`\`\``);
+		console.error(exc.stack);
+		console.error(exc.stdout.toString());
+		console.error(exc.stderr.toString());
+		//global.log(msg, `\`\`\`\n${exc.stack}\n\`\`\``);
 		if (fs.existsSync(`./programs/${file}`)) fs.unlinkSync(`./programs/${file}`);
 		msg.reply(
 			`**Error while sending the program to the queue.**\n${exc.stderr.toString()}`

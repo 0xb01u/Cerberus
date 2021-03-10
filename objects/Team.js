@@ -24,10 +24,9 @@ class Team {
 			this.save();
 
 			// Add to the server-name map:
-			let nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ?
-				JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) :
-				{};
+			let nameMap = JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`));
 			nameMap[id] = this.name;
+			nameMap[this.name] = id;
 			fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap, null, 2));
 		}
 	}
@@ -87,19 +86,11 @@ class Team {
 	 * Changes the team's name, for customization purposes.
 	 */
 	changeName(newName) {
-		// The name cannot be a different ID:
-		if (RegExp(`^${process.env.TEAM_PRE}\\d+`).test(newName)) {
-			// TODO: handle this exception.
-			return;
-		}
+		// The name cannot be the same as another team's name or ID.
+		let nameMap = JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`));
 
-		// The name cannot be the same as another team's name:
-		nameMap = (fs.existsSync(`./teams/${this.server}/nameMap.json`)) ?
-		JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`)) :
-		{};
-		if (Object.values(nameMap).includes(newName)) {
-			// TODO: handle this exception.
-			return;
+		if (newName in nameMap) {
+			return false;
 		}
 
 		this.name = newName;
@@ -108,13 +99,14 @@ class Team {
 		fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap, null, 2));
 
 		this.save();
+		return true;
 	}
 
 	/**
 	 * Sets the password for the team.
 	 */
 	setPassword(passwd) {
-		if (this.passwd === null) {
+		if (this.passwd == null) {
 			this.passwd = passwd;
 
 			for (let member of this.members) {

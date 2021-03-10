@@ -75,7 +75,8 @@ After this, your bot will have succesfully joined the specified server.
  }
  ```
  For that bot, all commands would start with "!", team IDs would start with "g", teams would be of just 1 person, and the special private bot channel in the server would be #bot. The server's channel where the leaderboards would be shown would be #leaderboards, and the top 10 teams of each leaderboard would be notified whenever any team made their position change. Notifications would be posted publicly on the channel #bot.
- 7. Execute `run.sh` on the bot's working directory. `run.sh` just contains:
+ 7. Place the corresponding Python client in the directory `tools/`, named simply `client` (without extension). If there's already a `client` file in the directory `tools/`, replace it with the desired one.
+ 8. Execute `run.sh` on the bot's working directory. `run.sh` just contains:
  ```sh
  nohup node . >> output.log 2>> err.log &
  ```

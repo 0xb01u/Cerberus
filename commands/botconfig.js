@@ -60,6 +60,12 @@ exports.run = async (bot, msg, args) => {
 			} else if (!isNaN(parseInt(args[0]))) {
 				process.env[field] = parseInt(args[0]);
 				env[field] = parseInt(args[0]);
+			} else if (args[0] === "true") {
+				process.env[field] = true;
+				env[field] = true;
+			} else if (args[0] === "false") {
+				process.env[field] = false;
+				env[field] = false;
 			} else {
 				process.env[field] = args[0];
 				env[field] = args[0];
@@ -68,8 +74,8 @@ exports.run = async (bot, msg, args) => {
 			msg.channel.send(`Changed \`${field}\` field to \`${env[field]}\`.`);
 		}
 		
-		delete env;
 		// Save the env file:
-		return fs.writeFileSync("env.json", JSON.stringify(env, null, 2));
+		fs.writeFileSync("env.json", JSON.stringify(env, null, 2));
+		delete env;
 	}
 }

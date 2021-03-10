@@ -128,8 +128,7 @@ class Student {
 	 * Adds an alias for a server name.
 	 */
 	addAlias(serverName, alias) {
-		let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
-		let serverID = guildMap[serverName];
+		let serverID = this.aliases[serverName];
 
 		aliases[alias] = serverID;
 

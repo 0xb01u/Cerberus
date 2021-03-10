@@ -102,6 +102,7 @@ class Request {
 			}
 		}
 
+		// Color for each request status:
 		let color = 0x888888;
 		if (this.table.Status.includes("finished")) {
 			color = 0x00ffff;

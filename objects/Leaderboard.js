@@ -122,7 +122,7 @@ class Leaderboard {
 				embedList.push(embed);
 				embed = new Discord.MessageEmbed()
 					.setDescription(this.description)
-					.setColor(0x00ff00)
+					.setColor(this.closed ? 0xff0000 : 0x00ff00)
 					.setFooter(this.name)
 					.setTimestamp(date);
 			}
@@ -136,9 +136,10 @@ class Leaderboard {
 				);
 			// Add team's program:
 			} else {
+				let team = global.getTeam(entry["User"], this.server);
 				embed.addFields(
 					{ name: "\u200B", value: entry["Pos"], inline: true },
-					{ name: "\u200B", value: entry["User"], inline: true },
+					{ name: "\u200B", value: team != null ? team.name : entry["User"], inline: true },
 					{ name: "\u200B", value: entry[targetColumn], inline: true }
 				);
 			}

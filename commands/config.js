@@ -1,5 +1,3 @@
-const fs = require("fs");
-
 exports.run = async (bot, msg, args) => {
 	if (msg.channel.type !== "dm") {
 		let reply = await msg.reply("this command can only be used via DM. Message me directly!");
@@ -18,9 +16,11 @@ exports.run = async (bot, msg, args) => {
 			` - Default server: ${bot.guilds.cache.get(student.preferredServer).name}\n` +
 			(student.preferredServer in student.credentials ?
 				`   + Team: ${student.credentials[student.preferredServer].team}\n` + 
-				`   + Password: ${student.credentials[student.preferredServer].passwd}\n` :
-				``) +
-			(student.preferredQueue !== null ?
+				(student.credentials[student.preferredServer].password != null ?
+					`   + Password: ${student.credentials[student.preferredServer].passwd}\n` :
+						``) :
+					``) +
+			(student.preferredQueue != null ?
 				` - Default queue: ${student.preferredQueue}\n` :
 				``)
 		);

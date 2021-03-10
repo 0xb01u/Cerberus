@@ -20,6 +20,12 @@ exports.run = async (bot, msg, args) => {
 	const teamList = teamFiles.filter(team => RegExp(`^${process.env.TEAM_PRE}\\d+.json$`).test(team)
 		&& !team.includes("#"));
 
+	if (args.length < 1) {		
+		return msg.reply(
+			`options: \`move, add, remove, setEditable/unconfirm, confirm, password/passwd/pass/pswd, <teamID>\`.`
+		);
+	}
+
 	let usr, tm;
 	switch (args[0]) {
 		case "move":{
@@ -205,8 +211,17 @@ exports.run = async (bot, msg, args) => {
 		// TODO: rename.
 
 		default:
-			return msg.reply(
-				`options: \`move, add, remove, setEditable/unconfirm, confirm, password/passwd/pass/pswd\`.`
+			tm = args[0];			
+			if (!teamList.includes(`${tm}.json`)) {
+				return msg.reply(
+					`team "${tm}" doesn't exist.`
+				);
+			}
+
+			let team = global.getTeam(tm, server);
+			return msg.channel.send(
+				`Raw dump of team ${tm}:\n` + 
+				`\`\`\`\n${JSON.stringify(team, null, 2)}\n\`\`\``
 			);
 	}
 }
