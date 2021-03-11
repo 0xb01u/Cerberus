@@ -16,7 +16,7 @@ exports.run = async (bot, msg, args) => {
 			` - Default server: ${bot.guilds.cache.get(student.preferredServer).name}\n` +
 			(student.preferredServer in student.credentials ?
 				`   + Team: ${student.credentials[student.preferredServer].team}\n` + 
-				(student.credentials[student.preferredServer].password != null ?
+				(student.credentials[student.preferredServer].passwd != null ?
 					`   + Password: ${student.credentials[student.preferredServer].passwd}\n` :
 						``) :
 					``) +
