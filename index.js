@@ -40,7 +40,7 @@ bot.on("ready", async () => {
 		// Rename to "Hermes":
 		// (await guild.members.fetch(bot.user.id)).setNickname("Hermes");
 
-		// New channel found: add to database.
+		// New server found: add to database.
 		if (!(guild.id in guildMap)) {
 			let guildName = guild.name.replace(/ /g, "_");
 			guildMap[guildName] = guild.id;
@@ -119,6 +119,7 @@ bot.on("guildMemberAdd", member => {
 	let guildMap = JSON.parse(fs.readFileSync(`./guilds/guildMap.json`));
 
 	if (!fs.existsSync(`./users/${member.id}.json`)) {
+		const Student = require("./objects/Student.js");
 		let student = new Student(member.id, guildMap[member.guild.id], member.name, member.user.username, member.user.discriminator);		
 	} else {
 		global.getStudent(member.id).addServer(guildName);
@@ -165,9 +166,9 @@ bot.on("message", async msg => {
 	/*
 	 * Sending a team-password file to update the teams.
 	 */
-	else if ((msg.channel.type !== "dm" && msg.member.hasPermission("ADMINISTRATOR"))
+	else if ((msg.channel.type !== "dm" && msg.member.hasPermission("MANAGE_GUILD"))
 		&& msg.attachments.size == 1 &&
-			(msg.attachments.first().name.match(/\.(teams|pass|passwords?)$/))) {
+			(msg.attachments.first().name.match(/\.(teams|pass|passwd|passwords?)$/))) {
 
 		if (msg.channel.name !== process.env.BOT_CHANNEL) {
 			//return msg.delete({ timeout: 0 });
@@ -194,7 +195,10 @@ bot.on("message", async msg => {
 					let teamID = line.split(" ")[0];
 					let passwd = line.split(" ")[1];
 
-					global.getTeam(teamID, msg.guild.id).setPassword(passwd);
+					let team = global.getTeam(teamID, msg.guild.id);
+					if (team != null && team.confirmed) {
+						team.setPassword(passwd);
+					}
 				}
 				msg.reply("the passwords for the teams have been updated succesfully!");
 			});
@@ -231,9 +235,9 @@ bot.on("message", async msg => {
 				return msg.reply(`sorry, I must join at least one server before executing any commands.`);
 			}
 
+			let student = global.getStudent(msg.user.id);
 			let guildName = args[0];
-			if (guildName in guildMap) {
-				let student = global.getStudent(msg.user.id);
+			if (guildName in student.aliases) {
 				serverID = student.aliases[args.shift()];
 			}
 		} else {
@@ -529,7 +533,7 @@ global.getStudent = function getStudent(userID) {
 global.getTeam = function getTeam(tm, guildID) {
 	let team = tm;
 	if (!fs.existsSync(`./teams/${guildID}/${team}.json`)) {
-		let nameMap = JSON.parse(fs.readFileSync(`./teams/${this.server}/nameMap.json`));
+		let nameMap = JSON.parse(fs.readFileSync(`./teams/${guildID}/nameMap.json`));
 
 		// The name of the team was provided:
 		if (tm in nameMap) {
@@ -555,7 +559,7 @@ global.log = async function log(triggerMsg, serverID, content) {
 		}
 	}
 
-	if (channel !== null) {
+	if (channel != null) {
 		if ((triggerMsg.content.length + content.length) < 1950) {
 			channel.send(
 				`${content}\n`
