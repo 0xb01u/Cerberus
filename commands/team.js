@@ -151,7 +151,7 @@ exports.run = async (bot, msg, args, serverID) => {
 					(num++).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false})) +
 					".json");
 
-				teamID = process.env.TEAM_PRE + (num).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false});
+				teamID = process.env.TEAM_PRE + (--num).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false});
 
 				let team = new Team(teamID, server);
 				if (team.join(msg.author.id)) {
@@ -230,13 +230,19 @@ exports.run = async (bot, msg, args, serverID) => {
 			}*/
 
 			args.shift();
-			team.changeName(args.join(" "));
+			if (team.changeName(args.join(" "))) {
+				msg.author.send(
+					`Correctly changed the name of the team ${team.id} on server ${serverName} to ${team.name}.`
+				);
+				global.log(msg, server, `Team ${team.id} was renamed to ${team.name}.`);
+			} else {
+				msg.author.send(
+					`The new name you provided for ${team.id} is invalid: ` +
+					`it is a team ID, or it is already in use by another team. Try another name.`
+				);
+				global.log(msg, server, `Team ${team.id} **failed** to be renamed to ${args.join(" ")}.`);
+			}
 
-			msg.author.send(
-				`Correctly changed the name of the team ${team.id} on server ${serverName} to ${team.name}.`
-			);
-
-			global.log(msg, server, `Team ${team.id} was renamed to ${team.name}.`);
 			return;}
 
 		case "accept":{

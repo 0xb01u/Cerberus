@@ -208,7 +208,38 @@ exports.run = async (bot, msg, args) => {
 				`The password for ${tm} was updated succesfully.`
 			);}
 
-		// TODO: rename.
+		case "rename":{
+			let name = "";
+			if (RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[2])) {
+				name = args[1];
+				tm = args[2];
+			} else if (RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[1])) {
+				name = args[2];
+				tm = args[1];
+			} else {
+				return msg.reply(
+					`the arguments do not have the correct format: ` +
+					`\`${process.env.PRE}teamedit rename <team> <newName>\``
+				);
+			}
+
+			let team;
+			if (!teamList.includes(`${tm}.json`)) {
+				return msg.reply(
+					`team ${tm} doesn't exist.`
+				);
+			}
+			team = global.getTeam(tm, server);
+			
+			if (team.changeName(name)) {
+				return msg.reply(
+					`correctly added <@${usr}> to the team ${tm}.`
+				);
+			} else {
+				return msg.reply(
+					`that name is invalid: it's already used by another team, or it's a team identifier.`
+				);
+			}}
 
 		default:
 			tm = args[0];			
