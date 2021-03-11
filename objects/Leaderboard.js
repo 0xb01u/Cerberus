@@ -140,7 +140,7 @@ class Leaderboard {
 				embed.addFields(
 					{ name: "\u200B", value: entry["Pos"], inline: true },
 					{ name: "\u200B",
-						value: team != null ?
+						value: (team != null && team.name != team.id) ?
 							team.name + ` (${team.id})` :
 							entry["User"],
 						inline: true },
