@@ -103,7 +103,7 @@ class Leaderboard {
 			.setURL(this.url)
 			.setFooter(this.name)
 			.setTimestamp(date);
-		if (this.description !== null) {
+		if (this.description != null) {
 			embed.setDescription(this.description);
 		}
 		embed.addFields(
