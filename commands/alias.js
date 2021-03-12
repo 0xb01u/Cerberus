@@ -11,7 +11,7 @@ exports.run = async (bot, msg, args) => {
 		return msg.reply(
 			`Usage: \`${process.env.PRE}alias <serverAlias> <newAlias>\`\n` +
 			`The server's name, replacing all spaces with underscores (\`_\`), ` +
-			`is a default \`serverAlias\`.`
+			`is a default \`<serverAlias>\`.`
 		);
 	}
 
