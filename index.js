@@ -34,8 +34,10 @@ bot.on("ready", async () => {
 
 		if (!fs.existsSync(`./guilds/${guild.id}`)) fs.mkdirSync(`./guilds/${guild.id}`);
 
-		if (!fs.existsSync(`./teams/${guild.id}/nameMap.json`))
+		if (!fs.existsSync(`./teams/${guild.id}/nameMap.json`)) {
+			fs.mkdirSync(`./teams/${guild.id}/`)
 			fs.writeFileSync(`./teams/${guild.id}/nameMap.json`, "{}");
+		}
 
 		// Rename to "Hermes":
 		// (await guild.members.fetch(bot.user.id)).setNickname("Hermes");
@@ -197,7 +199,7 @@ bot.on("message", async msg => {
 
 					let team = global.getTeam(teamID, msg.guild.id);
 					if (team != null && team.confirmed) {
-						team.setPassword(passwd);
+						team.setPassword(passwd, bot);
 					}
 				}
 				msg.reply("the passwords for the teams have been updated succesfully!");
@@ -213,6 +215,8 @@ bot.on("message", async msg => {
 	 * Usage of a regular command.
 	 */
 	else if (msg.content.startsWith(process.env.PRE)) {
+		console.error(msg.content);
+
 		let args = msg.content.substring(process.env.PRE.length).split(" ");
 		// Remove empty elements on args array:
 		args = args.filter((e) => e != "");
@@ -235,7 +239,7 @@ bot.on("message", async msg => {
 				return msg.reply(`sorry, I must join at least one server before executing any commands.`);
 			}
 
-			let student = global.getStudent(msg.user.id);
+			let student = global.getStudent(msg.author.id);
 			let guildName = args[0];
 			if (guildName in student.aliases) {
 				serverID = student.aliases[args.shift()];

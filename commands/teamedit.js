@@ -201,7 +201,7 @@ exports.run = async (bot, msg, args) => {
 
 			let team = global.getTeam(tm, server);
 
-			team.setPassword(args[2]);
+			team.setPassword(args[2], bot);
 
 			//msg.delete();
 			return msg.reply(

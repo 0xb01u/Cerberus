@@ -5,6 +5,8 @@ const { execSync } = require("child_process");
  * Send a program to the client.
  */	
 exports.run = async (bot, msg, args, file) => {
+	console.error(msg.content);
+	
 	let student = global.getStudent(msg.author.id);
 
 	let line = ``;
