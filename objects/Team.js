@@ -105,19 +105,24 @@ class Team {
 	/**
 	 * Sets the password for the team.
 	 */
-	setPassword(passwd) {
-		if (this.passwd == null) {
+	setPassword(passwd, bot=null) {
+		if (this.passwd !== passwd) {
 			this.passwd = passwd;
 
 			for (let member of this.members) {
 				let student = global.getStudent(member);
 
 				student.addPassword(this.server, this.passwd);
+				if (bot != null) {
+					bot.users.fetch(member).then(user => {
+						user.send(
+							`The password for the team ${this.id} has been changed to ${this.passwd}.`
+						);
+					});
+				}
 			}
 
 			this.save();
-		} else {
-			// TODO: handle this exception.
 		}
 	}
 
