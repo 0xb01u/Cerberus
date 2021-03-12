@@ -29,10 +29,6 @@ exports.run = async (bot, msg, args, serverID) => {
 		return;
 	}
 
-	// Create directories if they don't exist:
-	if (!fs.existsSync(`./teams`)) fs.mkdirSync(`./teams/${server}`, { recursive: true });
-	else if (!fs.existsSync(`./teams/${server}`)) fs.mkdirSync(`./teams/${server}`);
-
 	let teamFiles = fs.readdirSync(`./teams/${server}/`);
 	const teamList = teamFiles.filter(team => RegExp(`^${process.env.TEAM_PRE}\\d+`).test(team)
 		&& !team.includes("#"));
@@ -148,8 +144,8 @@ exports.run = async (bot, msg, args, serverID) => {
 				let num = 1;
 				while (teamList.includes(
 					process.env.TEAM_PRE +
-					(num++).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false})) +
-					".json");
+					(num++).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false}) +
+					".json"))
 
 				teamID = process.env.TEAM_PRE + (--num).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false});
 
