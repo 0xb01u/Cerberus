@@ -116,7 +116,7 @@ class Team {
 				if (bot != null) {
 					bot.users.fetch(member).then(user => {
 						user.send(
-							`The password for the team ${this.id} has been changed to ${this.passwd}.`
+							`The password for the team ${this.id} has been changed to \`${this.passwd}\`.`
 						);
 					});
 				}

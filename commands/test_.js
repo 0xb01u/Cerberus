@@ -23,9 +23,6 @@ exports.run = async (bot, msg, args, file) => {
 
 	} else {
 		/* DEFAULT ARGUMENTS COMPLETION */
-		if (args.includes("-u") || args.includes("-q") || args.includes("--")) {
-			line = args.join(" ").split("--")[0];
-		}
 
 		// Check if user and password were BOTH sent or not sent:
 		if ((!args.includes("-u") && args.includes("-x"))
@@ -47,7 +44,7 @@ exports.run = async (bot, msg, args, file) => {
 					`**Error**: You have no password set for ${credentials.team} yet.`
 				);
 			}
-			line += ` -u ${credentials.team} -x ${credentials.passwd} `
+			line = ` -u ${credentials.team} -x ${credentials.passwd} ` + line;
 		}
 
 		// Check if no queue was provided and there's no default one.
@@ -57,15 +54,11 @@ exports.run = async (bot, msg, args, file) => {
 			);
 		// Check and use default queue:
 		} else if (!args.includes("-q")) {
-			line += ` -q ${student.preferredQueue} `;	
+			line = ` -q ${student.preferredQueue} ` + line;
 		}
 
 		// Reconstruct the client command:
-		if (!args.includes("-u") && !args.includes("-q") && !args.includes("--")) {
-			line += ` -- ${args.join(" ")}`;
-		} else {
-			line += args.join(" ").split("--")[1] == null ? `` : `--${args.join(" ").split("--")[1]}`;
-		}
+		line += ` ${args.join(" ")}`;
 	}
 
 	// Send the program to the corresponding queue:
