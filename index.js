@@ -134,82 +134,80 @@ bot.on("guildMemberAdd", member => {
 bot.on("message", async msg => {
 	if (msg.author.bot) return;
 
-	/*
-	 * Sending a program to the queue.
-	 */
-	if (msg.channel.type === "dm" && msg.attachments.size == 1) {
-		// Download attachement:
-		let att = msg.attachments.first();
-		let args = msg.content.split(" ");
-
-		if (!fs.existsSync(`./programs/`)) fs.mkdirSync(`./programs`);
-
-		let filepath = `./programs/${att.name}`;
-		const file = fs.createWriteStream(filepath);
-		http.get(att.url, async response => {
-			let download = response.pipe(file);
-			download.on("finish", async () => {
-				try {
-					delete require.cache[require.resolve(`./commands/test_${""}.js`)];
-
-					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-					await require(`./commands/test_${""}.js`).run(bot, msg, args, att.name);
-					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
-				} catch (e) {
-					if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
-					msg.reply("there was an error trying to send your program to the queue :(");
-					console.log(e.stack);
-				}
-			});
-		});
-	}
-
-	/*
-	 * Sending a team-password file to update the teams.
-	 */
-	else if ((msg.channel.type !== "dm" && msg.member.hasPermission("MANAGE_GUILD"))
-		&& msg.attachments.size == 1 &&
-			(msg.attachments.first().name.match(/\.(teams|pass|passwd|passwords?)$/))) {
-
-		if (msg.channel.name !== process.env.BOT_CHANNEL) {
-			//return msg.delete({ timeout: 0 });
-			msg.channel.send("This is not the correct channel to send that!");
-		}
-
-		let att = msg.attachments.first();
-
+	if (msg.attachments.size == 1) {
 		/*
-		 * Fetch the file and process it.
+		 * Sending a program to the queue.
 		 */
-		http.get(att.url).on("response", async response => {
-			response.setEncoding("utf8");
-			let body = "";	// Text file.
+		if (msg.channel.type === "dm") {
+			// Download attachement:
+			let att = msg.attachments.first();
+			let args = msg.content.split(" ");
 
-			response.on("data", chunk => {
-				body += chunk;
-			});
+			if (!fs.existsSync(`./programs/`)) fs.mkdirSync(`./programs`);
 
-			response.on("end", () => {
-				let passwds = body.split("\n");
+			let filepath = `./programs/${att.name}`;
+			const file = fs.createWriteStream(filepath);
+			http.get(att.url, async response => {
+				let download = response.pipe(file);
+				download.on("finish", async () => {
+					try {
+						delete require.cache[require.resolve(`./commands/test_${""}.js`)];
 
-				for (let line of passwds) {
-					let teamID = line.split(" ")[0];
-					let passwd = line.split(" ")[1];
-
-					let team = global.getTeam(teamID, msg.guild.id);
-					if (team != null && team.confirmed) {
-						team.setPassword(passwd, bot);
+						await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
+						await require(`./commands/test_${""}.js`).run(bot, msg, args, att.name);
+						await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+					} catch (e) {
+						if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
+						await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+						msg.reply("there was an error trying to send your program to the queue :(");
+						console.log(e.stack);
 					}
-				}
-				msg.reply("the passwords for the teams have been updated succesfully!");
+				});
 			});
+		/*
+		 * Sending a team-password file to update the teams.
+		 */
+		} else if (msg.member.hasPermission("MANAGE_GUILD")
+				&& (msg.attachments.first().name.match(/\.(teams|pass|passwd|passwords?)$/))) {
+			if (msg.channel.name !== process.env.BOT_CHANNEL) {
+				//return msg.delete({ timeout: 0 });
+				msg.channel.send("This is not the correct channel to send that!");
+			}
 
-			response.on("error", e => {
-				msg.reply("there was an error trying to update the passwords for the teams >:(");
+			let att = msg.attachments.first();
+
+			/*
+			 * Fetch the file and process it.
+			 */
+			http.get(att.url).on("response", async response => {
+				response.setEncoding("utf8");
+				let body = "";	// Text file.
+
+				response.on("data", chunk => {
+					body += chunk;
+				});
+
+				response.on("end", () => {
+					let passwds = body.split("\n");
+
+					for (let line of passwds) {
+						let teamID = line.split(" ")[0];
+						let passwd = line.split(" ")[1];
+
+						let team = global.getTeam(teamID, msg.guild.id);
+						if (team != null && team.confirmed) {
+							team.setPassword(passwd, bot);
+						}
+					}
+					msg.reply("the passwords for the teams have been updated succesfully!");
+				});
+
+				response.on("error", e => {
+					msg.reply("there was an error trying to update the passwords for the teams >:(");
+				});
 			});
-		});
-	}
+		}
+	}	
 
 	/*
 	 * Usage of a regular command.
@@ -260,6 +258,21 @@ bot.on("message", async msg => {
 			// If the command couldn't be executed.
 			if (msg.channel.type === "dm") msg.reply("nonexistent command.");
 			console.log(e.stack);
+		}
+	}
+
+	/*
+	 * Log of messages sent to Hermes:
+	 */
+	else if (msg.channel.type === "dm") {
+		let student = global.getStudent(msg.author.id);
+		if (student != null) {
+			for (let server in student.credentials) {
+				// TODO: this is an ugly workaround.
+				global.log(msg, server,
+					`Received a private message.`
+				);
+			}
 		}
 	}
 });
