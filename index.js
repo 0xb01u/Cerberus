@@ -218,6 +218,8 @@ bot.on("message", async msg => {
 		let args = msg.content.substring(process.env.PRE.length).split(" ");
 		// Remove empty elements on args array:
 		args = args.filter((e) => e != "");
+		if (args.length < 1) return;	// Has happened lol.
+
 		let cmd = args.shift().toLowerCase();
 
 		if (cmd === "test_") {
@@ -355,8 +357,12 @@ async function refreshLeaderboard(reaction, user) {
 
 	if (lb.table == null) return channel.stopTyping();
 
-	let prevTop = lb.table.filter(entry => !entry.Program.startsWith("Ref")).slice(0, process.env.LEADERS)
+	let prevTop = lb.table.filter(entry => entry.User.startsWith(process.env.TEAM_PRE)).slice(0, process.env.LEADERS)
 		.map(entry => entry.User);
+	let prevTable = lb.table;
+	let prevRefIndex = prevTable.map((e, i) => e.Pos == "" ? i : "").filter(String).reverse();
+		// Reversed so earlier Refs are first.
+
 
 	let table = await lb.refresh();
 	// If the refresh request wasn't processed, return.
@@ -365,11 +371,11 @@ async function refreshLeaderboard(reaction, user) {
 
 
 	/* Position updates */
-	console.log(process.env, process.env.NOTIFY_LEADERS);
 	if (process.env.NOTIFY_LEADERS == "true") {
-
-		let top = lb.table.filter(entry => !entry.Program.startsWith("Ref")).slice(0, process.env.LEADERS)
+		let top = lb.table.filter(entry => entry.User.startsWith(process.env.TEAM_PRE)).slice(0, process.env.LEADERS)
 			.map(entry => entry.User);
+		let refIndex = table.map((e, i) => e.Pos == "" ? i : "").filter(String).reverse();
+			// Reversed so earlier Refs are first.
 
 		// Fetch news channel:
 		let newsCh;
@@ -389,7 +395,7 @@ async function refreshLeaderboard(reaction, user) {
 						`:partying_face: :confetti_ball: `
 					for (let tm of top) {
 						let team = global.getTeam(tm, server.id);
-						congratz += `${team.id} + ( `;
+						congratz += `${team.id} + ( `; 
 						for (let member of tm.members) {
 							congratz += `<@${member}> `;
 						}
@@ -397,16 +403,27 @@ async function refreshLeaderboard(reaction, user) {
 					}
 
 				} else {
-					let team = global.getTeam(top[0], server.id);
-					congratz = `Congratulations on being the first team on the leaderboard ${lb.name}, ` +
-						`${team.id}! :partying_face:`;
-					for (let member of team.members) {
-						congratz += ` <@${member}>`;
-					}
+					notifyTeamPublicly(top[0], server.id,
+						`Congratulations on being the first team on the leaderboard ${lb.name}! :partying_face:`
+					);
 				}
 				newsCh.send(congratz);
 			}
+		// Any team entering the leaderboard
+		} else {
+			let prevUsers = prevTable.filter(entry => entry.User.startsWith(process.env.TEAM_PRE)).map(entry => entry.User);
+			let currentUsers = table.filter(entry => entry.User.startsWith(process.env.TEAM_PRE)).map(entry => entry.User);
+
+			for (let tm of currentUsers) {
+				if (!prevUsers.includes(tm)) {
+					notifyTeamPublicly(tm, server.id,
+						`A new team has entered the leaderboard ${lb.name}! Congratulations! ` +
+						`From here, to the top :smile:`
+					);
+				}
+			}
 		}
+
 
 		// New #1!
 		if (prevTop[0] !== top[0]) {
@@ -476,6 +493,22 @@ async function refreshLeaderboard(reaction, user) {
 				}
 			}
 		}
+
+		if (JSON.stringify(prevRefIndex) != JSON.stringify(refIndex)) {			
+			let prevUsers = prevTable.map(entry => entry.User);
+			let currentUsers = table.map(entry => entry.User);
+
+			for (i = 0; i < prevRefIndex.length; i++) {
+				for (let tm of currentUsers) {
+					if ((prevUsers.indexOf(tm) == -1 || prevUsers.indexOf(tm) > prevRefIndex[i])
+						&& currentUsers.indexOf(tm) < refIndex[i]) {
+						notifyTeamPublicly(tm, server.id,
+							`A team has surpassed ${table[refIndex[i]].Program}! Well done! :thumbsup:`
+						);
+					}
+				}
+			}
+		}
 	}
 
 
@@ -484,7 +517,7 @@ async function refreshLeaderboard(reaction, user) {
 	// Get all the multiple messages forming the leaderboard:
 	let lbMsgs = channel.messages.cache.array()
 		.filter(msg => msg.embeds.length > 0 && msg.embeds[0].footer.text === name)
-		.sort(msg => { return msg.createdAt });
+		.sort(msg => { return -msg.createdAt });
 	// Get the desired column for the leaderboard:
 	let targetColumn;
 	for (let m of lbMsgs) {
@@ -596,6 +629,8 @@ global.log = async function log(triggerMsg, serverID, content) {
 async function notifyTeamPrivately(tm, serverID, msg) {
 	let team = global.getTeam(tm, serverID);
 
+	if (team == null) return [];
+
 	let msgs = [];
 	for (let member of team.members) {
 		let usr = await bot.users.fetch(member)
@@ -612,6 +647,8 @@ async function notifyTeamPublicly(tm, serverID, msg) {
 	if (process.env.PUBLIC_NOTIFY != "true") return;
 
 	let team = global.getTeam(tm, serverID);
+
+	if (team == null) return;
 
 	let msgEnd = ` ${team.name}:`;
 	for (let member of team.members) {
