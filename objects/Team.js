@@ -95,7 +95,7 @@ class Team {
 
 		this.name = newName;
 		// Update the server-name map:
-		nameMap[id] = this.name;
+		nameMap[this.id] = this.name;
 		fs.writeFileSync(`./teams/${this.server}/nameMap.json`, JSON.stringify(nameMap, null, 2));
 
 		this.save();

@@ -145,7 +145,7 @@ exports.run = async (bot, msg, args, serverID) => {
 				while (teamList.includes(
 					process.env.TEAM_PRE +
 					(num++).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false}) +
-					".json"))
+					".json"));
 
 				teamID = process.env.TEAM_PRE + (--num).toLocaleString('en-US', {minimumIntegerDigits: digits, useGrouping: false});
 
@@ -187,19 +187,10 @@ exports.run = async (bot, msg, args, serverID) => {
 				`Succsesfully left team ${team.name}.`
 			);
 
-			global.log(msg, server, `Someone left team ${teamID}.`);
+			global.log(msg, server, `Someone left team ${team.id}.`);
 			return;}
 
 		case "rename":{
-			if (args.length < 2) {
-				let reply = await msg.reply("you should tell me what team you want me to rename!");
-
-				/*if (msg.channel.type !== "dm") {
-					reply.delete({ timeout: 30000 });
-					msg.delete({ timeout: 30000 });
-				}*/
-			}
-
 			if (!(server in userTeams)) {
 				return msg.author.send(
 					`It looks like you are trying to **rename** your team on server ${serverName}, ` +
@@ -207,9 +198,9 @@ exports.run = async (bot, msg, args, serverID) => {
 				);
 			}
 
-			let team = global.getTeam(userTeams[server], server);
+			let team = global.getTeam(userTeams[server].team, server);
 
-			if (args.length < 3) {
+			if (args.length < 2) {
 				return msg.author.send(
 					`It looks like you are trying to **rename** your team ${team.name} on server ${serverName}, ` +
 					`but you didn't provide the new name! Use the command like this:\n`

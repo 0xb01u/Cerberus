@@ -35,11 +35,17 @@ exports.run = async (bot, msg, args) => {
 
 	let team = global.getTeam(tm, server);
 	let teamMsg = args.join(" ");
+	let userSent = "";
 
 	for (let member of team.members) {
 		bot.users.fetch(member).then(user => {
 			user.send(teamMsg);
 		});
+		userSent += `<@${member}> `;
+
 	}
-	
+
+	msg.reply(
+		`correctly sent your message to: ${userSent}`
+	);	
 }

@@ -210,12 +210,13 @@ exports.run = async (bot, msg, args) => {
 
 		case "rename":{
 			let name = "";
-			if (RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[2])) {
-				name = args[1];
-				tm = args[2];
-			} else if (RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[1])) {
-				name = args[2];
+			args.shift();
+			if (RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[1])) {
+				name = args[0];
 				tm = args[1];
+			} else if (RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[0])) {
+				tm = args.shift();
+				name = args.join(" ");
 			} else {
 				return msg.reply(
 					`the arguments do not have the correct format: ` +
@@ -233,7 +234,7 @@ exports.run = async (bot, msg, args) => {
 			
 			if (team.changeName(name)) {
 				return msg.reply(
-					`correctly added <@${usr}> to the team ${tm}.`
+					`correctly changed ${tm}'s name to \`${name}\`.`
 				);
 			} else {
 				return msg.reply(
