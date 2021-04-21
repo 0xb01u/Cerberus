@@ -37,28 +37,36 @@ A bot can only join servers you can create instant invites to. So make sure you 
 After this, your bot will have succesfully joined the specified server.
 
 ## Installing Hermes <a name=install></a>
- 1. Install [Node.js](https://nodejs.org/en/). This can be done via the webpage, apt (although probably an outdated version), or from [NodeSource repository](https://github.com/nodesource/distributions#debinstall). The latter is recommended, as is the option I've had the least problems with.
+ 1. Install [Node.js](https://nodejs.org/en/). This can be done via the webpage, apt (although it will probably host an outdated version), or from [NodeSource repository](https://github.com/nodesource/distributions#debinstall). The latter is recommended, as it is the option we've had the least problems with.
  2. Verify npm has been installed with Node.js by running on a terminal:
  ```
  npm --version
  ```
  3. Install python2. (Yes, python**2**. It's not my fault.)
- 4. Donwload the source code for the latest version of **Hermes** from its [GitHub releases' page](https://github.com/0xb01u/Cerberus/releases). Place/extract it where you want the bot's working directory to be.
- 5. Open a terminal on your bot's working directory. Execute.
+ 4. Make sure the DNS lookup service for your system is working fine; specifically, for the URLs `cdn.discordapp.com` and `discord.com`. In case of doubt, configure your system to automatically resolve those hostnames to their specific IP addresses, without consulting its DNS server. You can check their respective IP addresses by running on a terminal:
+ ```sh
+ host cdn.discordapp.com
+ ```
+ and
+ ```sh
+ host discord.com
+ ```
+ 5. Donwload the source code for the latest version of **Hermes** from its [GitHub releases' page](https://github.com/0xb01u/Cerberus/releases). Place/extract it where you want the bot's working directory to be.
+ 6. Open a terminal on your bot's working directory. Execute:
  ```
  npm install
  ```
- 6. Create a JSON file `env.json`, with the following elements and the corresponding values:
+ 7. Create a JSON file `env.json`, with the following elements and the corresponding values:
    * "TOKEN": your bot's **token**, between quotation marks.
    * "PRE": the command preffix, between quotation marks. This is the **substring** any message must start with to be considered a command. For example, if the value of this field is `"!"`, `!team join` will be a valid command.
-   * "TEAM_CAPACITY": the number of members a team of student has to have exactly. Currently, different sized teams are not supported.
+   * "TEAM_CAPACITY": the number of members a team of student must have exactly. Currently, different sized teams are not automatically supported.
    * "TEAM_PRE": the prefix for the team's identifiers, between quotation marks. For example, if you want the teams to be identified as g01, g02, g03..., this should be "g".
-   * "BOT_CHANNEL": the name of the server's private channel dedicated for special bot commands and activity monitoring.
-   * "LB_CHANNEL": the name of the server's public channel dedicated to leaderboard posting.
-   * "NOTIFY_LEADERS": (boolean) whether to publicly notify the top teams on the leaderboards of when their position change (true) or not (false).
+   * "BOT_CHANNEL": the name of the server's private channel dedicated for special bot admin commands and activity monitoring.
+   * "LB_CHANNEL": the name of the server's public channel dedicated to leaderboard visualization.
+   * "NOTIFY_LEADERS": (boolean) whether to publicly and privately notify the top teams on the leaderboards of when their position changes (true) or not (false).
    * "LEADERS": amount of top teams susceptible to position notifications (see NOTIFY_LEADERS).
    * "PUBLIC_NOTIFY": (boolean) whether to post the notifications in a server's public channel (true), or just notify the students privately (false).
-   * "BOT_NEWS": the name of the server's public channel where news and notifications such as position updates should be posted, if any.
+   * "BOT_NEWS": the name of the server's public channel where news and notifications such as position updates should be sent, if any.
  An example for such a file would be:
  ```json
  {
@@ -75,8 +83,8 @@ After this, your bot will have succesfully joined the specified server.
  }
  ```
  For that bot, all commands would start with "!", team IDs would start with "g", teams would be of just 1 person, and the special private bot channel in the server would be #bot. The server's channel where the leaderboards would be shown would be #leaderboards, and the top 10 teams of each leaderboard would be notified whenever any team made their position change. Notifications would be posted publicly on the channel #bot.
- 7. Place the corresponding Python client in the directory `tools/`, named simply `client` (without extension). If there's already a `client` file in the directory `tools/`, replace it with the desired one.
- 8. Execute `run.sh` on the bot's working directory. `run.sh` just contains:
+ 8. Place the corresponding Python client in the directory `tools/`, named simply `client` (without extension). If there's already a `client` file in the directory `tools/`, replace it with the desired one.
+ 9. Execute `run.sh` on the bot's working directory. `run.sh` just contains:
  ```sh
  nohup node . >> output.log 2>> err.log &
  ```

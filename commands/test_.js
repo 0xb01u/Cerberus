@@ -5,8 +5,6 @@ const { execSync } = require("child_process");
  * Send a program to the client.
  */	
 exports.run = async (bot, msg, args, file) => {
-	console.error(msg.content);
-	
 	let student = global.getStudent(msg.author.id);
 
 	let line = ``;
@@ -28,7 +26,7 @@ exports.run = async (bot, msg, args, file) => {
 		if ((!args.includes("-u") && args.includes("-x"))
 			|| (args.includes("-u") && !args.includes("-x"))) {
 			return msg.reply(
-				`**Error**: You must specify both an username (-u) `+
+				`**Error**: You must specify both an username (-u) ` +
 				`and a password (-x) when sending a program to the queue.`
 			);
 		// Check and use default user and password:
@@ -67,7 +65,8 @@ exports.run = async (bot, msg, args, file) => {
 		let output = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
 		fs.unlinkSync(`./programs/${file}`);
 		student.setCommand(line);
-		msg.reply(`Sent: \`${line}\`\n` + output.toString());
+		let outuputContent = output.toString();
+		msg.reply(`Sent: \`${line}\`\n` + outuputContent.substring(outuputContent.indexOf("\n")));
 
 		// Fetch request server:
 		let server = "";
@@ -101,7 +100,17 @@ exports.run = async (bot, msg, args, file) => {
 		// Create request object:
 		const Request = require("../objects/Request.js");
 		let req = new Request(reqURL, server);
-		await req.refresh();
+		let table = await req.refresh();
+
+		// Error fetching request table:
+		if (!table) {
+			throw new Error(
+				"The results associated to the Request couldn't be found. " +
+				"Your program probably didn't reach the server, and it wasn't processed. " +
+				"Check the link of your Request to verify this.\n" +
+				"Please try again. If the problem persists, contact a server administrator."
+			);
+		}
 
 		// Create and send embed:
 		let embed = req.toEmbed();
@@ -117,11 +126,11 @@ exports.run = async (bot, msg, args, file) => {
 	} catch (exc) {
 		msg.channel.stopTyping();
 		console.error(exc.stack);
-		console.error(exc.stdout.toString());
+		console.error(exc.message);
 		//global.log(msg, `\`\`\`\n${exc.stack}\n\`\`\``);
 		if (fs.existsSync(`./programs/${file}`)) fs.unlinkSync(`./programs/${file}`);
 		msg.reply(
-			`**Error while sending the program to the queue.**\n${exc.stderr.toString()}`
+			`**Error while sending the program to the queue.**\n${exc.message}`
 		);
 	}
 }

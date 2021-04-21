@@ -39,7 +39,7 @@ exports.run = async (bot, msg, args) => {
 
 	for (let member of team.members) {
 		bot.users.fetch(member).then(user => {
-			user.send(teamMsg);
+			user.send(`<@${member}> ${teamMsg}`);
 		});
 		userSent += `<@${member}> `;
 

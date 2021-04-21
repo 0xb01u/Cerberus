@@ -30,12 +30,13 @@ class Leaderboard {
 	 * Refreshes the leaderboard's contents.
 	 */
 	async refresh() {
+		// If the leaderboard is closed, simulate a correct fetch:
+		if (this.closed) return this.table;
+		
 		this.refreshCount++;
 
 		// Only resolve refresh requests at most every 10s.
 		if ((new Date()) - new Date(this.date) < 10000) return false;
-		// If the leaderboard is closed, simulate a correct fetch:
-		if (this.closed) return true;
 
 		let leaderboards = await scraper.get(this.url);
 

@@ -122,9 +122,9 @@ bot.on("guildMemberAdd", member => {
 
 	if (!fs.existsSync(`./users/${member.id}.json`)) {
 		const Student = require("./objects/Student.js");
-		let student = new Student(member.id, guildMap[member.guild.id], member.name, member.user.username, member.user.discriminator);		
+		let student = new Student(member.id, member.guild.name.replace(/ /g, "_"), member.user.username, member.user.discriminator);		
 	} else {
-		global.getStudent(member.id).addServer(guildName);
+		global.getStudent(member.id).addServer(member.guild.name.replace(/ /g, "_"));
 	}
 });
 
@@ -141,7 +141,7 @@ bot.on("message", async msg => {
 		if (msg.channel.type === "dm") {
 			// Download attachement:
 			let att = msg.attachments.first();
-			let args = msg.content.split(" ");
+			let args = msg.content.replace("\n", "\n ").split(" ");
 
 			if (!fs.existsSync(`./programs/`)) fs.mkdirSync(`./programs`);
 
@@ -160,8 +160,15 @@ bot.on("message", async msg => {
 						if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 						await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 						msg.reply("there was an error trying to send your program to the queue :(");
-						console.log(e.stack);
+						console.error(e.stack);
 					}
+				});
+
+				response.on("error", e => {
+					msg.reply(
+						"I'm sorry, there was a problem trying to download your file :cry:\n" +
+						"Can you send it again, please?"
+					);
 				});
 			});
 		/*
@@ -213,8 +220,6 @@ bot.on("message", async msg => {
 	 * Usage of a regular command.
 	 */
 	else if (msg.content.startsWith(process.env.PRE)) {
-		console.error(msg.content);
-
 		let args = msg.content.substring(process.env.PRE.length).split(" ");
 		// Remove empty elements on args array:
 		args = args.filter((e) => e != "");
@@ -259,7 +264,7 @@ bot.on("message", async msg => {
 		} catch (e) {
 			// If the command couldn't be executed.
 			if (msg.channel.type === "dm") msg.reply("nonexistent command.");
-			console.log(e.stack);
+			console.error(e.stack);
 		}
 	}
 
@@ -472,13 +477,13 @@ async function refreshLeaderboard(reaction, user) {
 			}
 			for (let worse of displaced) {
 				notifyTeamPrivately(worse, server.id,
-					`You've been displaced to a lower top${process.env.LEADERS} position on ${lb.name}! :scream:`
+					`You've been displaced to a lower top${process.env.LEADERS} position on ${lb.name}! :cry:`
 				);
 			}
 			for (let noMore of noTop) {
 				let despacito = await notifyTeamPrivately(noMore, server.id,
 					`Oh no! Someone has got a better position than you on ${lb.name}, and you are no longer ` +
-					`part of the top${process.env.LEADERS}. :cry:`
+					`part of the top${process.env.LEADERS}. :sob:`
 				);
 				for (let m of despacito) {
 					m.react("🇩");

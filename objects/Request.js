@@ -42,7 +42,9 @@ class Request {
 			tryN++;
 			sleep(20 * tryN - 20);
 		}
-		// TODO: exit failure.
+		if (req.length < 1) {
+			return false;
+		}
 
 		let request = new Promise((resolve, reject) => {
 			http.get(this.url).on("response", async response => {
@@ -71,7 +73,7 @@ class Request {
 					}
 
 					this.output = this.table.Output !== "" ?
-						`**Output:**\n\`\`\`\n${this.table["Output"]}\n\`\`\`` :
+						`**Output:**\n\`\`\`\n${this.table["Output"].substring(0, 1950)}\n\`\`\`` :
 						"";
 
 					this.save();
