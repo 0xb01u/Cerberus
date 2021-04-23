@@ -67,8 +67,8 @@ exports.run = async (bot, msg, args) => {
 				process.env[field] = false;
 				env[field] = false;
 			} else {
-				process.env[field] = args[0];
-				env[field] = args[0];
+				process.env[field] = args[0].replaceAll("\\t", "\t").replaceAll("\\s", " ");
+				env[field] = args[0].replaceAll("\\t", "\t").replaceAll("\\s", " ");
 			}
 
 			msg.channel.send(`Changed \`${field}\` field to \`${env[field]}\`.`);

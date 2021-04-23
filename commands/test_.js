@@ -1,6 +1,8 @@
 const fs = require("fs");
 const { execSync } = require("child_process");
 
+server = "";
+
 /**
  * Send a program to the client.
  */	
@@ -61,13 +63,6 @@ exports.run = async (bot, msg, args, file) => {
 
 	// Send the program to the corresponding queue:
 	try {
-		//console.log(`python2 ./tools/client ./programs/${file} ${line}`);
-		let output = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
-		fs.unlinkSync(`./programs/${file}`);
-		student.setCommand(line);
-		let outuputContent = output.toString();
-		msg.reply(`Sent: \`${line}\`\n` + outuputContent.substring(outuputContent.indexOf("\n")));
-
 		// Fetch request server:
 		let server = "";
 		for (let id of student.guilds) {
@@ -77,6 +72,13 @@ exports.run = async (bot, msg, args, file) => {
 				break;
 			}
 		}
+
+		//console.log(`python2 ./tools/client ./programs/${file} ${line}`);
+		let output = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
+		fs.unlinkSync(`./programs/${file}`);
+		student.setCommand(line);
+		let outuputContent = output.toString();
+		msg.reply(`Sent: \`${line}\`\n` + outuputContent.substring(outuputContent.indexOf("\n")));
 
 		if (server !== "") {
 			global.log(
@@ -132,5 +134,13 @@ exports.run = async (bot, msg, args, file) => {
 		msg.reply(
 			`**Error while sending the program to the queue.**\n${exc.message}`
 		);
+
+		if (server !== "") {
+			global.log(
+				msg,
+				server,
+				`**Error while sending a request.**\n${exc.message}`
+			);
+		}
 	}
 }

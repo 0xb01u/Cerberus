@@ -67,6 +67,7 @@ After this, your bot will have succesfully joined the specified server.
    * "LEADERS": amount of top teams susceptible to position notifications (see NOTIFY_LEADERS).
    * "PUBLIC_NOTIFY": (boolean) whether to post the notifications in a server's public channel (true), or just notify the students privately (false).
    * "BOT_NEWS": the name of the server's public channel where news and notifications such as position updates should be sent, if any.
+   * "COLUMN_SEPARATOR": the field separator for multi-field columns in leaderboard visualizations. This is used when visualizing more than 3 fields of a leaderboard: the remaining fields will be grouped in the last column, separated by this.
  An example for such a file would be:
  ```json
  {
@@ -79,10 +80,11 @@ After this, your bot will have succesfully joined the specified server.
  	"NOTIFY_LEADERS": true,
  	"LEADERS": 10,
  	"PUBLIC_NOTIFY": true,
- 	"BOT_NEWS": "bot"
+ 	"BOT_NEWS": "bot",
+   "COLUMN_SEPARATOR": " - "
  }
  ```
- For that bot, all commands would start with "!", team IDs would start with "g", teams would be of just 1 person, and the special private bot channel in the server would be #bot. The server's channel where the leaderboards would be shown would be #leaderboards, and the top 10 teams of each leaderboard would be notified whenever any team made their position change. Notifications would be posted publicly on the channel #bot.
+ For that bot, all commands would start with "!", team IDs would start with "g", teams would be of just 1 person, and the special private bot channel in the server would be #bot. The server's channel where the leaderboards would be shown would be #leaderboards, and the top 10 teams of each leaderboard would be notified whenever any team made their position change. Notifications would be posted publicly on the channel #bot. Multi-field columns in the leaderboards visualization will be separed with " - " (e.g: Score1 - Score2 - Time).
  8. Place the corresponding Python client in the directory `tools/`, named simply `client` (without extension). If there's already a `client` file in the directory `tools/`, replace it with the desired one.
  9. Execute `run.sh` on the bot's working directory. `run.sh` just contains:
  ```sh

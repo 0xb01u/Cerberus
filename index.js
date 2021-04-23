@@ -4,7 +4,7 @@ const fs = require("fs");
 
 var env = JSON.parse(fs.readFileSync("env.json"));
 for (let key in env) {
-	process.env[key] = env[key];
+	process.env[key] = (env[key] + "").replaceAll("\\ ", " ");
 }
 delete env;
 
@@ -141,7 +141,7 @@ bot.on("message", async msg => {
 		if (msg.channel.type === "dm") {
 			// Download attachement:
 			let att = msg.attachments.first();
-			let args = msg.content.replace("\n", "\n ").split(" ");
+			let args = msg.content.replaceAll("\n", "\n ").split(" ");
 
 			if (!fs.existsSync(`./programs/`)) fs.mkdirSync(`./programs`);
 
@@ -524,18 +524,18 @@ async function refreshLeaderboard(reaction, user) {
 		.filter(msg => msg.embeds.length > 0 && msg.embeds[0].footer.text === name)
 		.sort(msg => { return -msg.createdAt });
 	// Get the desired column for the leaderboard:
-	let targetColumn;
+	let targetColumns;
 	for (let m of lbMsgs) {
 		src = m.embeds[0];
 		if (src.fields[2].name !== "\u200B") {
-			targetColumn = src.fields[2].name;
+			targetColumns = src.fields[2].name.replaceAll(process.env.COLUMN_SEPARATOR, ",").replaceAll("_", " ").replace(/[\-,;\/]/g, ",").split(",");
 
 			break;
 		}
 	}
 
 	/* Create the embeds: */
-	let embedList = lb.toEmbeds(targetColumn);
+	let embedList = lb.toEmbeds(targetColumns);
 
 	// Send embeds:
 	for (let lbMsg of lbMsgs) {
@@ -638,7 +638,7 @@ async function notifyTeamPrivately(tm, serverID, msg) {
 
 	let msgs = [];
 	for (let member of team.members) {
-		let usr = await bot.users.fetch(member)
+		let usr = await bot.users.fetch(member);
 		msgs.push(await usr.send(msg));
 	}
 

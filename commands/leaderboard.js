@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 const Leaderboard = require("../objects/Leaderboard.js")
 
 exports.run = async (bot, msg, args, serverID) => {
@@ -21,6 +23,20 @@ exports.run = async (bot, msg, args, serverID) => {
 		);
 	}
 
+	// Close leaderboard
+	if (args[0] === "close") {
+		let name = args[1];
+		if (!fs.existsSync(`./guilds/${serverID}/${name}.json`)) {
+			let reply = await msg.reply(`leaderboard ${name} does't exist on the server!`);
+			return msg.delete({ timeout: 30000 });
+		}
+		let lb = Leaderboard.fromJSON(JSON.parse(fs.readFileSync(`./guilds/${serverID}/${name}.json`)));
+		lb.close();
+		return global.log(msg, serverID,
+			`Closed leaderboard ${name}.`
+		);
+	}
+
 	if (args.length < 3 || !args[0].match(/^https?:\/\//)) {
 		return msg.reply(
 			"I need at least one URL, one leaderboard name " +
@@ -30,7 +46,7 @@ exports.run = async (bot, msg, args, serverID) => {
 
 	let url = args[0];
 	let name = args[1];
-	let targetColumn = args[2];
+	let targetColumns = args[2].replaceAll("_", " ").replace(/[\-,;\/]/g, ",").split(",");
 
 	// TODO: try-catch;
 	// Create new leaderboard:
@@ -45,7 +61,7 @@ exports.run = async (bot, msg, args, serverID) => {
 		lb.setDescription(args.splice(3).join(" "));
 	}
 
-	let embedList = lb.toEmbeds(targetColumn);
+	let embedList = lb.toEmbeds(targetColumns);
 
 	// Fetch destination channel:
 	let channel;

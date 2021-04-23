@@ -88,13 +88,21 @@ class Leaderboard {
 	 */
 	close() {
 		this.closed = true;
+		
+		this.save();
 	}
 
 	/**
 	 * Turns the leaderboard into multiple message embeds to send.
 	 */
-	toEmbeds(targetColumn) {
+	toEmbeds(targetColumnsList) {
 		const Discord = require("discord.js");
+
+		let targetColumnsCopy = [...targetColumnsList];
+		let targetColumns = targetColumnsCopy.shift();
+		for (let column of targetColumnsCopy) {
+			targetColumns += process.env.COLUMN_SEPARATOR + column;
+		}
 
 		let date = new Date();
 		let embedList = [];
@@ -110,7 +118,7 @@ class Leaderboard {
 		embed.addFields(
 			{ name: "Pos", value: "\u200B", inline: true },
 			{ name: "Team", value: "\u200B", inline: true },
-			{ name: targetColumn, value: "\u200B", inline: true }
+			{ name: targetColumns, value: "\u200B", inline: true }
 		);
 
 		if (this.table == null) return [embed];
@@ -128,12 +136,18 @@ class Leaderboard {
 					.setTimestamp(date);
 			}
 
+			targetColumnsCopy = [...targetColumnsList];
+			let columnsValue = entry[targetColumnsCopy.shift()];
+			for (let column of targetColumnsCopy) {
+				columnsValue += process.env.COLUMN_SEPARATOR + entry[column];
+			}
+
 			// Add Reference:
 			if (entry["Pos"] == "") {
 				embed.addFields(
 					{ name: "\u200B", value: "\u200B", inline: true },
 					{ name: "\u200B", value: entry["Program"], inline: true },
-					{ name: "\u200B", value: entry[targetColumn], inline: true }
+					{ name: "\u200B", value: columnsValue, inline: true }
 				);
 			// Add team's program:
 			} else {
@@ -145,7 +159,7 @@ class Leaderboard {
 							team.name + ` (${team.id})` :
 							entry["User"],
 						inline: true },
-					{ name: "\u200B", value: entry[targetColumn], inline: true }
+					{ name: "\u200B", value: columnsValue, inline: true }
 				);
 			}
 

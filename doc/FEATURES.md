@@ -159,24 +159,24 @@ The name of the team will only be used on [Leaderboard visualziations](#leaderbo
 
 Admins can create visualizations for Tablón leaderboards hosted on the web, in a dedicated channel (specified as the environmental variable `LB_CHANNEL`). These visualizations will only show the positions, teams, and another of the leaderboard columns, at choice. The syntax to create leaderboard visualizations is:
 ```
-!leaderboard [url] [name] [desiredField] <description ...>
+!leaderboard [url] [name] [desiredFields] <description ...>
 ```
 where
  * `[url]` is the URL of the webpage hosting the leaderboard.
  * `[name]` is the name of the leaderboard in the webpage.
- * `[desiredField]` is the name of the third column to show.
- * `<description ...>` is an optional multiple word description. So, all the words written after `[desiredField]`, will count as description.
+ * `[desiredFields]` is the name of the fields to show in the third column, separated by '`,`', '`;`', '`/`' or '`-`'. Underscores '`_`' will be replaced with spaces, and that's the intended way to specify a field that has a space in its name.
+ * `<description ...>` is an optional multiple word description. So, all the words written after `[desiredFields]`, will count as description.
 
 As said before, these visualizations are only compatible with leaderboards from webpages using Tablón. Both the URL and the name are needed to locate the desired leaderboard.
 
 Examples of valid commands are:
 ```
-!leaderboard http://frontendv.infor.uva.es/leaderboards cudalb Time Leaderboard CUDA para la Simulacion de la Evolución.
-!leaderboard http://frontendv.infor.uva.es/leaderboards mpilb_score Total Leaderboard MPI para la Simulacion de la Evolución, con clasificación por puntos.
-!leaderboard http://tablon-aoc.infor.uva.es/leaderboards lb_mars Score Check the program with a set of unknown reference inputs, to rank the program.
+!leaderboard http://frontendv.infor.uva.es:8080/leaderboards cudalb Time Leaderboard CUDA para la Simulacion de la Evolución.
+!leaderboard http://frontendv.infor.uva.es:8080/leaderboards mpilb_score Total Leaderboard MPI para la Simulacion de la Evolución, con clasificación por puntos.
+!leaderboard http://tablon-aoc.infor.uva.es:8080/leaderboards lb_mars IC,Cod,Score Check the program with a set of unknown reference inputs, to rank the program.
 ```
 
-Leaderboard are displaeyed via [message embeds](https://discordjs.guide/popular-topics/embeds.html). Due to Discord limitations, various embeds will probably be needed to represent one leaderboard (as embeds can only have up to 25 fields, approximately 8 rows of data), so a visualization will probably need to be split among various messages. Other Discord limitations include: limiting the number of columns to 3, having to have so much space between rows, and having to show the leaderboard's description in all embeds, so their width is the same. (Well, at least is better than nothing.)
+Leaderboard are displaeyed via [message embeds](https://discordjs.guide/popular-topics/embeds.html). Due to Discord limitations, various embeds will probably be needed to represent one leaderboard (as embeds can only contain up to 25 fields, approximately 8 rows of data), so a visualization will probably need to be split among various messages. Other Discord limitations include: limiting the number of "real columns" to 3, having to have so much space between rows, and having to show the leaderboard's description in all embeds, so their width is the same. (Well, at least is better than nothing.)
 
 ### Updating the leaderboards' contents <a name=refresh></a>
 

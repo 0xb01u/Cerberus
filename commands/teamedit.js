@@ -251,9 +251,15 @@ exports.run = async (bot, msg, args) => {
 			}
 
 			let team = global.getTeam(tm, server);
+
+			let members = "";
+			for (let member of team.members) {
+				members += `<@${member}> `
+			}
 			return msg.channel.send(
 				`Raw dump of team ${tm}:\n` + 
-				`\`\`\`\n${JSON.stringify(team, null, 2)}\n\`\`\``
+				`\`\`\`\n${JSON.stringify(team, null, 2)}\n\`\`\`\n` +
+				`Team members: ${members}`
 			);
 	}
 }
