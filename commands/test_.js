@@ -73,19 +73,26 @@ exports.run = async (bot, msg, args, file) => {
 			}
 		}
 
+		// Add Hermes identification to files, for clout 😎
+		if (file.endsWith(".c") || file.endsWith(".cu") || file.endsWith(".cpp")) {	// TODO: .asm?
+			let program = fs.readFileSync(`./programs/${file}`).toString();
+			program = `# // Sent by Hermes, the Messenger, from whence Discord reigns.\n` + program;
+			fs.writeFileSync(`./programs/${file}`, program);
+		}
+
 		//console.log(`python2 ./tools/client ./programs/${file} ${line}`);
 		let output = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
 		fs.unlinkSync(`./programs/${file}`);
 		student.setCommand(line);
-		let outuputContent = output.toString();
-		msg.reply(`Sent: \`${line}\`\n` + outuputContent.substring(outuputContent.indexOf("\n")));
+		let outputContent = output.toString().substring(output.toString().indexOf("\n"));
+		msg.reply(`Sent: \`${line}\`\n` + outputContent);
 
 		if (server !== "") {
 			global.log(
 				msg,
 				server,
 				`New request:\n` +
-				`Sent: \`${line}\`\n` + output.toString()
+				`Sent: \`${line}\`\n` + outputContent
 			);
 		}
 
@@ -129,17 +136,19 @@ exports.run = async (bot, msg, args, file) => {
 		msg.channel.stopTyping();
 		console.error(exc.stack);
 		console.error(exc.message);
-		//global.log(msg, `\`\`\`\n${exc.stack}\n\`\`\``);
 		if (fs.existsSync(`./programs/${file}`)) fs.unlinkSync(`./programs/${file}`);
+		let errorMsg = exc.message;
+		if (exc.stdout != null && exc.stdout.toString().length > 0) errorMsg += "\n" + exc.stdout.toString();
+		if (exc.stderr != null && exc.stderr.toString().length > 0) errorMsg += "\n" + exc.stderr.toString();
 		msg.reply(
-			`**Error while sending the program to the queue.**\n${exc.message}`
+			`**Error while sending the program to the queue.**\n${errorMsg}`
 		);
 
 		if (server !== "") {
 			global.log(
 				msg,
 				server,
-				`**Error while sending a request.**\n${exc.message}`
+				`**Error while sending a request.**\n${errorMsg}`
 			);
 		}
 	}
