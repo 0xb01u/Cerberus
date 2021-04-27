@@ -444,7 +444,7 @@ async function refreshLeaderboard(reaction, user) {
 				`For how long can you hold that position? :thinking:`
 			);
 		// Any other change in top:
-		} else {
+		} else if (prevTop.length > process.env.LEADERS) {
 			let noTop = [];
 			let displaced = [];
 			let displacers = [];
@@ -522,7 +522,7 @@ async function refreshLeaderboard(reaction, user) {
 	// Get all the multiple messages forming the leaderboard:
 	let lbMsgs = channel.messages.cache.array()
 		.filter(msg => msg.embeds.length > 0 && msg.embeds[0].footer.text === name)
-		.sort(msg => { return -msg.createdAt });
+		.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 	// Get the desired column for the leaderboard:
 	let targetColumns;
 	for (let m of lbMsgs) {
