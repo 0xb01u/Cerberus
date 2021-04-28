@@ -84,7 +84,7 @@ exports.run = async (bot, msg, args, file) => {
 		let output = execSync(`python2 ./tools/client ./programs/${file} ${line}`);
 		fs.unlinkSync(`./programs/${file}`);
 		student.setCommand(line);
-		let outputContent = output.toString().substring(output.toString().indexOf("\n"));
+		let outputContent = output.toString().split("\n").filter(line => line.indexOf("ing ") < 0).join("\n");
 		msg.reply(`Sent: \`${line}\`\n` + outputContent);
 
 		if (server !== "") {
@@ -141,14 +141,14 @@ exports.run = async (bot, msg, args, file) => {
 		if (exc.stdout != null && exc.stdout.toString().length > 0) errorMsg += "\n" + exc.stdout.toString();
 		if (exc.stderr != null && exc.stderr.toString().length > 0) errorMsg += "\n" + exc.stderr.toString();
 		msg.reply(
-			`**Error while sending the program to the queue.**\n${errorMsg}`
+			`**Error while sending the program to the queue.**\n${errorMsg.substring(0, 1950)}`
 		);
 
 		if (server !== "") {
 			global.log(
 				msg,
 				server,
-				`**Error while sending a request.**\n${errorMsg}`
+				`**Error while sending a request.**\n${errorMsg.substring(0, 1965)}`
 			);
 		}
 	}
