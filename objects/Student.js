@@ -130,7 +130,16 @@ class Student {
 	addAlias(serverName, alias) {
 		let serverID = this.aliases[serverName];
 
-		aliases[alias] = serverID;
+		this.aliases[alias] = serverID;
+
+		this.save();
+	}
+
+	/**
+	 * Adds an alias for a server ID.
+	 */
+	addRawAlias(serverID, alias) {
+		this.aliases[alias] = serverID;
 
 		this.save();
 	}
