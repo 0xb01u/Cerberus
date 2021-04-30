@@ -61,18 +61,18 @@ exports.run = async (bot, msg, args, file) => {
 		line += ` ${args.join(" ")}`;
 	}
 
+	// Fetch request server:
+	let server = "";
+	for (let id of student.guilds) {
+		if (id in student.credentials && line.includes(student.credentials[id].team)
+			&& line.includes(student.credentials[id].passwd)) {
+			server = id;
+			break;
+		}
+	}
+
 	// Send the program to the corresponding queue:
 	try {
-		// Fetch request server:
-		let server = "";
-		for (let id of student.guilds) {
-			if (id in student.credentials && line.includes(student.credentials[id].team)
-				&& line.includes(student.credentials[id].passwd)) {
-				server = id;
-				break;
-			}
-		}
-
 		// Add Hermes identification to files, for clout 😎
 		if (file.endsWith(".c") || file.endsWith(".cu") || file.endsWith(".cpp")) {	// TODO: .asm?
 			let program = fs.readFileSync(`./programs/${file}`).toString();
@@ -96,7 +96,6 @@ exports.run = async (bot, msg, args, file) => {
 			);
 		}
 
-
 		/* Create the request as a refreshable embed: */
 
 		// Fetch request url:
@@ -113,11 +112,17 @@ exports.run = async (bot, msg, args, file) => {
 
 		// Error fetching request table:
 		if (!table) {
+			if (server !== "") {
+				global.log(msg, server
+					"@here **ERROR:** A user's Request couldn't reach the server."
+				);
+			}
+
 			throw new Error(
-				"The results associated to the Request couldn't be found. " +
-				"Your program probably didn't reach the server, and it wasn't processed. " +
-				"Check the link of your Request to verify this.\n" +
-				"Please try again. If the problem persists, contact a server administrator."
+				"The results associated to your Request couldn't be found. " +
+				"Your program probably didn't reach the server, and so it wasn't processed. " +
+				"Check your Request's link to verify this information.\n\n" +
+				"Please try again. If this problem persists, contact a server administrator."
 			);
 		}
 
