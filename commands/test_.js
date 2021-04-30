@@ -113,7 +113,7 @@ exports.run = async (bot, msg, args, file) => {
 		// Error fetching request table:
 		if (!table) {
 			if (server !== "") {
-				global.log(msg, server
+				global.log(msg, server,
 					"@here **ERROR:** A user's Request couldn't reach the server."
 				);
 			}
