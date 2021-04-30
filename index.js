@@ -360,14 +360,17 @@ async function refreshLeaderboard(reaction, user) {
 	const Leaderboard = require("./objects/Leaderboard.js");
 	let lb = Leaderboard.fromJSON(JSON.parse(fs.readFileSync(`./guilds/${server.id}/${name}.json`)));
 
-	if (lb.table == null) return channel.stopTyping();
+	let prevTop = [];
+	let prevTable = [];
+	let prevRefIndex = [];
 
-	let prevTop = lb.table.filter(entry => entry.User.startsWith(process.env.TEAM_PRE)).slice(0, process.env.LEADERS)
-		.map(entry => entry.User);
-	let prevTable = lb.table;
-	let prevRefIndex = prevTable.map((e, i) => e.Pos == "" ? i : "").filter(String).reverse();
-		// Reversed so earlier Refs are first.
-
+	if (lb.table != null) {
+		prevTop = lb.table.filter(entry => entry.User.startsWith(process.env.TEAM_PRE)).slice(0, process.env.LEADERS)
+			.map(entry => entry.User);
+		prevTable = lb.table;
+		prevRefIndex = prevTable.map((e, i) => e.Pos == "" ? i : "").filter(String).reverse();
+			// Reversed so earlier Refs are first.
+	}
 
 	let table = await lb.refresh();
 	// If the refresh request wasn't processed, return.
@@ -401,11 +404,21 @@ async function refreshLeaderboard(reaction, user) {
 					for (let tm of top) {
 						let team = global.getTeam(tm, server.id);
 						congratz += `${team.id} + ( `; 
-						for (let member of tm.members) {
+						for (let member of team.members) {
 							congratz += `<@${member}> `;
 						}
 						congratz += ") ";
 					}
+
+					// Fetch news channel and send message:
+					let channel;
+					for (let ch of (await bot.guilds.fetch(serverID)).channels.cache.array()) {
+						if (ch.name === process.env.BOT_NEWS) {
+							channel = ch;
+							break;
+						}
+					}
+					channel.send(congratz);
 
 				} else {
 					notifyTeamPublicly(top[0], server.id,
@@ -618,7 +631,8 @@ global.log = async function log(triggerMsg, serverID, content) {
 		if ((triggerMsg.content.length + content.length) < 1950) {
 			channel.send(
 				`${content}\n`
-				+ `Triggered by <@${triggerMsg.author.id}>:\n\`\`\`\n${triggerMsg.content}\n\`\`\``
+				+ `Triggered by <@${triggerMsg.author.id}>`
+				+ (triggerMsg.content.length > 0 ? `:\n\`\`\`\n${triggerMsg.content}\n\`\`\`` : `.`)
 			);
 		} else {
 			channel.send(
