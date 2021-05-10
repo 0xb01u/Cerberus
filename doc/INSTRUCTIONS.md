@@ -24,11 +24,11 @@ This file includes some instructions for using Hermes' different features, with 
 To send a program to Tablón, just send the source code for the program to the bot **via Direct Message**, specifying in the same message the request arguments: team, password, queue, and program arguments, using the format:
 
 ```
--u [TEAM] -x [PASSWORD] -q [QUEUE] -- [ARGS]
+-u [TEAM] -x [PASSWORD] -q [QUEUE] [ARGS]
 ```
 For example:
 ```
--u g110 -x abcd9876 -q testq -- 1 2 3
+-u g110 -x abcd9876 -q testq 1 2 3
 ```
 
 If you have set any [default arguments](./FEATURES.md#default), you might not include those in the message, although you can if you want to override the default ones. You can also just write `last` or `l` to execute exactly the last request arguments.
