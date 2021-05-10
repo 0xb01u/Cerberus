@@ -81,7 +81,7 @@ After this, your bot will have succesfully joined the specified server.
  	"LEADERS": 10,
  	"PUBLIC_NOTIFY": true,
  	"BOT_NEWS": "bot",
-   "COLUMN_SEPARATOR": " - "
+  "COLUMN_SEPARATOR": " - "
  }
  ```
  For that bot, all commands would start with "!", team IDs would start with "g", teams would be of just 1 person, and the special private bot channel in the server would be #bot. The server's channel where the leaderboards would be shown would be #leaderboards, and the top 10 teams of each leaderboard would be notified whenever any team made their position change. Notifications would be posted publicly on the channel #bot. Multi-field columns in the leaderboards visualization will be separed with " - " (e.g: Score1 - Score2 - Time).
