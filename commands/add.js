@@ -12,14 +12,14 @@ exports.run = async (bot, msg, args) => {
 		execSync(`cd ./programs; tar xzf original.tgz; make`);
 		// If all the commands are executed in one execSync(),
 		// stderr gets overwritten.
-		let result = execSync(`./programs/evolution ${test}`, { timeout: parseInt(process.env.TIMEWALL) });
+		let result = execSync(`./programs/${process.env.SEQ_PROGRAM} ${test}`, { timeout: parseInt(process.env.TIMEWALL) });
 		execSync(`cd ./programs; make clean`);
 
 		let tests = fs.readdirSync("./tests/");
 		let i = 0;
 		while (tests.includes(`${i}.sh`)) i++;
 
-		fs.writeFileSync(`./tests/${i}.sh`, `./programs/${process.env.BIN} ${test}\n`);
+		fs.writeFileSync(`./tests/${i}.sh`, `./programs/${process.env.PROGRAM} ${test}\n`);
 		fs.writeFileSync(`./outputs/c${i}.txt`, result);
 
 		return msg.reply(`correctly added test ${i + 1} with result:\n${result.toString(). split("\n")[2]}`);

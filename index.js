@@ -1,7 +1,12 @@
 const Discord = require("discord.js");
 const http = require("https");
 const fs = require("fs");
-require("dotenv").config();
+
+var env = JSON.parse(fs.readFileSync("env.json"));
+for (let key in env) {
+	process.env[key] = (env[key] + "").replaceAll("\\ ", " ");
+}
+delete env;
 
 const bot = new Discord.Client();
 bot.login(process.env.TOKEN);

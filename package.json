@@ -1,6 +1,6 @@
 {
   "name": "cerberus",
-  "version": "1.0.1",
+  "version": "0.4.0",
   "description": "Discord bot simulating http://frontendv.infor.uva.es/, including test executions, with execution outputs and feedback.",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/0xb01u/Cerberus#readme",
   "dependencies": {
-    "discord.js": "^12.2.0",
-    "dotenv": "^8.2.0"
+    "discord.js": "^12.2.0"
   }
 }
