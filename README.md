@@ -1,5 +1,7 @@
 ﻿# Support me
 
+TL;DR: You can give me money here: [**Ko-fi**](https://ko-fi.com/0xb01u). I will love you more if you do! <3
+
 I have spent countless hours working on Cerberus and Hermes, and I didn't get anything in return except my name on a paper. These (Cerberus and Hermes) have been personal projects I've developed at will, and I have **not** received any credits (ETCSs) nor financial income for working on them.
 
 The amount of effort put into these projects has been enormous. And, for that, I'd be grateful to receive donations.
