@@ -60,7 +60,7 @@ After this, your bot will have succesfully joined the specified server.
  	"PRE": "!",
  	"PROGRAM": "wind",
  	"SEQ_PROGRAM": "wind_original",
- 	"REQ_CHANNEL": "tablon_cuda",
+ 	"REQ_CHANNEL": "tablon",
  	"TIMEWALL": "60000"
  }
  ```
