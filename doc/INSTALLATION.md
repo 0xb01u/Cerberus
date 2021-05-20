@@ -26,11 +26,11 @@ You can delete your app, and effectively your bot too, in the "General Informati
 
 ## Making the bot join a server <a name=join></a>
 
-A bot can only join servers you can create instant invites to. So make sure you have the correct role on the server before attempting to join the bot.
+A bot can only join servers you can manage (as per the "Manage guild" permission). So make sure you have the correct role on the server before attempting to join the bot.
 
  1. On the Discord Developer Portal, access "OAuth2".
  2. Scroll down. On "Scopes", select "bot".
- 3. Scroll down more. On "Bot permissions", select "Administrator". This will give the bot **all the permissions** a user can have. This is mainly needed so that the bot can delete other user's messages (to not clog the text channels when they use the commands incorrectly), and in case in any future version some fancy feature needs other permissions. The bot might be able to work with just "Send Messages", "Manage Messages" and "Embed Links", although this has not been tested yet.
+ 3. Scroll down more. On "Bot permissions", select all the permissions needed for the bot to work. The default permissions for any user should be fine.
  4. Scroll up just a bit. Copy the URL generated at the bottom of the "Scopes" box.
  5. Access the URL copied. Select the server you want the bot to join. Click "Continue", then "Authorize".
 
