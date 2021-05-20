@@ -116,7 +116,6 @@ exports.run = async (bot, msg, args, queue) => {
 		}
 
 		let summary = `**Summary**:\n${passed} tests passed.\n${tests_failed.length} tests failed.\n${tests_error.length} errors.\n`;
-		console.log(tests_failed, tests_error);
 		if (tests_failed.length > 0) summary += `\nFailed tests: ${tests_failed}`;
 		if (tests_error.length > 0) summary += `\nErroneous tests: ${tests_error}`;
 
