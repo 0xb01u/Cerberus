@@ -1,6 +1,6 @@
 {
   "name": "cerberus",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Discord bot simulating http://frontendv.infor.uva.es/, including test executions, with execution outputs and feedback.",
   "main": "index.js",
   "scripts": {
