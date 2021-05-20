@@ -13,6 +13,10 @@ bot.login(process.env.TOKEN);
 
 bot.on("ready", async () => {
 	await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+
+	if (!fs.existsSync("./programs")) fs.mkdirSync("./programs");
+	if (!fs.existsSync("./tests")) fs.mkdirSync("./tests");
+	if (!fs.existsSync("./outputs")) fs.mkdirSync("./outputs");
 });
 
 bot.on("message", async msg => {

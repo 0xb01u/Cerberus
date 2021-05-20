@@ -44,12 +44,11 @@ After this, your bot will have succesfully joined the specified server.
  ```
  npm install
  ```
- 5. Create the folders `./outputs/`, `./tests/`, and `./programs`, if they aren't already. Place the reference program that will generate the correct results for the tests on `./programs/`, wrapped in a `.tgz` with name `original.tgz` and a `Makefile` inside to compile it.
+ 5. Place the reference program that will generate the correct results for the tests in a folder `./programs/`, wrapped in a `.tgz` with name `original.tgz` and a `Makefile` inside to compile it.
  6. Create a JSON file `env.json`, with the following elements and the corresponding values:
    * "TOKEN": your bot's **token**, between quotation marks.
    * "PRE": the command preffix, between quotation 
-   * "PROGRAM": the name of the program to work with (no file extensions), for file and path finding, and to generate the scripts to execute the tests.
-   * "SEQ_PROGRAM": name of the reference program, to generate the correct results for the tests with.
+   * "PROGRAM": the name of the (binary, compiled) program to work with (no file extensions), for file and path finding, to generate the scripts to execute the tests, and to generate the tests results. All `.tgz`s sent to the bot must generate a file with this exact name after being decompressed and compiled with `make`. This also applies to the refernce program `./programs/original.tgz`.
    * "REQ_CHANNEL": name of the channel used for request handling and tests execution.
    * "TIMEWALL": maximum amount of time, in milliseconds, for a test to execute.
  An example for such a file would be:
@@ -58,7 +57,6 @@ After this, your bot will have succesfully joined the specified server.
  	"TOKEN": ________________,
  	"PRE": "!",
  	"PROGRAM": "wind",
- 	"SEQ_PROGRAM": "wind_original",
  	"REQ_CHANNEL": "tablon",
  	"TIMEWALL": "60000"
  }
