@@ -16,7 +16,6 @@ These are the steps needed to create a Discord bot user and properly configure i
  4. Go to "Bot", click on "Add Bot" and confirm. Optionally but recommended, add an icon for the bot (this is the profile picture, so it will be shown on the Discord app).
  5. **The token is the key used to log in on Discord as the bot. It must be kept secret.**.Copy the **token** (click on "Copy") and save it somewhere safe, where **no one else can see it**. Tokens can be copied multiple times, in case you lose it; and a new one can be generated (click on "Regenerate"), in case someone else finds it and takes control of the bot.
  6. Scroll down the page and uncheck "Public bot". This way, only the user who is creating the app/bot will be able to join the bot on Discord servers.
- 7. Scroll down a bit more and check "Server members intent". This is **needed** so that the bot can **keep track of the students** (the server's users) properly.
 
 ### Deleting an app/bot <a name=delete></a>
 
