@@ -10,7 +10,7 @@ This is a reference guide for Cerberus.
 
 ## Sending programs <a name=sending></a>
 
-To send programs, you just need to drag and drop to the requests channel (i.e. `tablon_cuda`) a `.tgz` file containing all the needed files to compile it .
+To send programs, you just need to drag and drop to the requests channel (i.e. `tablon`) a `.tgz` file containing all the needed files to compile it by using just `make` (with no arguments).
 
 You can add the following rule to the Makefile of your program to make the required tgz easily:
 ```

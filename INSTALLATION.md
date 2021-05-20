@@ -44,7 +44,7 @@ After this, your bot will have succesfully joined the specified server.
  ```
  npm install
  ```
- 5. Place the reference program that will generate the correct results for the tests in a folder `./programs/`, wrapped in a `.tgz` with name `original.tgz` and a `Makefile` inside to compile it.
+ 5. Place the reference program that will generate the correct results for the tests in a folder `./programs/`, wrapped in a `.tgz` with name `original.tgz` and a `Makefile` inside to compile it using just `make` (without any arguments).
  6. Create a JSON file `env.json`, with the following elements and the corresponding values:
    * "TOKEN": your bot's **token**, between quotation marks.
    * "PRE": the command preffix, between quotation 
