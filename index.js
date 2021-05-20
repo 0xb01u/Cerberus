@@ -34,10 +34,10 @@ bot.on("message", async msg => {
 			let download = response.pipe(file);
 			download.on("finish", async () => {
 				try {
-					delete require.cache[require.resolve(`./commands/test_${}.js`)];
+					delete require.cache[require.resolve(`./commands/test_.js`)];
 
 					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-					await require(`./commands/test_${}.js`).run(bot, msg, args, queue);
+					await require(`./commands/test_.js`).run(bot, msg, args, queue);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					fs.unlinkSync(filepath);
@@ -51,7 +51,7 @@ bot.on("message", async msg => {
 	else if (msg.channel.name.startsWith(process.env.REQ_CHANNEL) && msg.attachments.size > 0) {
 		let att = msg.attachments.first();
 		let args = msg.content.split(" ");
-		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length + process.env.SEPARATOR.length);	// Currently "unused".
+		let queue = msg.channel.name.substring(process.env.REQ_CHANNEL.length);	// Currently "unused".
 
 		let filepath = `./programs/${process.env.PROGRAM}`;
 
@@ -69,10 +69,10 @@ bot.on("message", async msg => {
 				try {
 					await msg.delete();
 
-					delete require.cache[require.resolve(`./commands/test_${}.js`)];
+					delete require.cache[require.resolve(`./commands/test_.js`)];
 
 					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
-					await require(`./commands/test_${}.js`).run(bot, msg, args, queue);
+					await require(`./commands/test_.js`).run(bot, msg, args, queue);
 					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					console.log(e.stack);

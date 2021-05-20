@@ -11,7 +11,7 @@ const { execSync } = require("child_process");
  */
 exports.run = async (bot, msg, args, queue) => {
 	// Tests executions:
-	if (args.length == 0) {
+	if (args.length == 1 && args[0] === "") {
 		let passed = 0;
 		let tests_failed = [];
 		let tests_error = [];
@@ -65,7 +65,8 @@ exports.run = async (bot, msg, args, queue) => {
 			fs.writeFileSync(`./outputs/${i}.txt`, result);
 
 			try {
-				let output_type = queue === "cuda" ? "c" : "o";
+				//let output_type = queue === "cuda" ? "c" : "o";
+				let output_type = queue === "cuda" ? "c" : "c";
 				execSync(`diff ./outputs/${output_type}${i}.txt ./outputs/${i}.txt`);
 				let msg_update = await update(output_msg, output,
 					`\n**Test ${i + 1}**: Passed :white_check_mark:\n`
@@ -114,9 +115,9 @@ exports.run = async (bot, msg, args, queue) => {
 			fs.unlinkSync(`./outputs/${i}.txt`);
 		}
 
-		let summary = `**Summary**:\n${passed} tests passed.\n${failed} tests failed.\n${errors} errors.\n`;
-		if (test_failed.length > 0) summary += `\nFailed tests: ${tests_failed}`;
-		if (test_error.length > 0) summary += `\nErroneous tests: ${tests_error}`;
+		let summary = `**Summary**:\n${passed} tests passed.\n${tests_failed} tests failed.\n${tests_error} errors.\n`;
+		if (tests_failed.length > 0) summary += `\nFailed tests: ${tests_failed}`;
+		if (tests_error.length > 0) summary += `\nErroneous tests: ${tests_error}`;
 
 		if (tests_failed.length + tests_error.length === 0) {
 			summary += `\nSum of times: ${time}`
@@ -177,7 +178,7 @@ exports.run = async (bot, msg, args, queue) => {
 			fs.unlinkSync(`./programs/${process.env.PROGRAM}.tgz`);
 			execSync(`cd ./programs; make clean; rm -f *.cu *.h Makefile`);
 
-			return update(reply, reply.content, "invalid option.");
+			return update(reply, reply.content, " invalid option.");
 		}
 	}
 }

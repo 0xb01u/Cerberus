@@ -61,7 +61,7 @@ After this, your bot will have succesfully joined the specified server.
  	"PROGRAM": "wind",
  	"SEQ_PROGRAM": "wind_original",
  	"REQ_CHANNEL": "tablon_cuda",
- 	"TIMEWALL": "1000"
+ 	"TIMEWALL": "60000"
  }
  ```
  7. Execute `node .` on the bot's working directory. You can also make it run in background:
