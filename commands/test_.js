@@ -11,7 +11,7 @@ const { execSync } = require("child_process");
  */
 exports.run = async (bot, msg, args, queue) => {
 	// Tests executions:
-	if (args.length == 1 && args[0] === "") {
+	if (args.length == 1 && (args[0] === "" || args[0].toLowerCase() === "update")) {
 		let passed = 0;
 		let tests_failed = [];
 		let tests_error = [];
@@ -42,14 +42,14 @@ exports.run = async (bot, msg, args, queue) => {
 				let msg_update = null;
 				if (exc.stderr.length === 0) {
 					let program_output = exc.stdout.toString().length > 0 ? `\`\`\`\n${exc.stdout}\`\`\`\n` : "";
-					msg_update = update(output_msg, output, `\n**Test ${i + 1}**: **TIMEWALL REACHED** (${process.env.TIMEWALL/1000}s) :clock10:\n`
+					msg_update = await update(output_msg, output, `\n**Test ${i + 1}**: **TIMEWALL REACHED** (${process.env.TIMEWALL/1000}s) :clock10:\n`
 						+ `${program_output}Test was: \`.${current.substring("./programs".length)}\``);
 				} else {
 					if (exc.stdout.length + exc.stderr.length > 0) {
-						msg_update = update(output_msg, output, `\n**Test ${i + 1}**: **EXECUTION ERROR** :x:\n`
+						msg_update = await update(output_msg, output, `\n**Test ${i + 1}**: **EXECUTION ERROR** :x:\n`
 							+ `\`\`\`${exc.stdout}\n${exc.stderr}\`\`\`\nTest was: \`.${current.substring("./programs".length)}\``);
 					} else {
-						msg_update = update(output_msg, output, `\n**Test ${i + 1}**: **EXECUTION ERROR** :x:\n`
+						msg_update = await update(output_msg, output, `\n**Test ${i + 1}**: **EXECUTION ERROR** :x:\n`
 							+ `Test was: \`.${current.substring("./programs".length)}\``);
 					}
 				}
@@ -62,57 +62,72 @@ exports.run = async (bot, msg, args, queue) => {
 				continue;
 			}
 
-			fs.writeFileSync(`./outputs/${i}.txt`, result);
+			//let output_type = queue === "cuda" ? "c" : "o";
+			let output_type = queue === "cuda" ? "c" : "c";	// Placeholder.
+															// One day, I will implement queues. One day...
 
-			try {
-				//let output_type = queue === "cuda" ? "c" : "o";
-				let output_type = queue === "cuda" ? "c" : "c";
-				execSync(`diff ./outputs/${output_type}${i}.txt ./outputs/${i}.txt`);
+			if (args[0].toLowerCase() === "update") {
+				let prev_result = fs.readFileSync(`./outputs/${output_type}${i}.txt`).toString();
+				fs.writeFileSync(`./outputs/${output_type}${i}.txt`, result);
+
 				let msg_update = await update(output_msg, output,
-					`\n**Test ${i + 1}**: Passed :white_check_mark:\n`
+					`\n**Test ${i + 1}**: Updated :new:\n`
+					+ `Previous result: ${prev_result.split("\n")[2]}\n`
+					+ `New result: ${result.split("\n")[2]}\n`
 					+ `${result.split("\n")[1]}\n`);
 				output_msg = msg_update.msg;
 				output = msg_update.content;
+			} else {
+				fs.writeFileSync(`./outputs/${i}.txt`, result);
+				try {
 
-				passed++;
-				time += parseFloat(result.split("\n")[1].substring(6));
-			} catch (exc) {
-				let lines = exc.stdout.toString().split("\n");
-
-				if (lines[0] != "2c2") {
-					let expected_line = 2;
-					let result_line = 5;
-					// In case the time is exactly the same (has happened twice):
-					if (lines[0] === "3c3") {
-						expected_line--;
-						result_line -= 2;
-					}
-
-					let current = fs.readFileSync(`./tests/${i}.sh`).toString();
-
-					let msg_update = await update(output_msg, output, 
-						`\n**Test ${i + 1}**: Failed :woozy_face:\n`
-						+ `Expected: ${lines[expected_line].substring(10)}\n`
-						+ `Got: ${lines[result_line].substring(10)}\n`
-						+ `Test was: \`.${current.substring("./programs".length)}\``);
-					output_msg = msg_update.msg;
-					output = msg_update.content;
-
-					tests_failed.push(i + 1);
-
-					break;
-				} else {
+					execSync(`diff ./outputs/${output_type}${i}.txt ./outputs/${i}.txt`);
 					let msg_update = await update(output_msg, output,
 						`\n**Test ${i + 1}**: Passed :white_check_mark:\n`
-						+ `${lines[3].substring(2)}\n`);
+						+ `${result.split("\n")[1]}\n`);
 					output_msg = msg_update.msg;
 					output = msg_update.content;
 
 					passed++;
-					time += parseFloat(lines[3].substring(8))
+					time += parseFloat(result.split("\n")[1].substring(6));
+				} catch (exc) {
+					let lines = exc.stdout.toString().split("\n");
+
+					if (lines[0] != "2c2") {
+						let expected_line = 2;
+						let result_line = 5;
+						// In case the time is exactly the same (has happened twice):
+						if (lines[0] === "3c3") {
+							expected_line--;
+							result_line -= 2;
+						}
+
+						let current = fs.readFileSync(`./tests/${i}.sh`).toString();
+
+						let msg_update = await update(output_msg, output, 
+							`\n**Test ${i + 1}**: Failed :woozy_face:\n`
+							+ `Expected: ${lines[expected_line].substring(10)}\n`
+							+ `Got: ${lines[result_line].substring(10)}\n`
+							+ `Test was: \`.${current.substring("./programs".length)}\``);
+						output_msg = msg_update.msg;
+						output = msg_update.content;
+
+						tests_failed.push(i + 1);
+
+						//break;
+					} else {
+						let msg_update = await update(output_msg, output,
+							`\n**Test ${i + 1}**: Passed :white_check_mark:\n`
+							+ `${lines[3].substring(2)}\n`);
+						output_msg = msg_update.msg;
+						output = msg_update.content;
+
+						passed++;
+						time += parseFloat(lines[3].substring(8))
+					}
 				}
+				fs.unlinkSync(`./outputs/${i}.txt`);
 			}
-			fs.unlinkSync(`./outputs/${i}.txt`);
 		}
 
 		let summary = `**Summary**:\n${passed} tests passed.\n${tests_failed.length} tests failed.\n${tests_error.length} errors.\n`;
@@ -123,7 +138,8 @@ exports.run = async (bot, msg, args, queue) => {
 			summary += `\nSum of times: ${time}`
 		}
 
-		msg.reply(summary);
+		if (args[0].toLowerCase() !== "update") msg.reply(summary);
+		else msg.reply("all tests have been updated.");
 
 		execSync(`cd ./programs; make clean; rm -f *.c *.h *.cpp *.hpp *.cu Makefile`);
 
@@ -193,10 +209,10 @@ async function update(msg, original, addon) {
 
 	if (new_content.length > 2000) {
 		// TODO: take into account more than 10 continuations?
-		let continuation = header.substring(header.length - 2, header.length - 1) == NaN ?
+		let continuation = isNaN(header.substring(header.length - 2, header.length - 1)) ?
 			1 : parseInt(header.substring(header.length - 2, header.length - 1)) + 1;
 		if (continuation === 1) {
-			header += `(continued 1)`
+			header += ` (continued 1)`
 		}
 		header = `${header.substring(0, header.length - 2)}${continuation})`
 		// TODO; allow addons larger than 2000 characters?
