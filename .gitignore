@@ -1,7 +1,6 @@
 node_modules/
 .env
 *.c
-env.json
 
 # Hermes
 *.teams
