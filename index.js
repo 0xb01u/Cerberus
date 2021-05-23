@@ -141,7 +141,7 @@ bot.on("message", async msg => {
 		if (msg.channel.type === "dm") {
 			// Download attachement:
 			let att = msg.attachments.first();
-			let args = msg.content.replaceAll("\n", "\n ").split(" ");
+			let args = msg.content.replaceAll("\n", " ").split(" ");
 
 			if (!fs.existsSync(`./programs/`)) fs.mkdirSync(`./programs`);
 
@@ -220,7 +220,7 @@ bot.on("message", async msg => {
 	 * Usage of a regular command.
 	 */
 	else if (msg.content.startsWith(process.env.PRE)) {
-		let args = msg.content.substring(process.env.PRE.length).split(" ");
+		let args = msg.content.substring(process.env.PRE.length).replaceAll("\n", "\n ").split(" ");
 		// Remove empty elements on args array:
 		args = args.filter((e) => e != "");
 		if (args.length < 1) return;	// Has happened lol.
