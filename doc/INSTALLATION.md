@@ -68,7 +68,8 @@ After this, your bot will have succesfully joined the specified server.
    * "PUBLIC_NOTIFY": (boolean) whether to post the notifications in a server's public channel (true), or just notify the students privately (false).
    * "BOT_NEWS": the name of the server's public channel where news and notifications such as position updates should be sent, if any.
    * "COLUMN_SEPARATOR": the field separator for multi-field columns in leaderboard visualizations. This is used when visualizing more than 3 fields of a leaderboard: the remaining fields will be grouped in the last column, separated by this.
- An example for such a file would be:
+
+An example for such a file would be:
  ```json
  {
  	"TOKEN": ________________,
