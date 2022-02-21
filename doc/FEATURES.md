@@ -38,7 +38,7 @@ Using [`set`](#set) or [`config`](#config) commands (see below), you can set def
 -q differentq -- 1 2 3
 ```
 
-If you'd like to use all the default values, you could leave the message blank (if the program doesn't take any argument, or the default queue is a leaderboard one), you could write a doulbe hyphen and the program's arguments (for example `-- 1 2 3`), or you could just write the program's arguments directly (just `1 2 3`).
+If you'd like to use all the default values, you could leave the message blank (if the program doesn't take any argument, or the default queue is a leaderboard one), you could write a double hyphen and the program's arguments (for example `-- 1 2 3`), or you could just write the program's arguments directly (just `1 2 3`).
 
 **NOTE:** by default, Hermes will set your default server to be the very first server you join that already uses it. So, if you're just in one server using Hermes, that will be automatically set as your default server. The default queue won't be automatically set.
 
