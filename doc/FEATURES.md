@@ -38,13 +38,13 @@ Using [`set`](#set) or [`config`](#config) commands (see below), you can set def
 -q differentq -- 1 2 3
 ```
 
-If you'd like to use all the default values, you could leave the message blank (if the program doesn't take any argument, or the default queue is a leaderboard one), you could write a double hyphen and the program's arguments (for example `-- 1 2 3`), or you could just write the program's arguments directly (just `1 2 3`).
+If you'd like to use all the default values you have set, you can leave the message blank or just write the program's arguments directly (just `1 2 3`), if necessary. Note that when sending a program to a leaderboard queue the arguments are omitted, thus the message with the code attached may be blank.
 
-**NOTE:** by default, Hermes will set your default server to be the very first server you join that already uses it. So, if you're just in one server using Hermes, that will be automatically set as your default server. The default queue won't be automatically set.
+**NOTE:** by default, Hermes will set your default Discord server to be the very first server you join which added Hermes as a bot. So, if you're just in one Discord server that uses Hermes, that server will be automatically set as your default server. The default queue won't be automatically set.
 
 ### Resend last arguments <a name=last></a>
 
-If you fill the message with the source code attached with `last` or `l` (for short), exactly the same request arguments used in the last request will be reused in this request, regardless of the default arguments.
+If you write `last` or `l` (for short) in the message with the source code attached, exactly the same request arguments used in the last request will be reused in the new request, regardless of the default arguments.
 
 ## Commands <a name=commands></a>
 
@@ -110,7 +110,7 @@ The name of a server with all spaces replaced by underscores (`_`) is a default 
 
 ### team
 
-**This command is associated to a server, and thus must be sent to a server (if possible), or must specify its associated server as its first argument (`!team [serverName] <args>`).** Unless the corresponding command cannot be sent to a server, the `serverName` will be ommited in the explanations and examples.
+**This command is associated to a server, and thus must be sent to a server (if possible), or must specify its associated server as its first argument (`!team [serverName] <args>`).** In the explanatios examples shown in this section the `serverName` will be ommited unless the corresponding command is not allowed to be sent to a server.
 
 `team` is used to manage teams of students.
 
@@ -157,7 +157,7 @@ The name of the team will only be used on [Leaderboard visualziations](#leaderbo
 
 ## Leaderboards
 
-Admins can create visualizations for Tablón leaderboards hosted on the web, in a dedicated channel (specified as the environmental variable `LB_CHANNEL`). These visualizations will only show the positions, teams, and another of the leaderboard columns, at choice. The syntax to create leaderboard visualizations is:
+Admins can create visualizations for Tablón leaderboards hosted on the web, in a dedicated channel (specified as the environment variable `LB_CHANNEL`). These visualizations will show the positions, teams, and the desired fields (one or more) of the leaderboard columns, in 3 columns: one column for the positions, one column for the team names and IDs, and one column for all the desired fields, due to Discord limitations. The syntax to create leaderboard visualizations is:
 ```
 !leaderboard [url] [name] [desiredFields] <description ...>
 ```
@@ -180,8 +180,8 @@ Leaderboard are displaeyed via [message embeds](https://discordjs.guide/popular-
 
 ### Updating the leaderboards' contents <a name=refresh></a>
 
-Leaderboard visualizations are not updated ("refreshed") automatically. All Discord users (students and admins) can **refresh leaderboard visualizations by reacting** or de-reacting to any of the messages composing them with :arrows_counterclockwise:. The bot will re-fetch the leaderboard, re-create the embeds, and edit the corresponding messages with updated values. While updating a leaderboard, the bot will appear to be writing on the chat until the information is up to date; so trying to refresh while the bot appears writing on the chat is useless and discouraged. Also, the leaderboards will constantly show the date of the last time the information was updated, up to the minutes, in the bottom of each embed composing them. To avoid high network load and the bot malfunctioning, refreshes will only be processed as frequently as once every 10 seconds.
+Leaderboard visualizations are not updated ("refreshed") automatically. All Discord users (students and admins) can **refresh leaderboard visualizations by reacting** or de-reacting to any of the messages composing them with :arrows_counterclockwise:. The bot will re-fetch the leaderboard, re-create the embeds, and edit the corresponding messages with updated values. While updating a leaderboard, the bot will appear to be writing on the chat until the information is up to date; so trying to refresh while the bot appears to be writing on the chat is useless and discouraged. Also, the leaderboards will constantly show the date of the last time the information was updated, up to the minutes, in the bottom of each embed composing them. To avoid high network load and the bot malfunctioning, refreshes will only be processed as frequently as once every 10 seconds.
 
 ## Notifications on leaderboard position changes <a name=notifications></a>
 
-The bot can notify all members of the teams whenever their position on a certain leaderboard changes, if the environmental variable `"NOTIFY_LEADERS"` is set to true (in `env.json`). The amount of teams considered to be notified can be set with the environmental variable `"LEADERS`". "Positive" changes (that is, improving their position) would be notified publicly in a server's dedicated channel (set in the environmental variable `"BOT_NEWS"`), and "negative" changes (that is, having any other team surpassing their position) would be notified privately via DM. Public notifications are turned on by setting the environmental variable `"NOTIFY_LEADERS"` to true.
+The bot can notify all members of the teams whenever their position on a certain leaderboard changes, if the environment variable `"NOTIFY_LEADERS"` is set to true (in `env.json`). The amount of teams considered to be notified can be set with the environment variable `"LEADERS`". "Positive" changes (that is, teams improving their position) would be notified publicly in a server's dedicated channel (set in the environment variable `"BOT_NEWS"`), and "negative" changes (that is, having any other team surpassing their position) would be notified privately via DM. Public notifications are turned on by setting the environment variable `"NOTIFY_LEADERS"` to true.
