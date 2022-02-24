@@ -1,12 +1,12 @@
 ﻿# Support me
 
-TL;DR: You can give me money here: [**Ko-fi**](https://ko-fi.com/0xb01u). I will love you more if you do! <3
+TL;DR: You can give me money here: [**Ko-fi**](https://ko-fi.com/0xb01u). I will love you even more if you do! <3
 
-I have spent countless hours working on Cerberus and Hermes, and I didn't get anything in return except my name on a paper. These (Cerberus and Hermes) have been personal projects I've developed at will, and I have **not** received any credits (ETCSs) nor financial income for working on them.
+I have spent countless hours working on Cerberus and Hermes, and I didn't get anything in return except my name on a paper. These (Cerberus and Hermes) have been personal projects I've developed at will, and I have **not** received any credits (ECTSs) nor financial income for working on them.
 
 The amount of effort put into these projects has been enormous. And, for that, I'd be grateful to receive donations.
 
-If you find Cerberus (or Hermes) useful in any way, if you think they have made Computación Paralela a better subject, I would really appreciate if you supported me through my [**Ko-fi**](https://ko-fi.com/0xb01u). It can just be a one-time donation. Any amount, as small as it might be, will be of help. Obviously, you don't need to donate if you don't want to, but I will love you more if you do <3.
+If you find Cerberus (or Hermes) useful in any way, if you think they have made Computación Paralela a better subject, I would really appreciate if you supported me through my [**Ko-fi**](https://ko-fi.com/0xb01u). It can just be a one-time donation. Any amount, as small as it might be, will be of help. Obviously, you don't need to donate if you can't or don't want to, but I will really appreciate it if you do <3.
 
 Now, back with the real README.
 
