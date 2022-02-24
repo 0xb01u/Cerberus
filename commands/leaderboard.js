@@ -40,7 +40,8 @@ exports.run = async (bot, msg, args, serverID) => {
 	if (args.length < 3 || !args[0].match(/^https?:\/\//)) {
 		return msg.reply(
 			"I need at least one URL, one leaderboard name " +
-			"and one field name to fetch a leaderboard. :sweat_smile:"
+			"and one field name to fetch a leaderboard. :sweat_smile:\n" +
+			`\`${process.env.PRE}leaderboard [url] [name] [desiredFields] <description ...>\``
 		);
 	}
 

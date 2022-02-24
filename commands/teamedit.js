@@ -29,7 +29,12 @@ exports.run = async (bot, msg, args) => {
 	let usr, tm;
 	switch (args[0]) {
 		case "move":{
-			if (args[1].match(/^<@!?\d+>$/) && RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[2])) {
+			if (args.length < 3) {
+				return msg.reply(
+					`Invalid number of arguments: ` +
+					`\`${process.env.PRE}teamedit move <@user> <newTeam>\``
+				);
+			} else if (args[1].match(/^<@!?\d+>$/) && RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[2])) {
 				usr = args[1].match(/^<@!?(\d+)>$/)[1];
 				tm = args[2];
 			} else if (args[2].match(/^<@!?\d+>$/) && RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[1])) {
@@ -64,7 +69,12 @@ exports.run = async (bot, msg, args) => {
 			);}
 
 		case "add":{
-			if (args[1].match(/^<@!?\d+>$/) && RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[2])) {
+			if (args.length < 3) {
+				return msg.reply(
+					`Invalid number of arguments: ` +
+					`\`${process.env.PRE}teamedit add <@user> <team>\``
+				);
+			} else if (args[1].match(/^<@!?\d+>$/) && RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[2])) {
 				usr = args[1].match(/^<@!?(\d+)>$/)[1];
 				tm = args[2];
 			} else if (args[2].match(/^<@!?\d+>$/) && RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[1])) {
@@ -90,7 +100,12 @@ exports.run = async (bot, msg, args) => {
 			);}
 
 		case "remove":{
-			if (args[1].match(/^<@!?\d+>$/) && RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[2])) {
+			if (args.length < 3) {
+				return msg.reply(
+					`Invalid number of arguments: ` +
+					`\`${process.env.PRE}teamedit remove <@user> <team>\``
+				);
+			} else if (args[1].match(/^<@!?\d+>$/) && RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[2])) {
 				usr = args[1].match(/^<@!?(\d+)>$/)[1];
 				tm = args[2];
 			} else if (args[2].match(/^<@!?\d+>$/) && RegExp(`^${process.env.TEAM_PRE}\\d+$`).test(args[1])) {
