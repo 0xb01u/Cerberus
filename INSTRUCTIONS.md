@@ -56,7 +56,7 @@ The bot will delete the tests and its outputs, and will reorder the other tests 
 
 # Bugfixing
 
-If you notice any problem with Cerberus, send me a message through Discord (B0lu#8913) describing the problem and how to replicate it. I will try to fix it as soon as possible.
+If you notice any problem with Cerberus, open an issue in this repository describing the problem and how to replicate it. I will try to fix it as soon as possible.
 
 # Donate
 
