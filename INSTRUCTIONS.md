@@ -39,7 +39,7 @@ You can retrieve the arguments for a given list of tests by sending the message:
 !test <number of test> [number of second test] [number of third test] [...]
 ```
 
-I.e:
+e.g:
 ```
 !test 1 2 3 7 9
 ```
