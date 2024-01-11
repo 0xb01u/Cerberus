@@ -1,6 +1,6 @@
 {
   "name": "cerberus",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Discord bot simulating http://frontendv.infor.uva.es/, including test executions, with execution outputs and feedback.",
   "main": "index.js",
   "scripts": {
@@ -10,13 +10,13 @@
     "type": "git",
     "url": "git+https://github.com/0xb01u/Cerberus.git"
   },
-  "author": "B0lu",
-  "license": "GPL-3.0-or-later",
+  "author": "Bolu",
+  "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/0xb01u/Cerberus/issues"
   },
   "homepage": "https://github.com/0xb01u/Cerberus#readme",
   "dependencies": {
-    "discord.js": "^12.2.0"
+    "discord.js": "^14.14.1"
   }
 }

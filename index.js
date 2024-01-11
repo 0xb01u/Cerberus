@@ -26,18 +26,25 @@ for (let key in env) {
 }
 delete env;
 
-const bot = new Discord.Client();
+const bot = new Discord.Client({
+	intents: [
+		Discord.GatewayIntentBits.Guilds,
+		Discord.GatewayIntentBits.GuildMessages,
+		Discord.GatewayIntentBits.MessageContent,
+	],
+});
 bot.login(process.env.TOKEN);
 
 bot.on("ready", async () => {
-	await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+	console.log(`${bot.user.tag} is online.`);
+	bot.user.setPresence({ activity: {name: ``}, status: `online` });
 
 	if (!fs.existsSync("./programs")) fs.mkdirSync("./programs");
 	if (!fs.existsSync("./tests")) fs.mkdirSync("./tests");
 	if (!fs.existsSync("./outputs")) fs.mkdirSync("./outputs");
 });
 
-bot.on("message", async msg => {
+bot.on("messageCreate", async msg => {
 	if (msg.author.bot) return;
 
 	if (msg.channel.type === "dm" && msg.attachments.size > 0) {
@@ -52,18 +59,18 @@ bot.on("message", async msg => {
 		filepath += `.tgz`;
 
 		const file = fs.createWriteStream(filepath);
-		await http.get(att.url, async response => {
+		http.get(att.url, async response => {
 			let download = response.pipe(file);
 			download.on("finish", async () => {
 				try {
 					delete require.cache[require.resolve(`./commands/test_.js`)];
 
-					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
+					bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
 					await require(`./commands/test_.js`).run(bot, msg, args, queue);
-					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+					bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					fs.unlinkSync(filepath);
-					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+					bot.user.setPresence({ activity: {name: ``}, status: `online` });
 					msg.reply("invalid queue.");
 				}
 			});
@@ -85,7 +92,7 @@ bot.on("message", async msg => {
 
 
 		const file = fs.createWriteStream(filepath);
-		await http.get(att.url, async response => {
+		http.get(att.url, async response => {
 			let download = response.pipe(file);
 			download.on("finish", async () => {
 				try {
@@ -93,13 +100,13 @@ bot.on("message", async msg => {
 
 					delete require.cache[require.resolve(`./commands/test_.js`)];
 
-					await bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
+					bot.user.setPresence({ activity: {name: `EXECUTING.`}, status: `dnd` });
 					await require(`./commands/test_.js`).run(bot, msg, args, queue);
-					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+					bot.user.setPresence({ activity: {name: ``}, status: `online` });
 				} catch (e) {
 					console.log(e.stack);
 					fs.unlinkSync(filepath);
-					await bot.user.setPresence({ activity: {name: ``}, status: `online` });
+					bot.user.setPresence({ activity: {name: ``}, status: `online` });
 					msg.reply("invalid queue.");
 				}
 			});
