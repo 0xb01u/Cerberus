@@ -58,6 +58,3 @@ The bot will delete the tests and its outputs, and will reorder the other tests 
 
 If you notice any problem with Cerberus, open an issue in this repository describing the problem and how to replicate it. I will try to fix it as soon as possible.
 
-# Donate
-
-Small reminder that I have a [Ko-fi](https://ko-fi.com/0xb01u) just for this. If you find Cerberus useful, I would really appreciate any support given, as small as it might be.
