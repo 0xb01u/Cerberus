@@ -30,12 +30,3 @@ This software does not support plagiarism in any form.
 As a way of avoiding plagiarism, the bot will instantly delete any message sent to the request channel after downloading any .tgz file attached to it (if it's not busy executing earlier tests). The downloaded file will also be deleted as soon as it is compiled.
 
 Individual users are responsible for their usage of this bot and any of its functionalities.
-
-## Support me
-
-I have spent countless hours working on Cerberus and Hermes, and I didn't get anything in return, but the promise that my name would appear on a paper. These (Cerberus and Hermes) have been personal projects I've developed at will, on my free time, as an undergraduate student, and I have **not** received any credits (ECTSs) nor financial income for working on them.
-
-The amount of effort put into these projects has been enormous. And, for that, I'd be grateful to receive donations.
-
-If you find Cerberus (or Hermes) useful in any way, if you think they have helped to make better computer science or programming courses, I would really appreciate if you supported me through my [**Ko-fi**](https://ko-fi.com/0xb01u). It can just be a one-time donation. Any amount, as small as it might be, will be of help. Obviously, you don't need to donate if you can't or don't want to, but I will really appreciate it if you do <3.
-
